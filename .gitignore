@@ -1,0 +1,28 @@
+
+# Visual Studio
+
+*.user
+*.suo
+*.dll
+bin/
+obj/
+packages/
+
+
+_ReSharper*/
+
+
+*.ncrunch*
+_NCrunch_*/
+
+
+# ApprovalTests
+
+*.received.*
+
+
+# OS trash
+
+.DS_Store
+desktop.ini
+Thumbs.db
