@@ -4,6 +4,8 @@
 
 	using Xunit;
 
+	using Syntax;
+
 	public class DeepComparisonTest
 	{
 		[Fact]
@@ -30,12 +32,8 @@
 							X = 1, Y = 2, Z = 3
 						}
 				};
-			
-			var comparer = new DeepComparison().ToDeepComparer();
 
-			var result = comparer.Equals(object1, object2);
-
-			Assert.True(result);
+			object1.ShouldDeepEqual(object2);
 		}
 	}
 

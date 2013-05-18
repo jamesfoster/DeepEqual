@@ -37,10 +37,10 @@
 
 		public override string ToString()
 		{
-			var format = "Actual.{0}.{1} != Expected.{0}.{1} (Actual: {2}, Expected: {3})";
+			var format = "Actual{0}.{1} != Expected{0}.{1} (Actual: {2}, Expected: {3})";
 
 			if (ChildProperty == null)
-				format = "Actual.{0} != Expected.{0} (Actual: {2}, Expected: {3})";
+				format = "Actual{0} != Expected{0} (Actual: {2}, Expected: {3})";
 
 			return string.Format(format, Breadcrumb, ChildProperty, Value1, Value2);
 		}

@@ -4,17 +4,22 @@
 
 	public class DeepComparison
 	{
-		public IEqualityComparer ToDeepComparer()
+		public static IEqualityComparer CreateComparer()
 		{
-			var rootComparison = new CompositeComparison();
+			return new ComparisonComparer(Create());
+		}
 
-			rootComparison.AddRange(
+		public static CompositeComparison Create()
+		{
+			var root = new CompositeComparison();
+
+			root.AddRange(
 				new DefaultComparison(),
 				new EnumComparison(),
-				new ListComparison(rootComparison),
-				new ComplexObjectComparison(rootComparison));
+				new ListComparison(root),
+				new ComplexObjectComparison(root));
 
-			return new ComparisonComparer(rootComparison);
+			return root;
 		}
 	}
 }
