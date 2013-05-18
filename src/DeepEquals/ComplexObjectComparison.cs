@@ -39,7 +39,7 @@
 				results.Add(Inner.Compare(innerContext, propValue1, propValue2));
 			}
 
-			return ComparisonResult.FromResults(results);
+			return results.ToResult();
 		}
 	}
 }

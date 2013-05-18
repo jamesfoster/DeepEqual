@@ -48,7 +48,7 @@
 				results.Add(Inner.Compare(innerContext, p.Item1, p.Item2));
 			}
 
-			return ComparisonResult.FromResults(results);
+			return results.ToResult();
 		}
 
 		private bool CheckInnerCanCompare(Type listType1, Type listType2)
