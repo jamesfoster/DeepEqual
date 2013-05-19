@@ -1,12 +1,13 @@
 ﻿namespace DeepEquals
 {
 	using System.Collections;
+	using System.Collections.Generic;
 
-	public class ComparisonComparer : IEqualityComparer
+	public class ComparisonComparer : IEqualityComparer, IEqualityComparer<object>
 	{
-		private readonly CompositeComparison RootComparison;
+		private readonly IComparison RootComparison;
 
-		public ComparisonComparer(CompositeComparison rootComparison)
+		public ComparisonComparer(IComparison rootComparison)
 		{
 			RootComparison = rootComparison;
 		}
@@ -22,7 +23,7 @@
 
 		public int GetHashCode(object obj)
 		{
-			throw new System.NotImplementedException();
+			return obj.GetHashCode();
 		}
 	}
 }
