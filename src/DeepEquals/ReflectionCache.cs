@@ -70,6 +70,12 @@ namespace DeepEquals
 			return IsSetCache[type];
 		}
 
+		internal static bool IsValueType(Type type)
+		{
+			return type.IsValueType ||
+			       type == typeof (string);
+		}
+
 		internal static PropertyInfo[] GetProperties(object obj)
 		{
 			return GetProperties(obj.GetType());
