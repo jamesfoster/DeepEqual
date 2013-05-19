@@ -42,7 +42,18 @@
 			if (ChildProperty == null)
 				format = "Actual{0} != Expected{0} (Actual: {2}, Expected: {3})";
 
-			return string.Format(format, Breadcrumb, ChildProperty, Value1, Value2);
+			return string.Format(format, Breadcrumb, ChildProperty, Prettify(Value1), Prettify(Value2));
+		}
+
+		protected static string Prettify(object value)
+		{
+			if (value == null)
+				return "(null)";
+
+			if (value is string)
+				return string.Format("\"{0}\"", value);
+
+			return value.ToString();
 		}
 	}
 }

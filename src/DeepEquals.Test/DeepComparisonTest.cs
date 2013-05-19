@@ -22,7 +22,13 @@
 							Y = 2,
 							Z = 3
 						},
-					Set = new[] {3, 2, 4, 1}
+					Set = new[] {3, 4, 2, 1},
+					Dictionary = new Dictionary<int, int>
+						{
+							{2, 3},
+							{123, 234},
+							{345, 456}
+						}
 				};
 
 			var object2 = new
@@ -36,7 +42,13 @@
 							Y = 2,
 							Z = 3
 						},
-					Set = new HashSet<int> {1, 2, 3, 4}
+					Set = new HashSet<int> {1, 2, 3, 4},
+					Dictionary = new Dictionary<int, int>
+						{
+							{123, 234},
+							{345, 456},
+							{2, 3}
+						}
 				};
 
 			object1.ShouldDeepEqual(object2);
