@@ -14,6 +14,15 @@ namespace DeepEquals
 		private static readonly Dictionary<Type, bool> IsDictionaryCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new Dictionary<Type, PropertyInfo[]>();
 
+		public static void ClearCache()
+		{
+			EnumerationTypeCache.Clear();
+			IsListCache.Clear();
+			IsSetCache.Clear();
+			IsDictionaryCache.Clear();
+			PropertyCache.Clear();
+		}
+
 		internal static Type GetEnumerationType(Type type)
 		{
 			if (!EnumerationTypeCache.ContainsKey(type))
