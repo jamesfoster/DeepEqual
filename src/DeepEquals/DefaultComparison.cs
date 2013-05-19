@@ -14,6 +14,12 @@
 			if (value1.Equals(value2))
 				return ComparisonResult.Pass;
 
+			if (ReflectionCache.IsValueType(value1.GetType()))
+			{
+				context.AddDifference(value1, value2);
+				return ComparisonResult.Fail;
+			}
+
 			return ComparisonResult.Inconclusive;
 		}
 	}
