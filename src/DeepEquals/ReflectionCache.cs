@@ -6,11 +6,12 @@ namespace DeepEquals
 	using System.Linq;
 	using System.Reflection;
 
-	internal static class ReflectionCache
+	public static class ReflectionCache
 	{
 		private static readonly Dictionary<Type, Type> EnumerationTypeCache = new Dictionary<Type, Type>();
 		private static readonly Dictionary<Type, bool> IsListCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, bool> IsSetCache = new Dictionary<Type, bool>();
+		private static readonly Dictionary<Type, bool> IsDictionaryCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new Dictionary<Type, PropertyInfo[]>();
 
 		internal static Type GetEnumerationType(Type type)
@@ -56,7 +57,7 @@ namespace DeepEquals
 			return IsListCache[type];
 		}
 
-		public static bool IsSetType(Type type)
+		internal static bool IsSetType(Type type)
 		{
 			if (!IsSetCache.ContainsKey(type))
 			{
@@ -68,6 +69,19 @@ namespace DeepEquals
 			}
 
 			return IsSetCache[type];
+		}
+
+		internal static bool IsDictionaryType(Type type)
+		{
+			if (!IsDictionaryCache.ContainsKey(type))
+			{
+				var equals = type == typeof (IDictionary);
+				var inherits = type.GetInterface("IDictionary") == typeof (IDictionary);
+
+				IsDictionaryCache[type] = equals || inherits;
+			}
+
+			return IsDictionaryCache[type];
 		}
 
 		internal static bool IsValueType(Type type)
