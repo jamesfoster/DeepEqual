@@ -23,22 +23,6 @@
 			Differences.Add(difference);
 		}
 
-		public void AddDifference(object value1, object value2)
-		{
-			AddDifference(value1, value2, null);
-		}
-
-		public void AddDifference(object value1, object value2, string childProperty)
-		{
-			AddDifference(new Difference
-				{
-					Breadcrumb = Breadcrumb,
-					Value1 = value1,
-					Value2 = value2,
-					ChildProperty = childProperty
-				});
-		}
-
 		public IComparisonContext VisitingProperty(string propertyName)
 		{
 			var newBreadcrumb = string.Format("{0}.{1}", Breadcrumb, propertyName);
@@ -46,16 +30,11 @@
 			return new ComparisonContext(Differences, newBreadcrumb);
 		}
 
-		public IComparisonContext VisitingIndex(string index)
+		public IComparisonContext VisitingIndex(object index)
 		{
-			var newBreadcrumb = string.Format("{0}[{1}]", Breadcrumb, index);
+			var newBreadcrumb = string.Format(CultureInfo.InvariantCulture, "{0}[{1}]", Breadcrumb, index);
 
 			return new ComparisonContext(Differences, newBreadcrumb);
-		}
-
-		public IComparisonContext VisitingIndex(int index)
-		{
-			return VisitingIndex(index.ToString(CultureInfo.InvariantCulture));
 		}
 
 		public override string ToString()
