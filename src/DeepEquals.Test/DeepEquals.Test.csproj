@@ -83,6 +83,7 @@
     <Compile Include="Comparsions\ListComparisonTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Comparsions\SetComparisonTests.cs" />
     <Compile Include="DeepComparisonTest.cs">
       <SubType>Code</SubType>
     </Compile>

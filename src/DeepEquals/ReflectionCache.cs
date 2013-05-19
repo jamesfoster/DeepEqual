@@ -10,6 +10,7 @@ namespace DeepEquals
 	{
 		private static readonly Dictionary<Type, Type> EnumerationTypeCache = new Dictionary<Type, Type>();
 		private static readonly Dictionary<Type, bool> IsListCache = new Dictionary<Type, bool>();
+		private static readonly Dictionary<Type, bool> IsSetCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new Dictionary<Type, PropertyInfo[]>();
 
 		internal static Type GetEnumerationType(Type type)
@@ -53,6 +54,20 @@ namespace DeepEquals
 			}
 
 			return IsListCache[type];
+		}
+
+		public static bool IsSetType(Type type)
+		{
+			if (!IsSetCache.ContainsKey(type))
+			{
+				Func<Type, bool> isSet = t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ISet<>);
+				var equals = isSet(type);
+				var inherits = type.GetInterfaces().Any(isSet);
+
+				IsSetCache[type] = equals || inherits;
+			}
+
+			return IsSetCache[type];
 		}
 
 		internal static PropertyInfo[] GetProperties(object obj)

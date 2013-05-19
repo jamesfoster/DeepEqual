@@ -18,8 +18,11 @@
 					C = new List<int> {1, 2, 3},
 					Inner = new
 						{
-							X = 1, Y = 2, Z = 3
-						}
+							X = 1,
+							Y = 2,
+							Z = 3
+						},
+					Set = new[] {3, 2, 4, 1}
 				};
 
 			var object2 = new
@@ -29,8 +32,11 @@
 					C = new[] {1, 2, 3},
 					Inner = new TestType
 						{
-							X = 1, Y = 2, Z = 3
-						}
+							X = 1,
+							Y = 2,
+							Z = 3
+						},
+					Set = new HashSet<int> {1, 2, 3, 4}
 				};
 
 			object1.ShouldDeepEqual(object2);
