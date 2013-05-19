@@ -16,6 +16,7 @@
 			root.AddRange(
 				new DefaultComparison(),
 				new EnumComparison(),
+				new SetComparison(root),
 				new ListComparison(root),
 				new ComplexObjectComparison(root));
 
