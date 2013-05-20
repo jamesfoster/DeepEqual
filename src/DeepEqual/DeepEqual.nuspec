@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>James Foster</authors>
+    <owners>jamesfoster</owners>
+    <projectUrl>http://github.com/jamesfoster/DeepEqual</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>An extensible deep comparison library for .NET</description>
+    <copyright>Copyright 2013</copyright>
+    <tags>deepequal deep equal</tags>
+  </metadata>
+</package>
