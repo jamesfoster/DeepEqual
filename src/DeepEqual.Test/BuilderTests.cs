@@ -1,0 +1,288 @@
+﻿namespace DeepEqual.Test
+{
+	using System.Collections.Generic;
+
+	using Moq;
+
+	using Xbehave;
+
+	using Shouldly;
+
+	using System.Linq;
+
+	public class BuilderTests
+	{
+		protected Builder SUT { get; set; }
+
+		[Scenario]
+		public void Creating_a_builder()
+		{
+			"When creating a builder"
+				.When(() => SUT = new Builder());
+
+			"Then there should be no custom comparisons"
+				.Then(() => SUT.CustomComparisons.ShouldBeEmpty());
+
+			"And UnmatchedPropertiesIgnored should be true"
+				.And(() => SUT.UnmatchedPropertiesIgnored.ShouldBe(false));
+		}
+		
+		[Scenario]
+		public void Adding_a_custom_Comparison()
+		{
+			var result = default (Builder);
+			var custom = default (IComparison);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"And a custom comparison"
+				.And(() => custom = new Mock<IComparison>().Object);
+
+			"When adding the custom comparison"
+				.When(() => result = SUT.WithCustomComparison(custom));
+
+			"Then there should be a custom comparison"
+				.Then(() => SUT.CustomComparisons.Count.ShouldBe(1));
+
+			"And it should be the correct comparison"
+				.And(() => SUT.CustomComparisons[0].ShouldBeSameAs(custom));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+		
+		[Scenario]
+		public void Ignoring_unmatched_properties()
+		{
+			var result = default (Builder);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"When ignoring unmatched properties"
+				.When(() => result = SUT.IgnoreUnmatchedProperties());
+
+			"Then UnmatchedPropertiesIgnored should be true"
+				.Then(() => SUT.UnmatchedPropertiesIgnored.ShouldBe(true));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+
+		[Scenario]
+		public void Creating_a_default_Comparison()
+		{
+			var result = default (CompositeComparison);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"When calling Create"
+				.When(() => result = SUT.Create());
+
+			"Then it not return null"
+				.Then(() => result.ShouldNotBe(null));
+
+			"And the 1st comparer is the DefaultComparison"
+				.And(() => result.Comparisons[0].ShouldBeTypeOf<DefaultComparison>());
+
+			"And the 2nd comparer is the EnumComparison"
+				.And(() => result.Comparisons[1].ShouldBeTypeOf<EnumComparison>());
+			
+			"And the 3rd comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[2].ShouldBeTypeOf<DictionaryComparison>());
+			
+			"... with a DefaultComparison as the key comparer"
+				.And(() => ((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
+			
+			"... and the value comparer is the result"
+				.And(() => ((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result));
+			
+			"And the 4th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[3].ShouldBeTypeOf<SetComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result));
+			
+			"And the 5th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[4].ShouldBeTypeOf<ListComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
+			
+			"And the 6th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
+			
+			"... and IgnoreUnmatchedProperties should be false"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(false));
+		}
+
+		[Scenario]
+		public void Creating_a_Comparison_with_custom_comparisons()
+		{
+			var result = default (CompositeComparison);
+			var custom = default (IComparison);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"And a custom comparison"
+				.And(() =>
+					{
+						custom = new Mock<IComparison>().Object;
+
+						SUT.WithCustomComparison(custom);
+					});
+
+			"When calling Create"
+				.When(() => result = SUT.Create());
+
+			"Then it not return null"
+				.Then(() => result.ShouldNotBe(null));
+
+			"And the 1st comparer is the custom comparison"
+				.And(() => result.Comparisons[0].ShouldBeSameAs(custom));
+
+			"And the 2nd comparer is the DefaultComparison"
+				.And(() => result.Comparisons[1].ShouldBeTypeOf<DefaultComparison>());
+
+			"And the 3rd comparer is the EnumComparison"
+				.And(() => result.Comparisons[2].ShouldBeTypeOf<EnumComparison>());
+			
+			"And the 4th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[3].ShouldBeTypeOf<DictionaryComparison>());
+			
+			"... with a DefaultComparison as the key comparer"
+				.And(() => ((DictionaryComparison)result.Comparisons[3]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
+			
+			"... and the value comparer is the result"
+				.And(() => ((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(result));
+			
+			"And the 5th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[4].ShouldBeTypeOf<SetComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
+			
+			"And the 6th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[5].ShouldBeTypeOf<ListComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
+			
+			"And the 7th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[6].ShouldBeTypeOf<ComplexObjectComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(result));
+			
+			"... and IgnoreUnmatchedProperties should be false"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[6]).IgnoreUnmatchedProperties.ShouldBe(false));
+		}
+
+		[Scenario]
+		public void Creating_a_Comparison_and_ignoring_unmatched_properties()
+		{
+			var result = default (CompositeComparison);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"And we call IgnoreUnmatchedProperties"
+				.And(() => SUT.IgnoreUnmatchedProperties());
+
+			"When calling Create"
+				.When(() => result = SUT.Create());
+
+			"Then it not return null"
+				.Then(() => result.ShouldNotBe(null));
+
+			"And the 1st comparer is the DefaultComparison"
+				.And(() => result.Comparisons[0].ShouldBeTypeOf<DefaultComparison>());
+
+			"And the 2nd comparer is the EnumComparison"
+				.And(() => result.Comparisons[1].ShouldBeTypeOf<EnumComparison>());
+			
+			"And the 3rd comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[2].ShouldBeTypeOf<DictionaryComparison>());
+			
+			"... with a DefaultComparison as the key comparer"
+				.And(() => ((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
+			
+			"... and the value comparer is the result"
+				.And(() => ((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result));
+			
+			"And the 4th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[3].ShouldBeTypeOf<SetComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result));
+			
+			"And the 5th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[4].ShouldBeTypeOf<ListComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
+			
+			"And the 6th comparer is the DictionaryComparison"
+				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
+			
+			"... and the inner comparer is the result"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
+			
+			"... and IgnoreUnmatchedProperties should be true"
+				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(true));
+		}
+	}
+
+	public class Builder
+	{
+		public IList<IComparison> CustomComparisons { get; set; }
+
+		public bool UnmatchedPropertiesIgnored { get; set; }
+
+		public Builder()
+		{
+			CustomComparisons = new List<IComparison>();
+		}
+
+		public CompositeComparison Create()
+		{
+			var root = new CompositeComparison();
+
+			root.AddRange(CustomComparisons.ToArray());
+
+			root.AddRange(
+				new DefaultComparison(),
+				new EnumComparison(),
+				new DictionaryComparison(new DefaultComparison(), root),
+				new SetComparison(root),
+				new ListComparison(root),
+				new ComplexObjectComparison(root)
+					{
+						IgnoreUnmatchedProperties = UnmatchedPropertiesIgnored
+					}
+				);
+
+			return root;
+		}
+
+		public Builder IgnoreUnmatchedProperties()
+		{
+			UnmatchedPropertiesIgnored = true;
+
+			return this;
+		}
+
+		public Builder WithCustomComparison(IComparison comparison)
+		{
+			CustomComparisons.Add(comparison);
+
+			return this;
+		}
+	}
+}

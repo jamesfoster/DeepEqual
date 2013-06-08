@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BuilderTests.cs" />
     <Compile Include="Comparsions\ComplexObjectComparisonTests.cs">
       <SubType>Code</SubType>
     </Compile>
