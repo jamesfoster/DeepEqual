@@ -37,7 +37,7 @@
 
 		[Scenario]
 		[PropertyData("SimilarObjectsTestData")]
-		public void When_comparing_objects_of_the_same_type(object value1, object value2, ComparisonResult expected)
+		public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
 		{
 			"Given a fixture"
 				.Given(() =>
@@ -52,11 +52,14 @@
 						Inner = Fixture.Freeze<Mock<IComparison>>();
 
 						Inner.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-							.Returns<IComparisonContext, object, object>((c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail);
+						     .Returns<IComparisonContext, object, object>(
+							     (c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail);
 					});
 
 			"And a ComplexObjectComparison"
-				.And(() => SUT = Fixture.Create<ComplexObjectComparison>());
+				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
+				                        .With(x => x.IgnoreUnmatchedProperties, ignoreUnmatchedProperties)
+				                        .Create());
 
 			"And a Comparison context object"
 				.And(() => Context = new ComparisonContext("Property"));
@@ -71,11 +74,14 @@
 				.And(() =>
 					{
 						var properties1 = value1.GetType().GetProperties();
-						var properties2 = value2.GetType().GetProperties();
+						var properties2 = value2.GetType().GetProperties().ToDictionary(x => x.Name);
 
 						foreach (var p1 in properties1)
 						{
-							var p2 = properties2.FirstOrDefault(p => p.Name == p1.Name);
+							if(!properties2.ContainsKey(p1.Name))
+								continue;
+
+							var p2 = properties2[p1.Name];
 
 							var v1 = p1.GetValue(value1);
 							var v2 = p2.GetValue(value2);
@@ -92,17 +98,60 @@
 					{
 						new object[]
 							{
+								false,
 								new {A = 1, B = 2, C = 3},
 								new {A = 1, B = 2, C = 3},
 								ComparisonResult.Pass
 							},
-							new object[]
+						new object[]
 							{
+								false,
+								new {A = 1, B = 2, C = 3},
+								new {A = 1, B = 2},
+								ComparisonResult.Fail
+							},
+						new object[]
+							{
+								false,
+								new {A = 1, B = 2},
+								new {A = 1, B = 2, C = 3},
+								ComparisonResult.Fail
+							},
+						new object[]
+							{
+								false,
+								new {A = 1, B = 2, C = 3},
+								new {A = 123, B = 2, C = 3},
+								ComparisonResult.Fail
+							},
+						new object[]
+							{
+								true,
+								new {A = 1, B = 2, C = 3},
+								new {A = 1, B = 2, C = 3},
+								ComparisonResult.Pass
+							},
+						new object[]
+							{
+								true,
+								new {A = 1, B = 2, C = 3},
+								new {A = 1, B = 2},
+								ComparisonResult.Pass
+							},
+						new object[]
+							{
+								true,
+								new {A = 1, B = 2},
+								new {A = 1, B = 2, C = 3},
+								ComparisonResult.Pass
+							},
+						new object[]
+							{
+								true,
 								new {A = 1, B = 2, C = 3},
 								new {A = 123, B = 2, C = 3},
 								ComparisonResult.Fail
 							}
-
 					};
 			}
 		} 
