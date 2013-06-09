@@ -11,17 +11,7 @@
 
 		public static CompositeComparison Create()
 		{
-			var root = new CompositeComparison();
-
-			root.AddRange(
-				new DefaultComparison(),
-				new EnumComparison(),
-				new DictionaryComparison(new DefaultComparison(), root),
-				new SetComparison(root),
-				new ListComparison(root),
-				new ComplexObjectComparison(root));
-
-			return root;
+			return new Builder().Create();
 		}
 	}
 }
