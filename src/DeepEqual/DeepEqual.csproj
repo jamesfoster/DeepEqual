@@ -35,7 +35,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builder.cs" />
+    <Compile Include="ComparisonBuilder.cs" />
     <Compile Include="ComparisonContext.cs" />
     <Compile Include="ComparisonResult.cs" />
     <Compile Include="Extensions\ComparisonResultExtensions.cs" />

@@ -8,15 +8,15 @@
 
 	using Shouldly;
 
-	public class BuilderTests
+	public class ComparisonBuilderTests
 	{
-		protected Builder SUT { get; set; }
+		protected ComparisonBuilder SUT { get; set; }
 
 		[Scenario]
 		public void Creating_a_builder()
 		{
 			"When creating a builder"
-				.When(() => SUT = new Builder());
+				.When(() => SUT = new ComparisonBuilder());
 
 			"Then there should be no custom comparisons"
 				.Then(() => SUT.CustomComparisons.ShouldBeEmpty());
@@ -28,11 +28,11 @@
 		[Scenario]
 		public void Adding_a_custom_Comparison()
 		{
-			var result = default (Builder);
+			var result = default (ComparisonBuilder);
 			var custom = default (IComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"And a custom comparison"
 				.And(() => custom = new Mock<IComparison>().Object);
@@ -53,10 +53,10 @@
 		[Scenario]
 		public void Ignoring_unmatched_properties()
 		{
-			var result = default (Builder);
+			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"When ignoring unmatched properties"
 				.When(() => result = SUT.IgnoreUnmatchedProperties());
@@ -71,10 +71,10 @@
 		[Scenario]
 		public void Ignoring_specific_properties()
 		{
-			var result = default (Builder);
+			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"When ignoring unmatched properties"
 				.When(() => result = SUT.IgnoreProperty<Version>(x => x.Major));
@@ -92,7 +92,7 @@
 			var result = default (CompositeComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"When calling Create"
 				.When(() => result = SUT.Create());
@@ -144,7 +144,7 @@
 			var custom = default (IComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"And a custom comparison"
 				.And(() =>
@@ -206,7 +206,7 @@
 			var result = default (CompositeComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new Builder());
+				.Given(() => SUT = new ComparisonBuilder());
 
 			"And we call IgnoreUnmatchedProperties"
 				.And(() => SUT.IgnoreUnmatchedProperties());
