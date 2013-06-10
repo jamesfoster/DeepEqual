@@ -5,7 +5,7 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 
-	public class Builder
+	public class ComparisonBuilder
 	{
 		public IList<IComparison> CustomComparisons { get; set; }
 
@@ -13,7 +13,7 @@
 
 		public ComplexObjectComparison ComplexObjectComparison { get; set; }
 
-		public Builder()
+		public ComparisonBuilder()
 		{
 			CustomComparisons = new List<IComparison>();
 
@@ -38,21 +38,21 @@
 			return Root;
 		}
 
-		public Builder IgnoreUnmatchedProperties()
+		public ComparisonBuilder IgnoreUnmatchedProperties()
 		{
 			ComplexObjectComparison.IgnoreUnmatchedProperties = true;
 
 			return this;
 		}
 
-		public Builder WithCustomComparison(IComparison comparison)
+		public ComparisonBuilder WithCustomComparison(IComparison comparison)
 		{
 			CustomComparisons.Add(comparison);
 
 			return this;
 		}
 
-		public Builder IgnoreProperty<T>(Expression<Func<T, object>> property)
+		public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object>> property)
 		{
 			ComplexObjectComparison.IgnoreProperty(property);
 
