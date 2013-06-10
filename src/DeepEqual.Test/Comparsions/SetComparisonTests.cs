@@ -133,11 +133,17 @@
 								var local = i;
 
 								Inner.Verify(x => x.Compare(
-									It.Is<IComparisonContext>(c => c.Breadcrumb == "Set[" + local + "]"),
+									It.IsAny<ComparisonContext>(),
 									list1[local],
 									It.IsAny<object>()), Times.AtLeastOnce());
 							}
 						});
+
+				if (expected == ComparisonResult.Fail)
+				{
+					"And it should add a SetDifference"
+						.And(() => Context.Differences[0].ShouldBeTypeOf<SetDifference>());
+				}
 			}
 			else
 			{
@@ -173,7 +179,7 @@
 
 						new object[] {new HashSet<int> {1}, new[] {2}, ComparisonResult.Fail},
 						new object[] {new HashSet<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
-						new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 2, 2}, ComparisonResult.Fail}
+						new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 3}, ComparisonResult.Fail}
 					};
 			}
 		}

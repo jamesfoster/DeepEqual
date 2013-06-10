@@ -54,6 +54,7 @@
     <Compile Include="ListComparison.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SetComparison.cs" />
+    <Compile Include="SetDifference.cs" />
     <Compile Include="Syntax\ObjectExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

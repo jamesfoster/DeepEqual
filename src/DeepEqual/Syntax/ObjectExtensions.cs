@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Linq;
+	using System.Text;
 
 	public static class ObjectExtensions
 	{
@@ -29,16 +30,24 @@
 				return;
 			}
 
-			var message = "Failed";
+			var sb = new StringBuilder();
+
+			sb.Append("Comparison Failed");
 
 			if (context.Differences.Count > 0)
 			{
-				message += ": The following differences were found.";
+				sb.Append(": The following differences were found.");
 
-				message = context.Differences.Aggregate(message, (m, d) => m + "\n\t" + d);
+				foreach (var difference in context.Differences)
+				{
+					var lines = difference.ToString().Split(new[] {"\n"}, StringSplitOptions.None);
+
+					sb.Append("\n\t");
+					sb.Append(string.Join("\n\t", lines));
+				}
 			}
 
-			throw new Exception(message);
+			throw new Exception(sb.ToString());
 		}
 	}
 }
