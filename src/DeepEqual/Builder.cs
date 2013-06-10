@@ -1,43 +1,46 @@
 ﻿namespace DeepEqual
 {
+	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+	using System.Linq.Expressions;
 
 	public class Builder
 	{
 		public IList<IComparison> CustomComparisons { get; set; }
 
-		public bool UnmatchedPropertiesIgnored { get; set; }
+		protected CompositeComparison Root { get; set; }
+
+		public ComplexObjectComparison ComplexObjectComparison { get; set; }
 
 		public Builder()
 		{
 			CustomComparisons = new List<IComparison>();
+
+			Root = new CompositeComparison();
+
+			ComplexObjectComparison = new ComplexObjectComparison(Root);
 		}
 
 		public CompositeComparison Create()
 		{
-			var root = new CompositeComparison();
+			Root.AddRange(CustomComparisons.ToArray());
 
-			root.AddRange(CustomComparisons.ToArray());
-
-			root.AddRange(
+			Root.AddRange(
 				new DefaultComparison(),
 				new EnumComparison(),
-				new DictionaryComparison(new DefaultComparison(), root),
-				new SetComparison(root),
-				new ListComparison(root),
-				new ComplexObjectComparison(root)
-					{
-						IgnoreUnmatchedProperties = UnmatchedPropertiesIgnored
-					}
+				new DictionaryComparison(new DefaultComparison(), Root),
+				new SetComparison(Root),
+				new ListComparison(Root),
+				ComplexObjectComparison
 				);
 
-			return root;
+			return Root;
 		}
 
 		public Builder IgnoreUnmatchedProperties()
 		{
-			UnmatchedPropertiesIgnored = true;
+			ComplexObjectComparison.IgnoreUnmatchedProperties = true;
 
 			return this;
 		}
@@ -45,6 +48,13 @@
 		public Builder WithCustomComparison(IComparison comparison)
 		{
 			CustomComparisons.Add(comparison);
+
+			return this;
+		}
+
+		public Builder IgnoreProperty<T>(Expression<Func<T, object>> property)
+		{
+			ComplexObjectComparison.IgnoreProperty(property);
 
 			return this;
 		}

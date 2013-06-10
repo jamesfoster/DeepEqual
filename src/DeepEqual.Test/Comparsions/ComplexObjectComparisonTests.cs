@@ -1,5 +1,6 @@
 ﻿namespace DeepEqual.Test.Comparsions
 {
+	using System;
 	using System.Collections.Generic;
 
 	using Moq;
@@ -35,9 +36,7 @@
 				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
 		}
 
-		[Scenario]
-		[PropertyData("SimilarObjectsTestData")]
-		public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
+		public void SetUp()
 		{
 			"Given a fixture"
 				.Given(() =>
@@ -58,16 +57,26 @@
 
 			"And a ComplexObjectComparison"
 				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
-				                        .With(x => x.IgnoreUnmatchedProperties, ignoreUnmatchedProperties)
+				                        .Without(x => x.IgnoredProperties)
 				                        .Create());
 
 			"And a Comparison context object"
 				.And(() => Context = new ComparisonContext("Property"));
+		}
+
+		[Scenario]
+		[PropertyData("SimilarObjectsTestData")]
+		public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
+		{
+			SetUp();
+
+			"And IgnoreUnmatchedProperties is set to {0}"
+				.And(() => SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties);
 
 			"When calling Compare"
 				.When(() => Result = SUT.Compare(Context, value1, value2));
 
-			"It should return {2}"
+			"It should return {3}"
 				.Then(() => Result.ShouldBe(expected));
 
 			"And it should call Compare on the inner comparison for each property"
@@ -88,6 +97,81 @@
 							Inner.Verify(x => x.Compare(It.Is<IComparisonContext>(c => c.Breadcrumb == "Property." + p1.Name), v1, v2), Times.Once());
 						}
 					});
+		}
+
+		[Scenario]
+		public void Ignoring_properties_on_the_source_type()
+		{
+			MyClass value1 = null;
+			object value2 = null;
+
+			SetUp();
+
+			"And the IgnoreMe property is ignored"
+				.And(() => SUT.IgnoreProperty<MyClass>(x => x.IgnoreMe));
+
+			"And value1 is a MyClass instance"
+				.And(() => value1 = new MyClass
+					{
+						A = Fixture.Create<string>(),
+						B = Fixture.Create<string>(),
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"And value2 is equivalent to value1"
+				.And(() => value2 = new
+					{
+						value1.A,
+						value1.B,
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Ignoring_properties_on_the_destination_type()
+		{
+			object value1 = null;
+			MyClass value2 = null;
+
+			SetUp();
+
+			"And the IgnoreMe property is ignored"
+				.And(() => SUT.IgnoreProperty<MyClass>(x => x.IgnoreMe));
+
+			"And value1 is a MyClass instance"
+				.And(() => value2 = new MyClass
+					{
+						A = Fixture.Create<string>(),
+						B = Fixture.Create<string>(),
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"And value2 is equivalent to value1"
+				.And(() => value1 = new
+					{
+						value2.A,
+						value2.B,
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		private class MyClass
+		{
+			public string A { get; set; }
+			public string B { get; set; }
+			public string IgnoreMe { get; set; }
 		}
 
 		public static IEnumerable<object[]> SimilarObjectsTestData

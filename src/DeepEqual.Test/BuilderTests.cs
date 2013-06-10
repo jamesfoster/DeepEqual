@@ -1,5 +1,7 @@
 ﻿namespace DeepEqual.Test
 {
+	using System;
+
 	using Moq;
 
 	using Xbehave;
@@ -19,8 +21,8 @@
 			"Then there should be no custom comparisons"
 				.Then(() => SUT.CustomComparisons.ShouldBeEmpty());
 
-			"And UnmatchedPropertiesIgnored should be true"
-				.And(() => SUT.UnmatchedPropertiesIgnored.ShouldBe(false));
+			"And UnmatchedPropertiesIgnored should be false"
+				.And(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(false));
 		}
 		
 		[Scenario]
@@ -60,7 +62,25 @@
 				.When(() => result = SUT.IgnoreUnmatchedProperties());
 
 			"Then UnmatchedPropertiesIgnored should be true"
-				.Then(() => SUT.UnmatchedPropertiesIgnored.ShouldBe(true));
+				.Then(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+		
+		[Scenario]
+		public void Ignoring_specific_properties()
+		{
+			var result = default (Builder);
+
+			"Given a builder"
+				.Given(() => SUT = new Builder());
+
+			"When ignoring unmatched properties"
+				.When(() => result = SUT.IgnoreProperty<Version>(x => x.Major));
+
+			"Then UnmatchedPropertiesIgnored should be true"
+				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties[typeof(Version)].ShouldContain("Major"));
 
 			"And it should return the builder"
 				.And(() => result.ShouldBeSameAs(SUT));
