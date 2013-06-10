@@ -7,7 +7,7 @@
 	{
 		public static bool IsDeepEqual(this object actual, object expected)
 		{
-			var comparison = new ComparisonBuilder().Create();
+			var comparison = ComparisonSettings.Create();
 
 			var context = new ComparisonContext();
 
@@ -18,7 +18,7 @@
 
 		public static void ShouldDeepEqual(this object actual, object expected)
 		{
-			var comparison = new ComparisonBuilder().Create();
+			var comparison = ComparisonSettings.Create();
 
 			var context = new ComparisonContext();
 
