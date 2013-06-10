@@ -1,15 +1,22 @@
 ﻿namespace DeepEqual.Syntax
 {
 	using System;
-	using System.Linq;
+	using System.Diagnostics.Contracts;
 	using System.Text;
 
 	public static class ObjectExtensions
 	{
+		[Pure]
 		public static bool IsDeepEqual(this object actual, object expected)
 		{
 			var comparison = ComparisonSettings.Create();
 
+			return IsDeepEqual(actual, expected, comparison);
+		}
+
+		[Pure]
+		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison)
+		{
 			var context = new ComparisonContext();
 
 			var result = comparison.Compare(context, actual, expected);
@@ -21,6 +28,11 @@
 		{
 			var comparison = ComparisonSettings.Create();
 
+			ShouldDeepEqual(actual, expected, comparison);
+		}
+
+		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison)
+		{
 			var context = new ComparisonContext();
 
 			var result = comparison.Compare(context, actual, expected);
@@ -48,6 +60,13 @@
 			}
 
 			throw new Exception(sb.ToString());
+		}
+
+		public static CompareSyntax<TActual, TExpected> WithDeepEqual<TActual, TExpected>(
+			this TActual actual,
+			TExpected expected)
+		{
+			return new CompareSyntax<TActual, TExpected>(actual, expected);
 		}
 	}
 }
