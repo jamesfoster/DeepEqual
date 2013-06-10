@@ -39,7 +39,7 @@
 					Inner = new TestType
 						{
 							X = 1,
-							Y = 2,
+							Y = 3,
 							Z = 3
 						},
 					Set = new HashSet<int> {1, 2, 3, 4},
@@ -51,7 +51,12 @@
 						}
 				};
 
-			object1.ShouldDeepEqual(object2);
+
+			object1.WithDeepEqual(object2)
+			       .IgnoreProperty<TestType>(x => x.Y)
+			       .Assert();
+
+//			object1.ShouldDeepEqual(object2);
 		}
 	}
 
