@@ -32,6 +32,11 @@
 				return ComparisonResult.Fail;
 			}
 
+			if (dict1.Count == 0)
+			{
+				return ComparisonResult.Pass;
+			}
+
 			var results = new List<ComparisonResult>();
 
 			foreach (DictionaryEntry entry in dict1)
@@ -43,7 +48,8 @@
 					context.AddDifference(new MissingEntryDifference
 						{
 							Breadcrumb = context.Breadcrumb,
-							Value1 = entry.Key
+							Value1 = entry.Key,
+							Value2 = entry.Value
 						});
 
 					continue;
@@ -58,9 +64,8 @@
 			}
 
 			if(dict2.Count == 0)
-				return ComparisonResult.Pass;
-			
-			context.AddDifference(value1, value2);
+				return results.ToResult();
+
 			return ComparisonResult.Fail;
 		}
 

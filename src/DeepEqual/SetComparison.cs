@@ -63,16 +63,23 @@
 			for (int i = 0; i < set1.Length; i++)
 			{
 				var obj = set1[i];
-				var innerContext = context.VisitingIndex(i);
+				var innerContext = new ComparisonContext();
 				var found = expected.FirstOrDefault(e => Inner.Compare(innerContext, obj, e) == ComparisonResult.Pass);
 
 				if (found != null)
-					expected.Remove(found);
+					expected.RemoveAll(x => x.Equals(found));
 				else
 					extra.Add(obj);
 			}
+			
+			var equal = expected.Count == 0 && extra.Count == 0;
 
-			return expected.Count == 0 && extra.Count == 0;
+			if (!equal)
+			{
+				context.AddDifference(new SetDifference(context.Breadcrumb, expected, extra));
+			}
+
+			return equal;
 		}
 	}
 }
