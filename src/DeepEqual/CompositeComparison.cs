@@ -32,6 +32,17 @@
 
 		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
 		{
+			if (value1 == null && value2 == null)
+			{
+				return ComparisonResult.Pass;
+			}
+
+			if (value1 == null || value2 == null)
+			{
+				context.AddDifference(value1, value2);
+				return ComparisonResult.Fail;
+			}
+
 			foreach (var c in Comparisons)
 			{
 				if(!c.CanCompare(value1.GetType(), value2.GetType()))

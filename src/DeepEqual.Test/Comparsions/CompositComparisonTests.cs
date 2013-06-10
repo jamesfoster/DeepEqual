@@ -170,11 +170,33 @@
 			"it should call the inner comparers CanCompare"
 				.Then(() => Inner.VerifyAll(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
 
-			"it should call the inner comparers Compare"
+			"it should not call the inner comparers Compare"
 				.Then(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
 
 			"and it should return false"
 				.And(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+		}
+
+		[Scenario]
+		[Example(null, 1, ComparisonResult.Fail)]
+		[Example(1, null, ComparisonResult.Fail)]
+		[Example(null, null, ComparisonResult.Pass)]
+		public void When_testing_nulls(object value1, object value2, ComparisonResult expected)
+		{
+			"Given a Comparison context object"
+				.Given(() => Context = Fixture.Create<Mock<IComparisonContext>>());
+
+			"When calling Compare"
+				.When(() => Result = SUT.Compare(Context.Object, value1, value2));
+			
+			"Then it should return {2}"
+				.And(() => Result.ShouldBe(expected));
+
+			"And it should not call the inner comparers CanCompare"
+				.And(() => Inner.VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never()));
+
+			"And it should not call the inner comparers Compare"
+				.And(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
 		}
 	}
 }
