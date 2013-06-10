@@ -39,6 +39,7 @@
 			{
 				if (ignored.Contains(propertyInfo1.Name))
 				{
+					props2.Remove(propertyInfo1.Name);
 					continue;
 				}
 
