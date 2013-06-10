@@ -36,12 +36,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Builder.cs" />
-    <Compile Include="ComparisonComparer.cs" />
     <Compile Include="ComparisonContext.cs" />
     <Compile Include="ComparisonResult.cs" />
     <Compile Include="Extensions\ComparisonResultExtensions.cs" />
     <Compile Include="Extensions\ComparisonContextExtensions.cs" />
-    <Compile Include="DeepComparison.cs" />
     <Compile Include="ComplexObjectComparison.cs" />
     <Compile Include="CompositeComparison.cs" />
     <Compile Include="DictionaryComparison.cs" />
