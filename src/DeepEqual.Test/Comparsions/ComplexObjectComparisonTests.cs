@@ -102,27 +102,27 @@
 		[Scenario]
 		public void Ignoring_properties_on_the_source_type()
 		{
-			MyClass value1 = null;
+			A value1 = null;
 			object value2 = null;
 
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<MyClass>(x => x.IgnoreMe));
+				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1 is a MyClass instance"
-				.And(() => value1 = new MyClass
+				.And(() => value1 = new A
 					{
-						A = Fixture.Create<string>(),
-						B = Fixture.Create<string>(),
+						X = Fixture.Create<string>(),
+						Y = Fixture.Create<string>(),
 						IgnoreMe = Fixture.Create<string>()
 					});
 
 			"And value2 is equivalent to value1"
 				.And(() => value2 = new
 					{
-						value1.A,
-						value1.B,
+						value1.X,
+						value1.Y,
 						IgnoreMe = Fixture.Create<string>()
 					});
 
@@ -137,26 +137,26 @@
 		public void Ignoring_properties_on_the_destination_type()
 		{
 			object value1 = null;
-			MyClass value2 = null;
+			A value2 = null;
 
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<MyClass>(x => x.IgnoreMe));
+				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
-			"And value1 is a MyClass instance"
-				.And(() => value2 = new MyClass
+			"And value2"
+				.And(() => value2 = new A
 					{
-						A = Fixture.Create<string>(),
-						B = Fixture.Create<string>(),
+						X = Fixture.Create<string>(),
+						Y = Fixture.Create<string>(),
 						IgnoreMe = Fixture.Create<string>()
 					});
 
-			"And value2 is equivalent to value1"
+			"And value1 is equivalent to value2"
 				.And(() => value1 = new
 					{
-						value2.A,
-						value2.B,
+						value2.X,
+						value2.Y,
 						IgnoreMe = Fixture.Create<string>()
 					});
 
@@ -167,12 +167,48 @@
 				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
-		private class MyClass
+		[Scenario]
+		public void Ignoring_properties_on_a_base_class_also_ignores_them_on_derived_types()
 		{
-			public string A { get; set; }
-			public string B { get; set; }
+			B value1 = null;
+			object value2 = null;
+
+			SetUp();
+
+			"And the IgnoreMe property is ignored"
+				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+
+			"And value1"
+				.And(() => value1 = new B
+					{
+						X = Fixture.Create<string>(),
+						Y = Fixture.Create<string>(),
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"And value2 is equivalent to value1"
+				.And(() => value2 = new
+					{
+						value1.X,
+						value1.Y,
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		private class A
+		{
+			public string X { get; set; }
+			public string Y { get; set; }
 			public string IgnoreMe { get; set; }
 		}
+
+		private class B : A {}
 
 		public static IEnumerable<object[]> SimilarObjectsTestData
 		{

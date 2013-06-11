@@ -31,7 +31,7 @@
 			var props1 = ReflectionCache.GetProperties(type1);
 			var props2 = ReflectionCache.GetProperties(type2).ToDictionary(p => p.Name);
 
-			var ignored = GetIgnoredProperties(type1).Union(GetIgnoredProperties(type2)).ToArray();
+			var ignored = GetIgnoredPropertiesForTypes(type1, type2);
 
 			var results = new List<ComparisonResult>();
 
@@ -100,19 +100,22 @@
 
 		private void IgnoreProperty(Type type, string propertyName)
 		{
-			var list = GetIgnoredProperties(type);
-
-			list.Add(propertyName);
-		}
-
-		private List<string> GetIgnoredProperties(Type type)
-		{
 			if (!IgnoredProperties.ContainsKey(type))
 			{
 				IgnoredProperties[type] = new List<string>();
 			}
 
-			return IgnoredProperties[type];
+			IgnoredProperties[type].Add(propertyName);
+		}
+
+		private List<string> GetIgnoredPropertiesForTypes(Type type1, Type type2)
+		{
+			var seed = new List<string>().AsEnumerable();
+
+			return IgnoredProperties
+				.Where(pair => pair.Key.IsAssignableFrom(type1) || pair.Key.IsAssignableFrom(type2))
+				.Aggregate(seed, (current, pair) => current.Union(pair.Value))
+				.ToList();
 		}
 	}
 }
