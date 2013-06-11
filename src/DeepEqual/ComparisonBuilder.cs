@@ -12,6 +12,7 @@
 		protected CompositeComparison Root { get; set; }
 
 		public ComplexObjectComparison ComplexObjectComparison { get; set; }
+		public DefaultComparison DefaultComparison { get; set; }
 
 		public ComparisonBuilder()
 		{
@@ -20,6 +21,7 @@
 			Root = new CompositeComparison();
 
 			ComplexObjectComparison = new ComplexObjectComparison(Root);
+			DefaultComparison = new DefaultComparison();
 		}
 
 		public CompositeComparison Create()
@@ -27,7 +29,7 @@
 			Root.AddRange(CustomComparisons.ToArray());
 
 			Root.AddRange(
-				new DefaultComparison(),
+				DefaultComparison,
 				new EnumComparison(),
 				new DictionaryComparison(new DefaultComparison(), Root),
 				new SetComparison(Root),
@@ -56,6 +58,12 @@
 		{
 			ComplexObjectComparison.IgnoreProperty(property);
 
+			return this;
+		}
+
+		public ComparisonBuilder SkipDefault<T>()
+		{
+			DefaultComparison.Skip<T>();
 			return this;
 		}
 	}
