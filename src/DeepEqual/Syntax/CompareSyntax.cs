@@ -36,6 +36,24 @@
 			return this;
 		}
 
+		public CompareSyntax<TActual, TExpected> SkipDefault<T>()
+		{
+			Builder.SkipDefault<T>();
+			return this;
+		}
+
+		public CompareSyntax<TActual, TExpected> WithCustomComparison(IComparison comparison)
+		{
+			Builder.WithCustomComparison(comparison);
+			return this;
+		}
+
+		public CompareSyntax<TActual, TExpected> IgnoreUnmatchedProperties()
+		{
+			Builder.IgnoreUnmatchedProperties();
+			return this;
+		}
+
 		[Pure]
 		public bool Compare()
 		{
