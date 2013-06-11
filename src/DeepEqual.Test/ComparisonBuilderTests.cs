@@ -85,6 +85,24 @@
 			"And it should return the builder"
 				.And(() => result.ShouldBeSameAs(SUT));
 		}
+		
+		[Scenario]
+		public void Skipping_default_comparison_for_types()
+		{
+			var result = default (ComparisonBuilder);
+
+			"Given a builder"
+				.Given(() => SUT = new ComparisonBuilder());
+
+			"When ignoring unmatched properties"
+				.When(() => result = SUT.SkipDefault<Version>());
+
+			"Then UnmatchedPropertiesIgnored should be true"
+				.Then(() => SUT.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version)));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
 
 		[Scenario]
 		public void Creating_a_default_Comparison()
@@ -127,7 +145,7 @@
 			"... and the inner comparer is the result"
 				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
 			
-			"And the 6th comparer is the DictionaryComparison"
+			"And the 6th comparer is the ComplexObjectComparison"
 				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
 			
 			"... and the inner comparer is the result"
@@ -190,7 +208,7 @@
 			"... and the inner comparer is the result"
 				.And(() => ((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
 			
-			"And the 7th comparer is the DictionaryComparison"
+			"And the 7th comparer is the ComplexObjectComparison"
 				.And(() => result.Comparisons[6].ShouldBeTypeOf<ComplexObjectComparison>());
 			
 			"... and the inner comparer is the result"
@@ -244,7 +262,7 @@
 			"... and the inner comparer is the result"
 				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
 			
-			"And the 6th comparer is the DictionaryComparison"
+			"And the 6th comparer is the ComplexObjectComparison"
 				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
 			
 			"... and the inner comparer is the result"

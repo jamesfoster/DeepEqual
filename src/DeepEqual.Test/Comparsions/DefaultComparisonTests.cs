@@ -142,6 +142,63 @@
 				.Then(() => Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Inconclusive));
 		}
 
+		[Scenario]
+		[Example(typeof(AlwaysEqual), typeof(object))]
+		[Example(typeof(object), typeof(AlwaysEqual))]
+		[Example(typeof(AlwaysEqual), typeof(AlwaysEqual))]
+		[Example(typeof(object), typeof(AlwaysEqualAswell))]
+		[Example(typeof(AlwaysEqualAswell), typeof(object))]
+		public void Calling_CanCompare_compare_on_ignored_types(Type type1, Type type2)
+		{
+			"Given a DefaultComparison"
+				.Given(() => SUT = new DefaultComparison());
+
+			"And the type is skipped"
+				.And(() => SUT.Skip<AlwaysEqual>());
+
+			"When calling Compare"
+				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+
+			"The result should be Pass or Fail"
+				.Then(() => CanCompareResult.ShouldBe(false));
+		}
+
+		[Scenario]
+		public void Calling_Compare_compare_on_ignored_types()
+		{
+			var value1 = default (AlwaysEqual);
+			var value2 = default (object);
+
+			"Given a DefaultComparison"
+				.Given(() => SUT = new DefaultComparison());
+
+			"And the type is skipped"
+				.And(() => SUT.Skip<AlwaysEqual>());
+
+			"And 2 objects to compare"
+				.And(() =>
+					{
+						value1 = new AlwaysEqual();
+						value2 = new AlwaysEqual();
+					});
+
+			"When calling Compare"
+				.When(() => Result = SUT.Compare(null, value1, value2));
+
+			"The result should be Pass or Fail"
+				.Then(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+		}
+
+		private class AlwaysEqual
+		{
+			public override bool Equals(object obj)
+			{
+				return true;
+			}
+		}
+
+		private class AlwaysEqualAswell : AlwaysEqual {}
+
 		private class EqualsSpy
 		{
 			private bool Result { get; set; }
