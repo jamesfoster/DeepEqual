@@ -58,6 +58,7 @@
 			"And a ComplexObjectComparison"
 				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
 				                        .Without(x => x.IgnoredProperties)
+				                        .Without(x => x.IgnoreUnmatchedProperties)
 				                        .Create());
 
 			"And a Comparison context object"
@@ -100,7 +101,40 @@
 		}
 
 		[Scenario]
-		public void Ignoring_properties_on_the_source_type()
+		public void Ignoring_properties_on_the_source_type_when_missing()
+		{
+			A value1 = null;
+			object value2 = null;
+
+			SetUp();
+
+			"And the IgnoreMe property is ignored"
+				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+
+			"And value1 is a MyClass instance"
+				.And(() => value1 = new A
+					{
+						X = Fixture.Create<string>(),
+						Y = Fixture.Create<string>(),
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"And value2 is equivalent to value1"
+				.And(() => value2 = new
+					{
+						value1.X,
+						value1.Y
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Ignoring_properties_on_the_source_type_when_different()
 		{
 			A value1 = null;
 			object value2 = null;
@@ -134,7 +168,40 @@
 		}
 
 		[Scenario]
-		public void Ignoring_properties_on_the_destination_type()
+		public void Ignoring_properties_on_the_destination_type_when_missing()
+		{
+			object value1 = null;
+			A value2 = null;
+
+			SetUp();
+
+			"And the IgnoreMe property is ignored"
+				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+
+			"And value2"
+				.And(() => value2 = new A
+					{
+						X = Fixture.Create<string>(),
+						Y = Fixture.Create<string>(),
+						IgnoreMe = Fixture.Create<string>()
+					});
+
+			"And value1 is equivalent to value2"
+				.And(() => value1 = new
+					{
+						value2.X,
+						value2.Y
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Ignoring_properties_on_the_destination_type_when_different()
 		{
 			object value1 = null;
 			A value2 = null;
