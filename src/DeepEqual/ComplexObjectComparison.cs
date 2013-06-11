@@ -68,10 +68,15 @@
 			{
 				foreach (var p in props2)
 				{
+					if (ignored.Contains(p.Key))
+					{
+						continue;
+					}
+
 					var v = p.Value.GetValue(value2);
 					context.AddDifference("(missing)", v, p.Key);
+					results.Add(ComparisonResult.Fail);
 				}
-				return ComparisonResult.Fail;
 			}
 
 			return results.ToResult();
