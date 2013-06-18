@@ -9,7 +9,7 @@
 		[Pure]
 		public static bool IsDeepEqual(this object actual, object expected)
 		{
-			var comparison = ComparisonSettings.Create();
+			var comparison = new ComparisonBuilder().Create();
 
 			return IsDeepEqual(actual, expected, comparison);
 		}
@@ -26,7 +26,7 @@
 
 		public static void ShouldDeepEqual(this object actual, object expected)
 		{
-			var comparison = ComparisonSettings.Create();
+			var comparison = new ComparisonBuilder().Create();
 
 			ShouldDeepEqual(actual, expected, comparison);
 		}
