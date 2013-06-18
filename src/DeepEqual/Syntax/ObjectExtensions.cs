@@ -62,6 +62,7 @@
 			throw new Exception(sb.ToString());
 		}
 
+		[Pure]
 		public static CompareSyntax<TActual, TExpected> WithDeepEqual<TActual, TExpected>(
 			this TActual actual,
 			TExpected expected)
