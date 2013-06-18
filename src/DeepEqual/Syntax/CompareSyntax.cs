@@ -18,36 +18,42 @@
 			Builder = new ComparisonBuilder();
 		}
 
+		[Pure]
 		public CompareSyntax<TActual, TExpected> IgnoreSourceProperty(Expression<Func<TActual, object>> property)
 		{
 			Builder.IgnoreProperty(property);
 			return this;
 		}
-
+		
+		[Pure]
 		public CompareSyntax<TActual, TExpected> IgnoreDestinationProperty(Expression<Func<TExpected, object>> property)
 		{
 			Builder.IgnoreProperty(property);
 			return this;
 		}
-
+		
+		[Pure]
 		public CompareSyntax<TActual, TExpected> IgnoreProperty<T>(Expression<Func<T, object>> property)
 		{
 			Builder.IgnoreProperty(property);
 			return this;
 		}
-
+		
+		[Pure]
 		public CompareSyntax<TActual, TExpected> SkipDefault<T>()
 		{
 			Builder.SkipDefault<T>();
 			return this;
 		}
-
+		
+		[Pure]
 		public CompareSyntax<TActual, TExpected> WithCustomComparison(IComparison comparison)
 		{
 			Builder.WithCustomComparison(comparison);
 			return this;
 		}
-
+		
+		[Pure]
 		public CompareSyntax<TActual, TExpected> IgnoreUnmatchedProperties()
 		{
 			Builder.IgnoreUnmatchedProperties();
