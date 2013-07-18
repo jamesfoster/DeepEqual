@@ -99,16 +99,31 @@ namespace DeepEqual
 			       type == typeof (string);
 		}
 
-		internal static PropertyInfo[] GetProperties(object obj)
+		internal static PropertyInfo[] GetProperties(object obj, bool throwIfNotUnique = true)
 		{
-			return GetProperties(obj.GetType());
+			return GetProperties(obj.GetType(), throwIfNotUnique);
 		}
 
-		internal static PropertyInfo[] GetProperties(Type type)
+		internal static PropertyInfo[] GetProperties(Type type, bool throwIfNotUnique = true)
 		{
 			if (!PropertyCache.ContainsKey(type))
 			{
 				PropertyCache[type] = type.GetProperties();
+			}
+
+			if (throwIfNotUnique)
+			{
+				var lookup = PropertyCache[type].ToLookup(x => x.Name);
+
+				var nonUnique = lookup.Where(x => x.Count() > 1).Select(x => x.First().Name).ToArray();
+
+				if (nonUnique.Any())
+				{
+					var names = string.Join(", ", nonUnique);
+					var message = string.Format("{0} has multiple properties with the same name\n\t{1}", type, names);
+
+					throw new InvalidOperationException(message);
+				}
 			}
 
 			return PropertyCache[type];
