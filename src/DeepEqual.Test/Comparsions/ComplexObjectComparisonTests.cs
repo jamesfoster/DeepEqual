@@ -26,6 +26,8 @@
 
 		protected ComparisonResult Result { get; set; }
 
+		protected InvalidOperationException Exception { get; set; }
+
 		[Scenario]
 		public void Creating_a_ComplexObjectComparer()
 		{
@@ -57,8 +59,7 @@
 
 			"And a ComplexObjectComparison"
 				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
-				                        .Without(x => x.IgnoredProperties)
-				                        .Without(x => x.IgnoreUnmatchedProperties)
+				                        .OmitAutoProperties()
 				                        .Create());
 
 			"And a Comparison context object"
@@ -268,6 +269,30 @@
 				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
+		[Scenario]
+		public void Comparing_proxy_types_throws()
+		{
+			IFoo value1 = null;
+			IFoo value2 = null;
+
+			SetUp();
+
+			"And two values"
+				.And(() =>
+					{
+						value1 = Fixture.Create<IFoo>();
+						value2 = Fixture.Create<IFoo>();
+					});
+
+			"When comparing the 2 values"
+				.When(() => Exception = Should.Throw<InvalidOperationException>(() => SUT.Compare(Context, value1, value2)));
+
+			"Then it should throw a meaningful exception"
+				.Then(() => Exception
+					            .Message
+					            .ShouldBe("Castle.Proxies.IFooProxy has multiple properties with the same name\n\tMock"));
+		}
+
 		private class A
 		{
 			public string X { get; set; }
@@ -276,6 +301,11 @@
 		}
 
 		private class B : A {}
+
+		public interface IFoo
+		{
+			int Prop { get; set; }
+		}
 
 		public static IEnumerable<object[]> SimilarObjectsTestData
 		{
