@@ -48,7 +48,7 @@
 
 			if (context.Differences.Count > 0)
 			{
-				sb.Append(": The following differences were found.");
+				sb.AppendFormat(": The following {0} differences were found.", context.Differences.Count);
 
 				foreach (var difference in context.Differences)
 				{
