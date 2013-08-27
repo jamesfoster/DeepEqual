@@ -43,7 +43,7 @@
 					continue;
 				}
 
-				var propValue1 = propertyInfo1.GetValue(value1);
+				var propValue1 = propertyInfo1.GetValue(value1, null);
 
 				if (!props2.ContainsKey(propertyInfo1.Name))
 				{
@@ -56,7 +56,7 @@
 				}
 
 				var propertyInfo2 = props2[propertyInfo1.Name];
-				var propValue2 = propertyInfo2.GetValue(value2);
+				var propValue2 = propertyInfo2.GetValue(value2, null);
 
 				var innerContext = context.VisitingProperty(propertyInfo1.Name);
 				results.Add(Inner.Compare(innerContext, propValue1, propValue2));
@@ -73,7 +73,7 @@
 						continue;
 					}
 
-					var v = p.Value.GetValue(value2);
+					var v = p.Value.GetValue(value2, null);
 					context.AddDifference("(missing)", v, p.Key);
 					results.Add(ComparisonResult.Fail);
 				}
