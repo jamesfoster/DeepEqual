@@ -3,6 +3,8 @@
 	using System;
 	using System.Collections.Generic;
 
+	using DeepEqual.Syntax;
+
 	using Moq;
 
 	using Ploeh.AutoFixture;
@@ -270,27 +272,25 @@
 		}
 
 		[Scenario]
-		public void Comparing_proxy_types_throws()
+		public void Comparing_object_with_new_property_uses_value_in_derived_type()
 		{
-			IFoo value1 = null;
-			IFoo value2 = null;
+			Derived value1 = null;
+			object value2 = null;
 
 			SetUp();
-
+			
 			"And two values"
 				.And(() =>
 					{
-						value1 = Fixture.Create<IFoo>();
-						value2 = Fixture.Create<IFoo>();
+						value1 = new Derived ();
+						value2 = new {Property = "abc"};
 					});
 
 			"When comparing the 2 values"
-				.When(() => Exception = Should.Throw<InvalidOperationException>(() => SUT.Compare(Context, value1, value2)));
+				.When(() => Result = SUT.Compare(Context, value1, value2));
 
-			"Then it should throw a meaningful exception"
-				.Then(() => Exception
-					            .Message
-					            .ShouldBe("Castle.Proxies.IFooProxy has multiple properties with the same name\n\tMock"));
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		private class A
@@ -305,6 +305,22 @@
 		public interface IFoo
 		{
 			int Prop { get; set; }
+		}
+
+		public class Base
+		{
+			public int Property
+			{
+				get { return 123; }
+			}
+		}
+
+		public class Derived : Base
+		{
+			public new string Property
+			{
+				get { return "abc"; }
+			}
 		}
 
 		public static IEnumerable<object[]> SimilarObjectsTestData
@@ -371,6 +387,6 @@
 							}
 					};
 			}
-		} 
+		}
 	}
 }

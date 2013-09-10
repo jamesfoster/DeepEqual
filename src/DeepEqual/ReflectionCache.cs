@@ -104,29 +104,14 @@ namespace DeepEqual
 			return GetProperties(obj.GetType(), throwIfNotUnique);
 		}
 
-		internal static PropertyInfo[] GetProperties(Type type, bool throwIfNotUnique = true)
+		internal static PropertyInfo[] GetProperties(Type type)
 		{
 			if (!PropertyCache.ContainsKey(type))
 			{
 				PropertyCache[type] = type.GetProperties();
 			}
 
-			if (throwIfNotUnique)
-			{
-				var lookup = PropertyCache[type].ToLookup(x => x.Name);
-
-				var nonUnique = lookup.Where(x => x.Count() > 1).Select(x => x.First().Name).ToArray();
-
-				if (nonUnique.Any())
-				{
-					var names = string.Join(", ", nonUnique);
-					var message = string.Format("{0} has multiple properties with the same name\n\t{1}", type, names);
-
-					throw new InvalidOperationException(message);
-				}
-			}
-
-			return PropertyCache[type];
+			return PropertyCache[type].ToLookup(x => x.Name).Select(x => x.First()).ToArray();
 		}
 	}
 }
