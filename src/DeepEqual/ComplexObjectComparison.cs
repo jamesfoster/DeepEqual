@@ -28,8 +28,8 @@
 			var type1 = value1.GetType();
 			var type2 = value2.GetType();
 
-			var props1 = ReflectionCache.GetProperties(type1);
-			var props2 = ReflectionCache.GetProperties(type2).ToDictionary(p => p.Name);
+			var props1 = ReflectionCache.GetProperties(value1);
+			var props2 = ReflectionCache.GetProperties(value2).ToDictionary(p => p.Name);
 
 			var ignored = GetIgnoredPropertiesForTypes(type1, type2);
 
@@ -43,7 +43,7 @@
 					continue;
 				}
 
-				var propValue1 = propertyInfo1.GetValue(value1, null);
+				var propValue1 = propertyInfo1.Read(value1);
 
 				if (!props2.ContainsKey(propertyInfo1.Name))
 				{
@@ -56,7 +56,7 @@
 				}
 
 				var propertyInfo2 = props2[propertyInfo1.Name];
-				var propValue2 = propertyInfo2.GetValue(value2, null);
+				var propValue2 = propertyInfo2.Read(value2);
 
 				var innerContext = context.VisitingProperty(propertyInfo1.Name);
 				results.Add(Inner.Compare(innerContext, propValue1, propValue2));
@@ -73,7 +73,7 @@
 						continue;
 					}
 
-					var v = p.Value.GetValue(value2, null);
+					var v = p.Value.Read(value2);
 					context.AddDifference("(missing)", v, p.Key);
 					results.Add(ComparisonResult.Fail);
 				}

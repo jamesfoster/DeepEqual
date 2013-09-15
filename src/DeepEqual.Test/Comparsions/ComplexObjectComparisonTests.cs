@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Dynamic;
 
 	using DeepEqual.Syntax;
 
@@ -284,6 +285,39 @@
 					{
 						value1 = new Derived ();
 						value2 = new {Property = "abc"};
+					});
+
+			"When comparing the 2 values"
+				.When(() => Result = SUT.Compare(Context, value1, value2));
+
+			"Then it should return a Pass"
+				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Comparing_dynamic_object_with_static_object_succeeds()
+		{
+			dynamic value1 = null;
+			object value2 = null;
+
+			SetUp();
+			
+			"And a dynamic object"
+				.And(() =>
+					{
+						value1 = new ExpandoObject();
+						value1.Foo = "abc";
+						value1.Bar = 123;
+					});
+			
+			"And a static object"
+				.And(() =>
+					{
+						value2 = new
+						{
+							Foo = "abc",
+							Bar = 123
+						};
 					});
 
 			"When comparing the 2 values"

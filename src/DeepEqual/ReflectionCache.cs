@@ -3,8 +3,14 @@ namespace DeepEqual
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
+	using System.Dynamic;
 	using System.Linq;
-	using System.Reflection;
+	using System.Linq.Expressions;
+	using System.Runtime.CompilerServices;
+
+	using Microsoft.CSharp.RuntimeBinder;
+
+	using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
 	public static class ReflectionCache
 	{
@@ -12,7 +18,7 @@ namespace DeepEqual
 		private static readonly Dictionary<Type, bool> IsListCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, bool> IsSetCache = new Dictionary<Type, bool>();
 		private static readonly Dictionary<Type, bool> IsDictionaryCache = new Dictionary<Type, bool>();
-		private static readonly Dictionary<Type, PropertyInfo[]> PropertyCache = new Dictionary<Type, PropertyInfo[]>();
+		private static readonly Dictionary<Type, PropertyReader[]> PropertyCache = new Dictionary<Type, PropertyReader[]>();
 
 		public static void ClearCache()
 		{
@@ -99,19 +105,74 @@ namespace DeepEqual
 			       type == typeof (string);
 		}
 
-		internal static PropertyInfo[] GetProperties(object obj, bool throwIfNotUnique = true)
+		internal static PropertyReader[] GetProperties(object obj)
 		{
-			return GetProperties(obj.GetType(), throwIfNotUnique);
-		}
+			var type = obj.GetType();
 
-		internal static PropertyInfo[] GetProperties(Type type)
-		{
 			if (!PropertyCache.ContainsKey(type))
 			{
-				PropertyCache[type] = type.GetProperties();
+				if (obj is IDynamicMetaObjectProvider)
+					return GetDynamicProperties(obj as IDynamicMetaObjectProvider); // Dont cache dynamic properties
+				
+				PropertyCache[type] = GetStaticProperties(type);
 			}
 
-			return PropertyCache[type].ToLookup(x => x.Name).Select(x => x.First()).ToArray();
+			return PropertyCache[type];
+		}
+
+		private static PropertyReader[] GetDynamicProperties(IDynamicMetaObjectProvider provider)
+		{
+			var metaObject = provider.GetMetaObject(Expression.Constant(provider));
+
+			var memberNames = metaObject.GetDynamicMemberNames(); // may return property names as well as method names, etc.
+
+			var result = new List<PropertyReader>();
+
+			foreach (var name in memberNames)
+			{
+				try
+				{
+					var argumentInfo = new[] {CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)};
+
+					var binder = Binder.GetMember(CSharpBinderFlags.None, name, provider.GetType(), argumentInfo);
+
+					var site = CallSite<Func<CallSite, object, object>>.Create(binder);
+
+					var value = site.Target(site, provider); // will throw if no valid property getter
+
+					result.Add(new PropertyReader
+					{
+						Name = name,
+						Read = o => value
+					});
+				}
+				catch (RuntimeBinderException)
+				{
+				}
+			}
+
+			return result.ToArray();
+		}
+
+		private static PropertyReader[] GetStaticProperties(Type type)
+		{
+			var properties = type.GetProperties();
+
+			return properties
+				.ToLookup(x => x.Name)
+				.Select(x => x.First())
+				.Select(x => new PropertyReader
+				{
+					Name = x.Name,
+					Read = o => x.GetValue(o, null)
+				})
+				.ToArray();
+		}
+
+		internal class PropertyReader
+		{
+			public string Name { get; set; }
+			public Func<object, object> Read { get; set; }
 		}
 	}
 }
