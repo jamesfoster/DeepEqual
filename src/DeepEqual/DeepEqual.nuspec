@@ -10,6 +10,6 @@
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>An extensible deep comparison library for .NET</description>
     <copyright>Copyright 2013</copyright>
-    <tags>deepequal deep equal</tags>
+    <tags>deepequal deep equal equality comparison compare</tags>
   </metadata>
 </package>
