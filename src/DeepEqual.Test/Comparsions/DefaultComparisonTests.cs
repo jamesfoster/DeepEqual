@@ -26,26 +26,13 @@
 		}
 
 		[Scenario]
-		[Example(typeof(int))]
-		[Example(typeof(string))]
-		[Example(typeof(object))]
-		[Example(typeof(Type))]
-		public void Can_compare_types_that_are_equal(Type type)
-		{
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
-
-			"When calling CanCompare"
-				.When(() => CanCompareResult = SUT.CanCompare(type, type));
-
-			"Then the result should be true"
-				.Then(() => CanCompareResult.ShouldBe(true));
-		}
-
-		[Scenario]
-		[Example(typeof(int), typeof(object))]
-		[Example(typeof(int), typeof(long))]
-		public void Can_not_compare_types_that_are_different(Type type1, Type type2)
+		[Example(typeof (int), typeof (int))]
+		[Example(typeof (string), typeof (int))]
+		[Example(typeof (object), typeof (int))]
+		[Example(typeof (Type), typeof (int))]
+		[Example(typeof (int), typeof (object))]
+		[Example(typeof (int), typeof (long))]
+		public void Can_compare_any_type(Type type1, Type type2)
 		{
 			"Given a DefaultComparison"
 				.Given(() => SUT = new DefaultComparison());
@@ -54,7 +41,91 @@
 				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
 
 			"Then the result should be true"
-				.Then(() => CanCompareResult.ShouldBe(false));
+				.Then(() => CanCompareResult.ShouldBe(true));
+		}
+
+		[Scenario]
+		public void Comparing_different_types_results_in_implicit_cast()
+		{
+			var object1 = default (CastSpy);
+			var object2 = default (string);
+
+			"Given a DefaultComparison"
+				.Given(() => SUT = new DefaultComparison());
+
+			"And 2 objects to compare"
+				.And(() =>
+					{
+						object1 = new CastSpy("abc");
+						object2 = "abc";
+					});
+
+			"And a Comparison context object"
+				.And(() => Context = new ComparisonContext());
+
+			"When calling Compare"
+				.When(() => Result = SUT.Compare(Context, object1, object2));
+
+			"Then it should call the implicit operator"
+				.Then(() => object1.Called.ShouldBe(true));
+
+			"And it should return Pass"
+				.And(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Comparing_different_types_results_in_call_to_IConvertible()
+		{
+			var object1 = default (StringConvertibleSpy);
+			var object2 = default (string);
+
+			"Given a DefaultComparison"
+				.Given(() => SUT = new DefaultComparison());
+
+			"And 2 objects to compare"
+				.And(() =>
+					{
+						object1 = new StringConvertibleSpy("abc");
+						object2 = "abc";
+					});
+
+			"And a Comparison context object"
+				.And(() => Context = new ComparisonContext());
+
+			"When calling Compare"
+				.When(() => Result = SUT.Compare(Context, object1, object2));
+
+			"Then it should call IConvertible.ToString"
+				.Then(() => object1.Called.ShouldBe(true));
+
+			"And it should return Pass"
+				.And(() => Result.ShouldBe(ComparisonResult.Pass));
+		}
+
+		[Scenario]
+		public void Comparing_incompatible_types_returns_Inconclusive()
+		{
+			var object1 = default (object);
+			var object2 = default (int);
+
+			"Given a DefaultComparison"
+				.Given(() => SUT = new DefaultComparison());
+
+			"And 2 objects to compare"
+				.And(() =>
+					{
+						object1 = new object();
+						object2 = 123;
+					});
+
+			"And a Comparison context object"
+				.And(() => Context = new ComparisonContext());
+
+			"When calling Compare"
+				.When(() => Result = SUT.Compare(Context, object1, object2));
+
+			"Then it should return Inconclusive"
+				.Then(() => Result.ShouldBe(ComparisonResult.Inconclusive));
 		}
 
 		[Scenario]
@@ -148,7 +219,7 @@
 		[Example(typeof(AlwaysEqual), typeof(AlwaysEqual))]
 		[Example(typeof(object), typeof(AlwaysEqualAswell))]
 		[Example(typeof(AlwaysEqualAswell), typeof(object))]
-		public void Calling_CanCompare_compare_on_ignored_types(Type type1, Type type2)
+		public void Calling_CanCompare_on_ignored_types_returns_false(Type type1, Type type2)
 		{
 			"Given a DefaultComparison"
 				.Given(() => SUT = new DefaultComparison());
@@ -159,12 +230,12 @@
 			"When calling Compare"
 				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
 
-			"The result should be Pass or Fail"
+			"The result should be false"
 				.Then(() => CanCompareResult.ShouldBe(false));
 		}
 
 		[Scenario]
-		public void Calling_Compare_compare_on_ignored_types()
+		public void Calling_Compare_on_ignored_types_returns_Inconclusive()
 		{
 			var value1 = default (AlwaysEqual);
 			var value2 = default (object);
@@ -185,7 +256,7 @@
 			"When calling Compare"
 				.When(() => Result = SUT.Compare(null, value1, value2));
 
-			"The result should be Pass or Fail"
+			"The result should be Inconclusive"
 				.Then(() => Result.ShouldBe(ComparisonResult.Inconclusive));
 		}
 
@@ -198,6 +269,8 @@
 		}
 
 		private class AlwaysEqualAswell : AlwaysEqual {}
+
+		#region Spies
 
 		private class EqualsSpy
 		{
@@ -222,5 +295,123 @@
 				return (Calls != null ? Calls.GetHashCode() : 0);
 			}
 		}
+
+		private class CastSpy
+		{
+			private readonly string Value;
+			public bool Called { get; private set; }
+
+			public CastSpy(string value)
+			{
+				Value = value;
+			}
+
+			public static implicit operator string(CastSpy spy)
+			{
+				spy.Called = true;
+
+				return spy.Value;
+			}
+		}
+
+		private class StringConvertibleSpy : IConvertible
+		{
+			private readonly string Value;
+			public bool Called { get; private set; }
+
+			public StringConvertibleSpy(string value)
+			{
+				Value = value;
+			}
+
+			public TypeCode GetTypeCode()
+			{
+				return Value.GetTypeCode();
+			}
+
+			public bool ToBoolean(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public char ToChar(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public sbyte ToSByte(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public byte ToByte(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public short ToInt16(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public ushort ToUInt16(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public int ToInt32(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public uint ToUInt32(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public long ToInt64(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public ulong ToUInt64(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public float ToSingle(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public double ToDouble(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public decimal ToDecimal(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public DateTime ToDateTime(IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+
+			public string ToString(IFormatProvider provider)
+			{
+				Called = true;
+
+				return Value;
+			}
+
+			public object ToType(Type conversionType, IFormatProvider provider)
+			{
+				throw new InvalidOperationException();
+			}
+		}
+
+		#endregion
 	}
 }
