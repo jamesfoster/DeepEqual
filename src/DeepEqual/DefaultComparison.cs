@@ -67,7 +67,7 @@
 			SkippedTypes.Add(typeof (T));
 		}
 
-		private static bool CoerceValues(ref object value1, ref object value2)
+		private bool CoerceValues(ref object value1, ref object value2)
 		{
 			try
 			{

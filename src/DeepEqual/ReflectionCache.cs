@@ -6,6 +6,7 @@ namespace DeepEqual
 	using System.Dynamic;
 	using System.Linq;
 	using System.Linq.Expressions;
+	using System.Reflection;
 	using System.Runtime.CompilerServices;
 
 	using Microsoft.CSharp.RuntimeBinder;
@@ -156,17 +157,31 @@ namespace DeepEqual
 
 		private static PropertyReader[] GetStaticProperties(Type type)
 		{
-			var properties = type.GetProperties();
+			var properties = type.GetProperties().AsEnumerable();
+
+			properties = RemoveHiddenProperties(properties);
+			properties = ExcludeIndexProperties(properties);
 
 			return properties
-				.ToLookup(x => x.Name)
-				.Select(x => x.First())
 				.Select(x => new PropertyReader
-				{
-					Name = x.Name,
-					Read = o => x.GetValue(o, null)
-				})
+					{
+						Name = x.Name,
+						Read = o => x.GetValue(o, null)
+					})
 				.ToArray();
+		}
+
+		private static IEnumerable<PropertyInfo> RemoveHiddenProperties(IEnumerable<PropertyInfo> properties)
+		{
+			return properties
+				.ToLookup(x => x.Name)
+				.Select(x => x.First());
+		}
+
+		private static IEnumerable<PropertyInfo> ExcludeIndexProperties(IEnumerable<PropertyInfo> properties)
+		{
+			return properties
+				.Where(x => !x.GetIndexParameters().Any());
 		}
 
 		internal class PropertyReader
