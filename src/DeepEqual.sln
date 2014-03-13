@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FC56EB7E-42BE-4EA2-A0C4-1766D453F866}"
 	ProjectSection(SolutionItems) = preProject
 		.nuget\NuGet.Config = .nuget\NuGet.Config
@@ -13,6 +15,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Test", "DeepEqual.Test\DeepEqual.Test.csproj", "{941815E1-B504-4C64-B6E6-4E8C68421516}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Benchmark", "DeepEqual.Benchmark\DeepEqual.Benchmark.csproj", "{E85D1A5D-F779-474F-857A-2A0D1AAB9880}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,6 +36,10 @@ Global
 		{E85D1A5D-F779-474F-857A-2A0D1AAB9880}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E85D1A5D-F779-474F-857A-2A0D1AAB9880}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E85D1A5D-F779-474F-857A-2A0D1AAB9880}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

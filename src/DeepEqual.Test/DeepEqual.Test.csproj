@@ -68,6 +68,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bug\ComparingObjectsPropertiesWithArguments.cs" />
     <Compile Include="ComparisonBuilderTests.cs" />
     <Compile Include="Comparsions\ComplexObjectComparisonTests.cs">
       <SubType>Code</SubType>
@@ -98,6 +99,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj">
+      <Project>{4dab6570-df99-4574-8bb0-99573d9c6224}</Project>
+      <Name>DeepEqual.Test.VB</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DeepEqual\DeepEqual.csproj">
       <Project>{5125dcf0-fad0-412f-b06c-ff4ce289a844}</Project>
       <Name>DeepEqual</Name>
