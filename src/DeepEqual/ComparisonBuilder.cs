@@ -61,7 +61,14 @@
 			return this;
 		}
 
-		public ComparisonBuilder SkipDefault<T>()
+        public ComparisonBuilder IgnoreProperty(string property)
+        {
+            ComplexObjectComparison.IgnoreProperty(property);
+
+            return this;
+        }
+
+        public ComparisonBuilder SkipDefault<T>()
 		{
 			DefaultComparison.Skip<T>();
 			return this;
