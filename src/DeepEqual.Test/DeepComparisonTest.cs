@@ -1,10 +1,13 @@
 ﻿namespace DeepEqual.Test
 {
-	using System.Collections.Generic;
+    using System.Collections.Generic;
 
 	using Xunit;
 
 	using Syntax;
+    
+    using Xbehave;
+    using Shouldly;
 
 	public class DeepComparisonTest
 	{
@@ -57,8 +60,44 @@
 			       .Assert();
 
 //			object1.ShouldDeepEqual(object2);
-		}
-	}
+        }
+
+        [Fact]
+        public void TestIgnorePropertiesRegardlessOfType()
+        {
+            var object1 = new
+            {
+                X = 1,
+                Y = 2,
+                Z = 3
+            };
+
+            var object2 = new
+            {
+                X = 1,
+                Y = 3,
+                Z = 3
+            };
+
+            bool objectsEqual = false;
+
+            "Given a comparison between 2 objects where Y differs and Y is ignored"
+                .Given(() => objectsEqual = object1.WithDeepEqual(object2)
+                                                   .IgnoreProperty("Y")
+                                                   .Compare());
+
+            "Then it should find they are equal"
+                .Then(() => objectsEqual.ShouldBe(true));
+
+            "Given a comparison between 2 objects where Y differs but Z is ignored"
+                .Given(() => objectsEqual = object1.WithDeepEqual(object2)
+                                                   .IgnoreProperty("Z")
+                                                   .Compare());
+
+            "Then it should find they are not equal"
+                .Then(() => objectsEqual.ShouldBe(false));
+        }
+    }
 
 	public class TestType 
 	{
