@@ -8,6 +8,7 @@
 	public class ListComparison : IComparison
 	{
 		public IComparison Inner { get; private set; }
+        public bool DisregardListOrder { get; set; }
 
 		public ListComparison(IComparison inner)
 		{
@@ -37,6 +38,14 @@
 			{
 				return ComparisonResult.Pass;
 			}
+
+            if (DisregardListOrder)
+            {
+                IComparer objectComparer = new ObjectComparer();
+
+                Array.Sort(list1, objectComparer);
+                Array.Sort(list2, objectComparer);
+            }
 
 			var zip = list1.Zip(list2, Tuple.Create).ToArray();
 

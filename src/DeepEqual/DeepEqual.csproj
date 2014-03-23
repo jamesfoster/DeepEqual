@@ -34,6 +34,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ComparisonBuilder.cs" />
@@ -47,6 +48,7 @@
     <Compile Include="Difference.cs" />
     <Compile Include="IComparisonContext.cs" />
     <Compile Include="MissingEntryDifference.cs" />
+    <Compile Include="ObjectComparer.cs" />
     <Compile Include="ReflectionCache.cs" />
     <Compile Include="DefaultComparison.cs" />
     <Compile Include="EnumComparison.cs" />
