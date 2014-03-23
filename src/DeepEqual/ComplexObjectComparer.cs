@@ -8,15 +8,13 @@
 	{
 		private readonly IComparison inner;
 		private readonly bool ignoreUnmatchedProperties;
-		private readonly IDictionary<Type, List<string>> ignoredProperties;
+		private readonly List<Func<PropertyReader, bool>> ignoredProperties;
 
 		private readonly List<ComparisonResult> results;
-		private Type sourceType;
-		private Type destinationType;
 		private List<PropertyPair> propertyMap;
 		private PropertyPair currentPair;
 
-		public ComplexObjectComparer(IComparison inner, bool ignoreUnmatchedProperties, IDictionary<Type, List<string>> ignoredProperties)
+		public ComplexObjectComparer(IComparison inner, bool ignoreUnmatchedProperties, List<Func<PropertyReader, bool>> ignoredProperties)
 		{
 			this.inner = inner;
 			this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
@@ -26,11 +24,7 @@
 
 		public ComparisonResult CompareObjects(IComparisonContext context, object source, object destination)
 		{
-			sourceType = source.GetType();
-			destinationType = destination.GetType();
-
 			PreparePropertyInfo(source, destination);
-
 
 			foreach (var pair in propertyMap)
 			{
@@ -117,32 +111,33 @@
 
 		private bool IsPropertyIgnored()
 		{
-			var ignored = GetIgnoredPropertiesForTypes(sourceType, destinationType);
+			foreach (var ignoredProperty in ignoredProperties)
+			{
+				if (currentPair.Source != null && ignoredProperty(currentPair.Source))
+				{
+					return true;
+				}
 
-			return ignored.Contains(currentPair.Name);
-		}
+				if (currentPair.Destination != null && ignoredProperty(currentPair.Destination))
+				{
+					return true;
+				}
+			}
 
-		private List<string> GetIgnoredPropertiesForTypes(Type type1, Type type2)
-		{
-			var seed = Enumerable.Empty<string>();
-
-			return ignoredProperties
-				.Where(pair => pair.Key.IsAssignableFrom(type1) || pair.Key.IsAssignableFrom(type2))
-				.Aggregate(seed, (current, pair) => current.Union(pair.Value))
-				.ToList();
+			return false;
 		}
 
 		private class PropertyPair
 		{
-			public PropertyPair(ReflectionCache.PropertyReader source, ReflectionCache.PropertyReader destination, string name)
+			public PropertyPair(PropertyReader source, PropertyReader destination, string name)
 			{
 				Source = source;
 				Destination = destination;
 				Name = name;
 			}
 
-			public ReflectionCache.PropertyReader Source { get; private set; }
-			public ReflectionCache.PropertyReader Destination { get; private set; }
+			public PropertyReader Source { get; private set; }
+			public PropertyReader Destination { get; private set; }
 			public string Name { get; private set; }
 		}
 	}
