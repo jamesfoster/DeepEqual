@@ -144,6 +144,7 @@ namespace DeepEqual
 					result.Add(new PropertyReader
 					{
 						Name = name,
+						DeclaringType = provider.GetType(),
 						Read = o => value
 					});
 				}
@@ -166,6 +167,7 @@ namespace DeepEqual
 				.Select(x => new PropertyReader
 					{
 						Name = x.Name,
+						DeclaringType = type,
 						Read = o => x.GetValue(o, null)
 					})
 				.ToArray();
@@ -182,12 +184,6 @@ namespace DeepEqual
 		{
 			return properties
 				.Where(x => !x.GetIndexParameters().Any());
-		}
-
-		internal class PropertyReader
-		{
-			public string Name { get; set; }
-			public Func<object, object> Read { get; set; }
 		}
 	}
 }

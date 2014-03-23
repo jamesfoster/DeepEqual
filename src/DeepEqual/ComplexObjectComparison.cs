@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Collections.Generic;
-	using System.Linq;
 	using System.Linq.Expressions;
 
 	public class ComplexObjectComparison : IComparison
@@ -11,12 +10,12 @@
 
 		public bool IgnoreUnmatchedProperties { get; set; }
 
-		public IDictionary<Type, List<string>> IgnoredProperties { get; set; }
+		public List<Func<PropertyReader, bool>> IgnoredProperties { get; set; }
 
 		public ComplexObjectComparison(IComparison inner)
 		{
 			Inner = inner;
-			IgnoredProperties = new Dictionary<Type, List<string>>();
+			IgnoredProperties = new List<Func<PropertyReader, bool>>();
 		}
 
 		public bool CanCompare(Type type1, Type type2)
@@ -54,12 +53,7 @@
 
 		private void IgnoreProperty(Type type, string propertyName)
 		{
-			if (!IgnoredProperties.ContainsKey(type))
-			{
-				IgnoredProperties[type] = new List<string>();
-			}
-
-			IgnoredProperties[type].Add(propertyName);
+			IgnoredProperties.Add(property => type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName);
 		}
 	}
 }
