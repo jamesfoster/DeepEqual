@@ -52,13 +52,22 @@
 
 			"And an inner comparison"
 				.And(() =>
-					{
-						Inner = Fixture.Freeze<Mock<IComparison>>();
+				{
+					Inner = Fixture.Freeze<Mock<IComparison>>();
 
-						Inner.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-						     .Returns<IComparisonContext, object, object>(
-							     (c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail);
-					});
+					Inner.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
+					     .Returns<IComparisonContext, object, object>(
+						     (c, v1, v2) =>
+						     {
+							     if (v1.Equals(v2))
+							     {
+								     return ComparisonResult.Pass;
+							     }
+
+							     c.AddDifference(new Difference());
+							     return ComparisonResult.Fail;
+						     });
+				});
 
 			"And a ComplexObjectComparison"
 				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
@@ -83,6 +92,17 @@
 
 			"It should return {3}"
 				.Then(() => Result.ShouldBe(expected));
+
+			if (expected == ComparisonResult.Fail)
+			{
+				"And it should add a difference to the context"
+					.And(() => Context.Differences.Count.ShouldBe(1));
+			}
+			else
+			{
+				"And there should be no differences in the context"
+					.And(() => Context.Differences.Count.ShouldBe(0));
+			}
 
 			"And it should call Compare on the inner comparison for each property"
 				.And(() =>
