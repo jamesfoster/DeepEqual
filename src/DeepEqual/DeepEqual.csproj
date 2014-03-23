@@ -39,6 +39,7 @@
     <Compile Include="ComparisonBuilder.cs" />
     <Compile Include="ComparisonContext.cs" />
     <Compile Include="ComparisonResult.cs" />
+    <Compile Include="ComplexObjectComparer.cs" />
     <Compile Include="Extensions\ComparisonResultExtensions.cs" />
     <Compile Include="Extensions\ComparisonContextExtensions.cs" />
     <Compile Include="ComplexObjectComparison.cs" />
