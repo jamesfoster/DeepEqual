@@ -35,7 +35,7 @@
 		public void Creating_a_ComplexObjectComparer()
 		{
 			"When creating a ComplexObjectComparison"
-				.When(() => SUT = new ComplexObjectComparison(null));
+				.When(() => SUT = new ComplexObjectComparison(null, null));
 
 			"It should be an IComparison"
 				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
@@ -113,7 +113,7 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+                .And(() => SUT.IgnoredProperties.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1 is a MyClass instance"
 				.And(() => value1 = new A
@@ -146,7 +146,7 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+                .And(() => SUT.IgnoredProperties.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1 is a MyClass instance"
 				.And(() => value1 = new A
@@ -180,7 +180,7 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+                .And(() => SUT.IgnoredProperties.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value2"
 				.And(() => value2 = new A
@@ -213,7 +213,7 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+                .And(() => SUT.IgnoredProperties.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value2"
 				.And(() => value2 = new A
@@ -247,7 +247,7 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+                .And(() => SUT.IgnoredProperties.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1"
 				.And(() => value1 = new B

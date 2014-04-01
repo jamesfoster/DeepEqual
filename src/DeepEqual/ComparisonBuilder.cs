@@ -10,6 +10,7 @@
 		public IList<IComparison> CustomComparisons { get; set; }
 
 		protected CompositeComparison Root { get; set; }
+        public IgnoredProperties IgnoredProperties = new IgnoredProperties();
 
         public ListComparison ListComparison { get; set; }
         public ComplexObjectComparison ComplexObjectComparison { get; set; }
@@ -21,8 +22,8 @@
 
 			Root = new CompositeComparison();
 
-            ListComparison = new ListComparison(Root);
-            ComplexObjectComparison = new ComplexObjectComparison(Root);
+            ListComparison = new ListComparison(Root, IgnoredProperties);
+            ComplexObjectComparison = new ComplexObjectComparison(Root, IgnoredProperties);
 			DefaultComparison = new DefaultComparison();
 		}
 
@@ -58,14 +59,14 @@
 
 		public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object>> property)
 		{
-			ComplexObjectComparison.IgnoreProperty(property);
+            IgnoredProperties.IgnoreProperty(property);
 
-			return this;
+			return this;   
 		}
 
         public ComparisonBuilder IgnoreProperty(string property)
         {
-            ComplexObjectComparison.IgnoreProperty(property);
+            IgnoredProperties.IgnoreProperty(property);
 
             return this;
         }

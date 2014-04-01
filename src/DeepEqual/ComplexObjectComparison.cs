@@ -10,14 +10,12 @@
 		public IComparison Inner { get; set; }
 
 		public bool IgnoreUnmatchedProperties { get; set; }
-		public IDictionary<Type, List<string>> IgnoredProperties { get; set; }
-        public IList<string> IgnoredPropertyNames { get; set; }
+        public IgnoredProperties IgnoredProperties { get; private set; }
 
-		public ComplexObjectComparison(IComparison inner)
+        public ComplexObjectComparison(IComparison inner, IgnoredProperties ignoredProperties)
 		{
 			Inner = inner;
-			IgnoredProperties = new Dictionary<Type, List<string>>();
-            IgnoredPropertyNames = new List<string>();
+            IgnoredProperties = ignoredProperties;
 		}
 
 		public bool CanCompare(Type type1, Type type2)
@@ -33,7 +31,11 @@
 			var props1 = ReflectionCache.GetProperties(value1);
 			var props2 = ReflectionCache.GetProperties(value2).ToDictionary(p => p.Name);
 
-			var ignored = GetIgnoredPropertiesForTypes(type1, type2);
+            var ignored = new List<string>();
+            if (IgnoredProperties != null)
+            {
+                ignored = IgnoredProperties.GetIgnoredPropertiesForTypes(type1, type2);
+            }
 
 			var results = new List<ComparisonResult>();
 
@@ -82,55 +84,6 @@
 			}
 
 			return results.ToResult();
-		}
-
-        public void IgnoreProperty(string propertyName)
-        {
-            IgnoredPropertyNames.Add(propertyName);
-        }
-
-        public void IgnoreProperty<T>(Expression<Func<T, object>> property)
-		{
-			var exp = property.Body;
-
-			if (exp is UnaryExpression)
-			{
-				exp = ((UnaryExpression) exp).Operand; // implicit cast to object
-			}
-
-			var member = exp as MemberExpression;
-
-			if (member == null)
-			{
-				return;
-			}
-
-			var propertyName = member.Member.Name;
-
-			IgnoreProperty(typeof (T), propertyName);
-		}
-
-		private void IgnoreProperty(Type type, string propertyName)
-		{
-			if (!IgnoredProperties.ContainsKey(type))
-			{
-				IgnoredProperties[type] = new List<string>();
-			}
-
-			IgnoredProperties[type].Add(propertyName);
-		}
-
-		private List<string> GetIgnoredPropertiesForTypes(Type type1, Type type2)
-		{
-			var seed = new List<string>().AsEnumerable();
-
-            List<string> ignoredPropertiesForTypes = 
-			    IgnoredProperties
-				    .Where(pair => pair.Key.IsAssignableFrom(type1) || pair.Key.IsAssignableFrom(type2))
-				    .Aggregate(seed, (current, pair) => current.Union(pair.Value))
-				    .ToList();
-
-            return ignoredPropertiesForTypes.Union(IgnoredPropertyNames).ToList();
 		}
 	}
 }
