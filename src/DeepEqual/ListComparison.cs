@@ -8,10 +8,13 @@
 	public class ListComparison : IComparison
 	{
 		public IComparison Inner { get; private set; }
+        public bool DisregardListOrder { get; set; }
+        public IgnoredProperties IgnoredProperties;
 
-		public ListComparison(IComparison inner)
+		public ListComparison(IComparison inner, IgnoredProperties ignoredProperties)
 		{
 			Inner = inner;
+            IgnoredProperties = ignoredProperties;
 		}
 
 		public bool CanCompare(Type type1, Type type2)
@@ -37,6 +40,14 @@
 			{
 				return ComparisonResult.Pass;
 			}
+
+            if (DisregardListOrder)
+            {
+                IComparer objectComparer = new ObjectComparer(IgnoredProperties);
+
+                Array.Sort(list1, objectComparer);
+                Array.Sort(list2, objectComparer);
+            }
 
 			var zip = list1.Zip(list2, Tuple.Create).ToArray();
 

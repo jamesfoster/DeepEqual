@@ -38,8 +38,22 @@
 			Builder.IgnoreProperty(property);
 			return this;
 		}
-		
-		[Pure]
+
+        [Pure]
+        public CompareSyntax<TActual, TExpected> IgnoreProperty(string property)
+        {
+            Builder.IgnoreProperty(property);
+            return this;
+        }
+
+        [Pure]
+        public CompareSyntax<TActual, TExpected> DisregardListOrder()
+        {
+            Builder.DisregardListOrder();
+            return this;
+        }
+
+        [Pure]
 		public CompareSyntax<TActual, TExpected> SkipDefault<T>()
 		{
 			Builder.SkipDefault<T>();

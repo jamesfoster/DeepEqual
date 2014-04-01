@@ -80,7 +80,7 @@
 				.When(() => result = SUT.IgnoreProperty<Version>(x => x.Major));
 
 			"Then UnmatchedPropertiesIgnored should be true"
-                .Then(() => SUT.ComplexObjectComparison.IgnoredProperties.IgnoredPropertiesPerType[typeof(Version)].ShouldContain("Major"));
+				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties[typeof(Version)].ShouldContain("Major"));
 
 			"And it should return the builder"
 				.And(() => result.ShouldBeSameAs(SUT));
