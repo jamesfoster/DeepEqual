@@ -53,7 +53,12 @@
 
 		private void IgnoreProperty(Type type, string propertyName)
 		{
-			IgnoredProperties.Add(property => type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName);
+			IgnoreProperty(property => type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName);
+		}
+
+		public void IgnoreProperty(Func<PropertyReader, bool> item)
+		{
+			IgnoredProperties.Add(item);
 		}
 	}
 }
