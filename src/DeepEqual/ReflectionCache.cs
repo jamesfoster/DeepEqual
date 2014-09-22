@@ -47,9 +47,13 @@ namespace DeepEqual
 				return type.GetElementType();
 			}
 
-			var implements = type.GetInterfaces().Union(new[] {type}).FirstOrDefault(
-				t => t.IsGenericType &&
-				     t.GetGenericTypeDefinition() == typeof (IEnumerable<>)
+			var implements = type
+				.GetInterfaces()
+				.Union(new[] {type})
+				.FirstOrDefault(
+					t =>
+						t.IsGenericType &&
+						t.GetGenericTypeDefinition() == typeof (IEnumerable<>)
 				);
 
 			if (implements == null)
@@ -115,7 +119,7 @@ namespace DeepEqual
 				if (obj is IDynamicMetaObjectProvider)
 					return GetDynamicProperties(obj as IDynamicMetaObjectProvider); // Dont cache dynamic properties
 				
-				PropertyCache[type] = GetStaticProperties(type);
+				PropertyCache[type] = GetPublicPropertiesAdFields(type);
 			}
 
 			return PropertyCache[type];
@@ -156,7 +160,12 @@ namespace DeepEqual
 			return result.ToArray();
 		}
 
-		private static PropertyReader[] GetStaticProperties(Type type)
+		private static PropertyReader[] GetPublicPropertiesAdFields(Type type)
+		{
+			return GetPublicProperties(type).Concat(GetPublicFields(type)).ToArray();
+		}
+
+		private static IEnumerable<PropertyReader> GetPublicProperties(Type type)
 		{
 			var properties = type.GetProperties().AsEnumerable();
 
@@ -164,13 +173,13 @@ namespace DeepEqual
 			properties = ExcludeIndexProperties(properties);
 
 			return properties
-				.Select(x => new PropertyReader
-					{
-						Name = x.Name,
-						DeclaringType = type,
-						Read = o => x.GetValue(o, null)
-					})
-				.ToArray();
+				.Select(
+					x => new PropertyReader
+						{
+							Name = x.Name,
+							DeclaringType = type,
+							Read = o => x.GetValue(o, null)
+						});
 		}
 
 		private static IEnumerable<PropertyInfo> RemoveHiddenProperties(IEnumerable<PropertyInfo> properties)
@@ -184,6 +193,29 @@ namespace DeepEqual
 		{
 			return properties
 				.Where(x => !x.GetIndexParameters().Any());
+		}
+
+		private static IEnumerable<PropertyReader> GetPublicFields(Type type)
+		{
+			var fields = type.GetFields().AsEnumerable();
+
+			fields = RemoveHiddenFields(fields);
+
+			return fields
+				.Select(
+					x => new PropertyReader
+						{
+							Name = x.Name,
+							DeclaringType = type,
+							Read = o => x.GetValue(o)
+						});
+		}
+
+		private static IEnumerable<FieldInfo> RemoveHiddenFields(IEnumerable<FieldInfo> properties)
+		{
+			return properties
+				.ToLookup(x => x.Name)
+				.Select(x => x.First());
 		}
 	}
 }
