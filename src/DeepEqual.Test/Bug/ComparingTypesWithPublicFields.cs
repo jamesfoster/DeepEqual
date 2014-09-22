@@ -9,7 +9,7 @@
 	public class ComparingTypesWithPublicFields
 	{
 		[Fact]
-		public static void TestIgnoreByType()
+		public static void Should_consider_public_fields_when_comparing_complex_objects()
 		{
 			var expected = new Data
 				{
