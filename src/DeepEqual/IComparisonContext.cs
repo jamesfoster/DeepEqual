@@ -11,5 +11,6 @@
 
 		IComparisonContext VisitingProperty(string propertyName);
 		IComparisonContext VisitingIndex(object index);
+		bool ShouldVisitObjects(object item1, object item2);
 	}
 }

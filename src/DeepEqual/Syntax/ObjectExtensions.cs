@@ -7,33 +7,37 @@
 	public static class ObjectExtensions
 	{
 		[Pure]
-		public static bool IsDeepEqual(this object actual, object expected)
+		public static bool IsDeepEqual(this object actual, object expected, bool recursionProtection = true)
 		{
 			var comparison = new ComparisonBuilder().Create();
 
-			return IsDeepEqual(actual, expected, comparison);
+			return IsDeepEqual(actual, expected, comparison, recursionProtection);
 		}
 
 		[Pure]
-		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison)
+		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison, bool recursionProtection = true)
 		{
-			var context = new ComparisonContext();
+			var context = new ComparisonContext {
+				RecursionProtection = recursionProtection
+			};
 
 			var result = comparison.Compare(context, actual, expected);
 
 			return result == ComparisonResult.Pass;
 		}
 
-		public static void ShouldDeepEqual(this object actual, object expected)
+		public static void ShouldDeepEqual(this object actual, object expected, bool recursionProtection = true)
 		{
 			var comparison = new ComparisonBuilder().Create();
 
-			ShouldDeepEqual(actual, expected, comparison);
+			ShouldDeepEqual(actual, expected, comparison, recursionProtection);
 		}
 
-		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison)
+		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison, bool recursionProtection = true)
 		{
-			var context = new ComparisonContext();
+			var context = new ComparisonContext {
+				RecursionProtection = recursionProtection
+			};
 
 			var result = comparison.Compare(context, actual, expected);
 

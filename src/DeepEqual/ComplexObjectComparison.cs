@@ -25,6 +25,11 @@
 
 		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
 		{
+			if (!context.VisitObjects(value1, value2))
+			{
+				return ComparisonResult.Pass;
+			}
+
 			var comparer = new ComplexObjectComparer(Inner, IgnoreUnmatchedProperties, IgnoredProperties);
 
 			return comparer.CompareObjects(context, value1, value2);

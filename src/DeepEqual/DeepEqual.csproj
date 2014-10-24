@@ -36,6 +36,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComparedObjectHash.cs" />
     <Compile Include="ComparisonBuilder.cs" />
     <Compile Include="ComparisonContext.cs" />
     <Compile Include="ComparisonResult.cs" />
