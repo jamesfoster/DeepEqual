@@ -33,7 +33,7 @@
 			set { ComparedObjectHash.Enabled = value; }
 		}
 
-		public bool VisitObjects(object item1, object item2)
+		public bool ShouldVisitObjects(object item1, object item2)
 		{
 			return ComparedObjectHash.Add(item1, item2);
 		}

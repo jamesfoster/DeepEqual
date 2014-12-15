@@ -25,7 +25,7 @@
 
 		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
 		{
-			if (!context.VisitObjects(value1, value2))
+			if (!context.ShouldVisitObjects(value1, value2))
 			{
 				return ComparisonResult.Pass;
 			}
