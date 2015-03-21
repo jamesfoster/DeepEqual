@@ -1,9 +1,6 @@
 ﻿namespace DeepEqual.Test.Bug
 {
-	using DeepEqual.Syntax;
 	using DeepEqual.Test.Helper;
-
-	using Shouldly;
 
 	using Xunit;
 

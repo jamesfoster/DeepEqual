@@ -110,6 +110,14 @@ namespace DeepEqual
 			       type == typeof (string);
 		}
 
+		public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)
+		{
+			foreach (var type in types)
+			{
+				PropertyCache[type] = GetPropertiesAndFields(type, CacheBehaviour.IncludePrivate);
+			}
+		}
+
 		internal static PropertyReader[] GetProperties(object obj)
 		{
 			var type = obj.GetType();
@@ -119,7 +127,7 @@ namespace DeepEqual
 				if (obj is IDynamicMetaObjectProvider)
 					return GetDynamicProperties(obj as IDynamicMetaObjectProvider); // Dont cache dynamic properties
 				
-				PropertyCache[type] = GetPublicPropertiesAdFields(type);
+				PropertyCache[type] = GetPropertiesAndFields(type, CacheBehaviour.PublicOnly);
 			}
 
 			return PropertyCache[type];
@@ -160,14 +168,17 @@ namespace DeepEqual
 			return result.ToArray();
 		}
 
-		private static PropertyReader[] GetPublicPropertiesAdFields(Type type)
+		private static PropertyReader[] GetPropertiesAndFields(Type type, CacheBehaviour behaviour)
 		{
-			return GetPublicProperties(type).Concat(GetPublicFields(type)).ToArray();
+			return GetProperties(type, behaviour)
+				.Concat(GetFields(type, behaviour))
+				.ToArray();
 		}
 
-		private static IEnumerable<PropertyReader> GetPublicProperties(Type type)
+		private static IEnumerable<PropertyReader> GetProperties(Type type, CacheBehaviour behaviour)
 		{
-			var properties = type.GetProperties().AsEnumerable();
+			var bindingFlags = GetBindingFlags(behaviour);
+			var properties = type.GetProperties(bindingFlags).AsEnumerable();
 
 			properties = RemoveHiddenProperties(properties);
 			properties = ExcludeIndexProperties(properties);
@@ -195,9 +206,10 @@ namespace DeepEqual
 				.Where(x => !x.GetIndexParameters().Any());
 		}
 
-		private static IEnumerable<PropertyReader> GetPublicFields(Type type)
+		private static IEnumerable<PropertyReader> GetFields(Type type, CacheBehaviour behaviour)
 		{
-			var fields = type.GetFields().AsEnumerable();
+			var bindingFlags = GetBindingFlags(behaviour);
+			var fields = type.GetFields(bindingFlags).AsEnumerable();
 
 			fields = RemoveHiddenFields(fields);
 
@@ -217,5 +229,23 @@ namespace DeepEqual
 				.ToLookup(x => x.Name)
 				.Select(x => x.First());
 		}
+
+		private static BindingFlags GetBindingFlags(CacheBehaviour behaviour)
+		{
+			var result = BindingFlags.Instance | BindingFlags.Public;
+
+			if (behaviour == CacheBehaviour.IncludePrivate)
+			{
+				result |= BindingFlags.NonPublic;
+			}
+
+			return result;
+		}
+	}
+
+	internal enum CacheBehaviour
+	{
+		PublicOnly,
+		IncludePrivate
 	}
 }

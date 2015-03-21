@@ -68,8 +68,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bug\ComparingTypesWithPublicFields.cs" />
-    <Compile Include="Bug\ComparingObjectsPropertiesWithArguments.cs" />
+    <Compile Include="Features\ComparingTypesWithPrivateFields.cs" />
+    <Compile Include="Features\ComparingTypesWithPublicFields.cs" />
+    <Compile Include="Features\ComparingObjectsPropertiesWithArguments.cs" />
     <Compile Include="ComparisonBuilderTests.cs" />
     <Compile Include="Comparsions\ComplexObjectComparisonTests.cs">
       <SubType>Code</SubType>
@@ -93,8 +94,10 @@
     </Compile>
     <Compile Include="Dummy.cs" />
     <Compile Include="Helper\DeepAssert.cs" />
+    <Compile Include="Helper\EchoComparison.cs" />
     <Compile Include="MockExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Syntax\CompareSyntaxTests.cs" />
     <Compile Include="Syntax\ResultTests.cs" />
   </ItemGroup>
   <ItemGroup>

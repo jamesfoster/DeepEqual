@@ -5,7 +5,7 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 
-	public class ComparisonBuilder
+	public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 	{
 		public IList<IComparison> CustomComparisons { get; set; }
 
@@ -71,6 +71,17 @@
 		public ComparisonBuilder SkipDefault<T>()
 		{
 			DefaultComparison.Skip<T>();
+			return this;
+		}
+
+		public ComparisonBuilder ExposeInternalsOf<T>()
+		{
+			return ExposeInternalsOf(typeof(T));
+		}
+
+		public ComparisonBuilder ExposeInternalsOf(params Type[] types)
+		{
+			ReflectionCache.CachePrivatePropertiesOfTypes(types);
 			return this;
 		}
 	}
