@@ -1,6 +1,7 @@
 ﻿namespace DeepEqual.Test.Bug
 {
 	using DeepEqual.Syntax;
+	using DeepEqual.Test.Helper;
 	using DeepEqual.Test.VB;
 	using Xunit;
 
@@ -12,7 +13,7 @@
 			var x = new HasPropertiesWithArguments();
 			var y = new HasPropertiesWithArguments();
 
-			x.ShouldDeepEqual(y);
+			DeepAssert.AreEqual(x, y);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿namespace DeepEqual.Test.Bug
 {
 	using DeepEqual.Syntax;
+	using DeepEqual.Test.Helper;
 
 	using Shouldly;
 
@@ -23,7 +24,7 @@
 					Name = "Joe"
 				};
 
-			actual.IsDeepEqual(expected).ShouldBe(false);
+			DeepAssert.AreNotEqual(actual, expected);
 		}
 
 		public class Data
