@@ -271,6 +271,7 @@
 		private class AlwaysEqualAswell : AlwaysEqual {}
 
 		#region Spies
+		//ncrunch: no coverage start
 
 		private class EqualsSpy
 		{
@@ -412,6 +413,7 @@
 			}
 		}
 
+		//ncrunch: no coverage end
 		#endregion
 	}
 }

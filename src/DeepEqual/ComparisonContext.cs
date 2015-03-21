@@ -36,10 +36,5 @@
 
 			return new ComparisonContext(Differences, newBreadcrumb);
 		}
-
-		public override string ToString()
-		{
-			return string.Format("Breadcrumb: {0}, Differences: {1}", Breadcrumb, Differences.Count);
-		}
 	}
 }

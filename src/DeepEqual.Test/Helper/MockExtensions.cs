@@ -1,4 +1,4 @@
-﻿namespace DeepEqual.Test
+namespace DeepEqual.Test.Helper
 {
 	using System;
 	using System.Collections.Generic;

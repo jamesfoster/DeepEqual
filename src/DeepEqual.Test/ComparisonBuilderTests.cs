@@ -94,6 +94,30 @@
 		}
 		
 		[Scenario]
+		public void Ignoring_specific_properties_2()
+		{
+			var result = default (ComparisonBuilder);
+
+			"Given a builder"
+				.Given(() => SUT = new ComparisonBuilder());
+
+			"When ignoring the Major property of Version"
+				.When(() => result = SUT.IgnoreProperty(x => x.Name == "Major"));
+
+			"Then it should add an IgnoredProperty"
+				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1));
+
+			"And it should return true for the Major property of the Version type"
+				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
+					{
+						Name = "Major"
+					}).ShouldBe(true));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+		
+		[Scenario]
 		public void Skipping_default_comparison_for_types()
 		{
 			var result = default (ComparisonBuilder);

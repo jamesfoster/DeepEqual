@@ -1,7 +1,11 @@
+//ncrunch: no coverage start
+
 namespace DeepEqual.Syntax
 {
 	using System;
 	using System.Runtime.Serialization;
+
+	using DeepEqual.Formatting;
 
 	public class DeepEqualException : Exception
 	{
