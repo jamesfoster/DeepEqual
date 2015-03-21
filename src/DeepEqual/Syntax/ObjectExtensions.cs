@@ -31,24 +31,7 @@
 				return;
 			}
 
-			var sb = new StringBuilder();
-
-			sb.Append("Comparison Failed");
-
-			if (context.Differences.Count > 0)
-			{
-				sb.AppendFormat(": The following {0} differences were found.", context.Differences.Count);
-
-				foreach (var difference in context.Differences)
-				{
-					var lines = difference.ToString().Split(new[] {"\n"}, StringSplitOptions.None);
-
-					sb.Append("\n\t");
-					sb.Append(string.Join("\n\t", lines));
-				}
-			}
-
-			throw new Exception(sb.ToString());
+			throw new DeepEqualException(context);
 		}
 
 		[Pure]
