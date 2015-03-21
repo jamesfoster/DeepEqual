@@ -46,6 +46,13 @@
     <Compile Include="CompositeComparison.cs" />
     <Compile Include="DictionaryComparison.cs" />
     <Compile Include="Difference.cs" />
+    <Compile Include="Formatting\BasicDifferenceFormatter.cs" />
+    <Compile Include="Formatting\DeepEqualExceptionMessageBuilder.cs" />
+    <Compile Include="Formatting\DifferenceFormatterBase.cs" />
+    <Compile Include="Formatting\DifferenceFormatterFactory.cs" />
+    <Compile Include="Formatting\IDifferenceFormatter.cs" />
+    <Compile Include="Formatting\MissingEntryDifferenceFormatter.cs" />
+    <Compile Include="Formatting\SetDifferenceFormatter.cs" />
     <Compile Include="IComparisonBuilder.cs" />
     <Compile Include="IComparisonContext.cs" />
     <Compile Include="MissingEntryDifference.cs" />
@@ -59,7 +66,6 @@
     <Compile Include="SetComparison.cs" />
     <Compile Include="SetDifference.cs" />
     <Compile Include="Syntax\CompareSyntax.cs" />
-    <Compile Include="Syntax\DeepEqualExceptionMessageBuilder.cs" />
     <Compile Include="Syntax\DeepEqualException.cs" />
     <Compile Include="Syntax\ObjectExtensions.cs" />
   </ItemGroup>

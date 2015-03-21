@@ -92,9 +92,11 @@
 			Actual.ShouldDeepEqual(Expected, Builder.Create());
 		}
 
+		//ncrunch: no coverage start
 		CompositeComparison IComparisonBuilder<CompareSyntax<TActual, TExpected>>.Create()
 		{
 			throw new NotImplementedException();
 		}
+		//ncrunch: no coverage end
 	}
 }

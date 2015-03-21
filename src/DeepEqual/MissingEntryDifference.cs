@@ -2,12 +2,22 @@
 {
 	public class MissingEntryDifference : Difference
 	{
-		public override string ToString()
+		public MissingEntryDifference(MissingSide side, object key, object value)
 		{
-			return string.Format("Expected{0}[{1}] not found (Actual{0}[{1}] = {2})",
-				Breadcrumb,
-				Prettify(Value1),
-				Prettify(Value2));
+			Side = side;
+			Key = key;
+			Value = value;
 		}
+
+		public MissingSide Side { get; set; }
+		public object Key { get; set; }
+		public object Value { get; set; }
 	}
+
+	public enum MissingSide
+	{
+		Actual,
+		Expected
+	}
+
 }

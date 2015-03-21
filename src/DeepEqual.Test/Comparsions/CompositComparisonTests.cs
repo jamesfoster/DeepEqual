@@ -5,6 +5,7 @@
 	using System.Linq;
 
 	using DeepEqual;
+	using DeepEqual.Test.Helper;
 
 	using Moq;
 
@@ -68,6 +69,19 @@
 
 			"CanCompare should always true"
 				.And(() => SUT.CanCompare(null, null).ShouldBe(true));
+		}
+
+		[Scenario]
+		public void When_adding_a_caomparison()
+		{
+			"Given a CompostieComperer"
+				.Given(() => SUT = new CompositeComparison());
+
+			"When adding a comparer"
+				.Then(() => SUT.Add(Mock.Of<IComparison>()));
+
+			"Then there should be one comparison"
+				.Then(() => SUT.Comparisons.Count.ShouldBe(1));
 		}
 
 		[Scenario]
