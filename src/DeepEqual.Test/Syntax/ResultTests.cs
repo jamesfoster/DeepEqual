@@ -1,7 +1,5 @@
 ﻿namespace DeepEqual.Test.Syntax
 {
-	using System;
-
 	using DeepEqual.Test.Helper;
 
 	using Xunit;
@@ -33,26 +31,6 @@
 			var comparison = new EchoComparison(ComparisonResult.Inconclusive);
 
 			DeepAssert.AreEqual(a, b, comparison);
-		}
-
-		public class EchoComparison : IComparison
-		{
-			private readonly ComparisonResult result;
-
-			public EchoComparison(ComparisonResult result)
-			{
-				this.result = result;
-			}
-
-			public bool CanCompare(Type type1, Type type2)
-			{
-				return true;
-			}
-
-			public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
-			{
-				return result;
-			}
 		}
 	}
 }

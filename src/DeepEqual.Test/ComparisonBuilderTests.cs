@@ -101,11 +101,56 @@
 			"Given a builder"
 				.Given(() => SUT = new ComparisonBuilder());
 
-			"When ignoring unmatched properties"
+			"When skipping the default comparison fer Version"
 				.When(() => result = SUT.SkipDefault<Version>());
 
-			"Then UnmatchedPropertiesIgnored should be true"
+			"Then SkippedTypes should contain Version"
 				.Then(() => SUT.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version)));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+		
+		[Scenario]
+		public void Expoising_internals_of_a_given_type()
+		{
+			var result = default (ComparisonBuilder);
+			var properties = default (PropertyReader[]);
+
+			"Given a builder"
+				.Given(() => SUT = new ComparisonBuilder());
+
+			"When exposing the internals of Version"
+				.When(() => result = SUT.ExposeInternalsOf<Version>())
+				.And("", () => properties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)));
+
+			"Then ReflectionCache should contain the private properties of Version"
+				.Then(() => properties.ShouldContain(x => x.Name == "_Major"));
+
+			"And it should return the builder"
+				.And(() => result.ShouldBeSameAs(SUT));
+		}
+		
+		[Scenario]
+		public void Expoising_internals_of_many_types()
+		{
+			var result = default (ComparisonBuilder);
+			var versionProperties = default (PropertyReader[]);
+			var uriProperties = default (PropertyReader[]);
+
+			"Given a builder"
+				.Given(() => SUT = new ComparisonBuilder());
+
+			"When exposing the internals of Version"
+				.When(() => result = SUT.ExposeInternalsOf(typeof(Version), typeof(Uri)))
+				.And("", () => versionProperties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)))
+				.And("", () => uriProperties = ReflectionCache.GetProperties(new Uri("http://google.com")));
+
+			"Then ReflectionCache should contain the private properties of Version"
+				.Then(() => versionProperties.ShouldContain(x => x.Name == "_Major"));
+
+			"And ReflectionCache should contain the private properties of Uri"
+				.Then(() => uriProperties.ShouldContain(x => x.Name == "m_Syntax"));
 
 			"And it should return the builder"
 				.And(() => result.ShouldBeSameAs(SUT));
@@ -182,47 +227,8 @@
 			"When calling Create"
 				.When(() => result = SUT.Create());
 
-			"Then it not return null"
-				.Then(() => result.ShouldNotBe(null));
-
-			"And the 1st comparer is the custom comparison"
-				.And(() => result.Comparisons[0].ShouldBeSameAs(custom));
-
-			"And the 2nd comparer is the DefaultComparison"
-				.And(() => result.Comparisons[1].ShouldBeTypeOf<DefaultComparison>());
-
-			"And the 3rd comparer is the EnumComparison"
-				.And(() => result.Comparisons[2].ShouldBeTypeOf<EnumComparison>());
-			
-			"And the 4th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[3].ShouldBeTypeOf<DictionaryComparison>());
-			
-			"... with a DefaultComparison as the key comparer"
-				.And(() => ((DictionaryComparison)result.Comparisons[3]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
-			
-			"... and the value comparer is the result"
-				.And(() => ((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(result));
-			
-			"And the 5th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[4].ShouldBeTypeOf<SetComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
-			
-			"And the 6th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[5].ShouldBeTypeOf<ListComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
-			
-			"And the 7th comparer is the ComplexObjectComparison"
-				.And(() => result.Comparisons[6].ShouldBeTypeOf<ComplexObjectComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(result));
-			
-			"... and IgnoreUnmatchedProperties should be false"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[6]).IgnoreUnmatchedProperties.ShouldBe(false));
+			"Then the 1st comparer is the custom comparison"
+				.Then(() => result.Comparisons[0].ShouldBeSameAs(custom));
 		}
 
 		[Scenario]
@@ -239,41 +245,8 @@
 			"When calling Create"
 				.When(() => result = SUT.Create());
 
-			"Then it not return null"
-				.Then(() => result.ShouldNotBe(null));
-
-			"And the 1st comparer is the DefaultComparison"
-				.And(() => result.Comparisons[0].ShouldBeTypeOf<DefaultComparison>());
-
-			"And the 2nd comparer is the EnumComparison"
-				.And(() => result.Comparisons[1].ShouldBeTypeOf<EnumComparison>());
-			
-			"And the 3rd comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[2].ShouldBeTypeOf<DictionaryComparison>());
-			
-			"... with a DefaultComparison as the key comparer"
-				.And(() => ((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
-			
-			"... and the value comparer is the result"
-				.And(() => ((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result));
-			
-			"And the 4th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[3].ShouldBeTypeOf<SetComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result));
-			
-			"And the 5th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[4].ShouldBeTypeOf<ListComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
-			
-			"And the 6th comparer is the ComplexObjectComparison"
-				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
-			
-			"... and the inner comparer is the result"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
+			"Then the 6th comparer is the ComplexObjectComparison"
+				.Then(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
 			
 			"... and IgnoreUnmatchedProperties should be true"
 				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(true));

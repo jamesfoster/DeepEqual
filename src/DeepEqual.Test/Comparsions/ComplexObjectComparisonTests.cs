@@ -3,21 +3,18 @@
 	using System;
 	using System.Collections.Generic;
 	using System.Dynamic;
-
-	using DeepEqual.Syntax;
+	using System.Linq;
 
 	using Moq;
 
 	using Ploeh.AutoFixture;
 	using Ploeh.AutoFixture.AutoMoq;
 
-	using Xbehave;
-
 	using Shouldly;
 
-	using Xunit.Extensions;
+	using Xbehave;
 
-	using System.Linq;
+	using Xunit.Extensions;
 
 	public class ComplexObjectComparisonTests
 	{
@@ -135,7 +132,7 @@
 			"And the IgnoreMe property is ignored"
 				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
-			"And value1 is a MyClass instance"
+			"And value1 is provided"
 				.And(() => value1 = new A
 					{
 						X = Fixture.Create<string>(),

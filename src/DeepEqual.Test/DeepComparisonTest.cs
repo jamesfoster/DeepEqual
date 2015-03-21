@@ -1,12 +1,11 @@
 ﻿namespace DeepEqual.Test
 {
+	using System;
 	using System.Collections.Generic;
 
 	using DeepEqual.Test.Helper;
 
 	using Xunit;
-
-	using Syntax;
 
 	public class DeepComparisonTest
 	{
@@ -16,7 +15,7 @@
 			var object1 = new
 				{
 					A = 1,
-					B = System.UriKind.Absolute,
+					B = UriKind.Absolute,
 					C = new List<int> {1, 2, 3},
 					Inner = new
 						{

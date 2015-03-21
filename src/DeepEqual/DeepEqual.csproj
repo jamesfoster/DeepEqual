@@ -46,6 +46,7 @@
     <Compile Include="CompositeComparison.cs" />
     <Compile Include="DictionaryComparison.cs" />
     <Compile Include="Difference.cs" />
+    <Compile Include="IComparisonBuilder.cs" />
     <Compile Include="IComparisonContext.cs" />
     <Compile Include="MissingEntryDifference.cs" />
     <Compile Include="PropertyReader.cs" />
