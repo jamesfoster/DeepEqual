@@ -92,8 +92,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Dummy.cs" />
+    <Compile Include="Helper\DeepAssert.cs" />
     <Compile Include="MockExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Syntax\ResultTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

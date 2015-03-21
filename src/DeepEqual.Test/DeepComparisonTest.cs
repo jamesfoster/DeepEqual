@@ -2,6 +2,8 @@
 {
 	using System.Collections.Generic;
 
+	using DeepEqual.Test.Helper;
+
 	using Xunit;
 
 	using Syntax;
@@ -51,12 +53,11 @@
 						}
 				};
 
+			var comparison = new ComparisonBuilder()
+				.IgnoreProperty<TestType>(x => x.Y)
+				.Create();
 
-			object1.WithDeepEqual(object2)
-			       .IgnoreProperty<TestType>(x => x.Y)
-			       .Assert();
-
-//			object1.ShouldDeepEqual(object2);
+			DeepAssert.AreEqual(object1, object2, comparison);
 		}
 	}
 
