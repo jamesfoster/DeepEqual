@@ -59,6 +59,8 @@
     <Compile Include="SetComparison.cs" />
     <Compile Include="SetDifference.cs" />
     <Compile Include="Syntax\CompareSyntax.cs" />
+    <Compile Include="Syntax\DeepEqualExceptionMessageBuilder.cs" />
+    <Compile Include="Syntax\DeepEqualException.cs" />
     <Compile Include="Syntax\ObjectExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

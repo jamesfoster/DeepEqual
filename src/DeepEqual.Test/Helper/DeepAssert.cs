@@ -19,7 +19,7 @@
 		public static void AreNotEqual(object actual, object expected, IComparison comparison = null)
 		{
 			actual.IsDeepEqual(expected, comparison).ShouldBe(false);
-			Assert.Throws<Exception>(() => actual.ShouldDeepEqual(expected, comparison));
+			Assert.Throws<DeepEqualException>(() => actual.ShouldDeepEqual(expected, comparison));
 		}
 	}
 }
