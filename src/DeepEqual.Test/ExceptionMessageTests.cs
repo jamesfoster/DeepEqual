@@ -1,4 +1,6 @@
-﻿namespace DeepEqual.Test
+﻿using Xunit.Extensions;
+
+namespace DeepEqual.Test
 {
 	using System.Collections.Generic;
 
@@ -114,6 +116,23 @@ Comparison Failed: The following 1 differences were found.
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
 	Actual != Expected (""...45678901234567890123"" != ""...01234567890123456789"")");
+		}
+
+		[Theory]
+		[InlineData("0123456789012345678", "01234567890123456789", "0123456789012345678", "01234567890123456789")]
+		[InlineData("012345678901234567", "0123456789012345678", "012345678901234567", "0123456789012345678")]
+		[InlineData("0123456789012345678", "012345678901234567890", "0123456789012345678", "...12345678901234567890")]
+		[InlineData("012345678901234567890", "0123456789012345678", "...12345678901234567890", "0123456789012345678")]
+		public void Strings_around_same_length_as_max_length(string value1, string value2, string expected1, string expected2)
+		{
+			var context = new ComparisonContext();
+			context.AddDifference(
+				value1,
+				value2);
+
+			AssertExceptionMessage(context, string.Format(@"
+Comparison Failed: The following 1 differences were found.
+	Actual != Expected (""{0}"" != ""{1}"")", expected1, expected2));
 		}
 
 		[Fact]
