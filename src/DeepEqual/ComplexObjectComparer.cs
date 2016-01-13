@@ -83,8 +83,12 @@
 
 		private void PreparePropertyInfo(object source, object destination)
 		{
-			var sourceProperties = ReflectionCache.GetProperties(source);
-			var destinationProperties = ReflectionCache.GetProperties(destination).ToDictionary(x => x.Name);
+			var sourceProperties = ReflectionCache
+				.GetProperties(source);
+
+			var destinationProperties = ReflectionCache
+				.GetProperties(destination)
+				.ToDictionary(x => x.Name);
 
 			propertyMap = new List<PropertyPair>();
 
