@@ -2,12 +2,14 @@ namespace DeepEqual
 {
 	using System;
 	using System.Collections;
+	using System.Collections.Concurrent;
 	using System.Collections.Generic;
 	using System.Dynamic;
 	using System.Linq;
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Runtime.CompilerServices;
+	using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 	using Microsoft.CSharp.RuntimeBinder;
 
@@ -15,11 +17,16 @@ namespace DeepEqual
 
 	public static class ReflectionCache
 	{
-		private static readonly Dictionary<Type, Type> EnumerationTypeCache = new Dictionary<Type, Type>();
-		private static readonly Dictionary<Type, bool> IsListCache = new Dictionary<Type, bool>();
-		private static readonly Dictionary<Type, bool> IsSetCache = new Dictionary<Type, bool>();
-		private static readonly Dictionary<Type, bool> IsDictionaryCache = new Dictionary<Type, bool>();
-		private static readonly Dictionary<Type, PropertyReader[]> PropertyCache = new Dictionary<Type, PropertyReader[]>();
+		private static readonly ConcurrentDictionary<Type, Type> EnumerationTypeCache
+			= new ConcurrentDictionary<Type, Type>();
+		private static readonly ConcurrentDictionary<Type, bool> IsListCache
+			= new ConcurrentDictionary<Type, bool>();
+		private static readonly ConcurrentDictionary<Type, bool> IsSetCache
+			= new ConcurrentDictionary<Type, bool>();
+		private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache
+			= new ConcurrentDictionary<Type, bool>();
+		private static readonly ConcurrentDictionary<Type, PropertyReader[]> PropertyCache
+			= new ConcurrentDictionary<Type, PropertyReader[]>();
 
 		public static void ClearCache()
 		{
@@ -32,12 +39,7 @@ namespace DeepEqual
 
 		internal static Type GetEnumerationType(Type type)
 		{
-			if (!EnumerationTypeCache.ContainsKey(type))
-			{
-				EnumerationTypeCache[type] = GetEnumerationTypeImpl(type);
-			}
-
-			return EnumerationTypeCache[type];
+			return EnumerationTypeCache.GetOrAdd(type, GetEnumerationTypeImpl);
 		}
 
 		private static Type GetEnumerationTypeImpl(Type type)
@@ -66,42 +68,42 @@ namespace DeepEqual
 
 		internal static bool IsListType(Type type)
 		{
-			if (!IsListCache.ContainsKey(type))
-			{
-				var equals = type == typeof (IEnumerable);
-				var inherits = type.GetInterface("IEnumerable") == typeof (IEnumerable);
+			return IsListCache.GetOrAdd(type, IsListTypeImpl);
+		}
 
-				IsListCache[type] = equals || inherits;
-			}
+		private static bool IsListTypeImpl(Type type)
+		{
+			var equals = type == typeof(IEnumerable);
+			var inherits = type.GetInterface("IEnumerable") == typeof(IEnumerable);
 
-			return IsListCache[type];
+			return equals || inherits;
 		}
 
 		internal static bool IsSetType(Type type)
 		{
-			if (!IsSetCache.ContainsKey(type))
-			{
-				Func<Type, bool> isSet = t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof (ISet<>);
-				var equals = isSet(type);
-				var inherits = type.GetInterfaces().Any(isSet);
+			return IsSetCache.GetOrAdd(type, IsSetTypeImpl);
+		}
 
-				IsSetCache[type] = equals || inherits;
-			}
+		private static bool IsSetTypeImpl(Type type)
+		{
+			Func<Type, bool> isSet = t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISet<>);
+			var equals = isSet(type);
+			var inherits = type.GetInterfaces().Any(isSet);
 
-			return IsSetCache[type];
+			return equals || inherits;
 		}
 
 		internal static bool IsDictionaryType(Type type)
 		{
-			if (!IsDictionaryCache.ContainsKey(type))
-			{
-				var equals = type == typeof (IDictionary);
-				var inherits = type.GetInterface("IDictionary") == typeof (IDictionary);
+			return IsDictionaryCache.GetOrAdd(type, IsDictionaryTypeImpl);
+		}
 
-				IsDictionaryCache[type] = equals || inherits;
-			}
+		private static bool IsDictionaryTypeImpl(Type type)
+		{
+			var equals = type == typeof(IDictionary);
+			var inherits = type.GetInterface("IDictionary") == typeof(IDictionary);
 
-			return IsDictionaryCache[type];
+			return equals || inherits;
 		}
 
 		internal static bool IsValueType(Type type)
@@ -112,32 +114,37 @@ namespace DeepEqual
 
 		public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)
 		{
+			Func<Type, PropertyReader[]> getAllProperties =
+				t => GetPropertiesAndFields(t, CacheBehaviour.IncludePrivate);
+
 			foreach (var type in types)
 			{
-				PropertyCache[type] = GetPropertiesAndFields(type, CacheBehaviour.IncludePrivate);
+				PropertyCache.AddOrUpdate(type, getAllProperties, (t, value) => getAllProperties(t));
 			}
 		}
 
 		internal static PropertyReader[] GetProperties(object obj)
 		{
-			var type = obj.GetType();
-
-			if (!PropertyCache.ContainsKey(type))
+			// Dont cache dynamic properties
+			if (obj is IDynamicMetaObjectProvider)
 			{
-				if (obj is IDynamicMetaObjectProvider)
-					return GetDynamicProperties(obj as IDynamicMetaObjectProvider); // Dont cache dynamic properties
-				
-				PropertyCache[type] = GetPropertiesAndFields(type, CacheBehaviour.PublicOnly);
+				return GetDynamicProperties(obj as IDynamicMetaObjectProvider);
 			}
 
-			return PropertyCache[type];
+			var type = obj.GetType();
+
+			Func<Type, PropertyReader[]> getPublicProperties =
+				t => GetPropertiesAndFields(t, CacheBehaviour.PublicOnly);
+
+			return PropertyCache.GetOrAdd(type, getPublicProperties);
 		}
 
 		private static PropertyReader[] GetDynamicProperties(IDynamicMetaObjectProvider provider)
 		{
 			var metaObject = provider.GetMetaObject(Expression.Constant(provider));
 
-			var memberNames = metaObject.GetDynamicMemberNames(); // may return property names as well as method names, etc.
+			// may return property names as well as method names, etc.
+			var memberNames = metaObject.GetDynamicMemberNames();
 
 			var result = new List<PropertyReader>();
 
@@ -145,13 +152,21 @@ namespace DeepEqual
 			{
 				try
 				{
-					var argumentInfo = new[] {CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)};
+					var argumentInfo = new[]
+						{
+							CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
+						};
 
-					var binder = Binder.GetMember(CSharpBinderFlags.None, name, provider.GetType(), argumentInfo);
+					var binder = Binder.GetMember(
+						CSharpBinderFlags.None,
+						name,
+						provider.GetType(),
+						argumentInfo);
 
 					var site = CallSite<Func<CallSite, object, object>>.Create(binder);
 
-					var value = site.Target(site, provider); // will throw if no valid property getter
+					// will throw if no valid property getter
+					var value = site.Target(site, provider);
 
 					result.Add(new PropertyReader
 					{
