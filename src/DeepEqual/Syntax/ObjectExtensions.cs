@@ -7,7 +7,13 @@
 	public static class ObjectExtensions
 	{
 		[Pure]
-		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison = null)
+		public static bool IsDeepEqual(this object actual, object expected)
+		{
+			return IsDeepEqual(actual, expected, null);
+		}
+
+		[Pure]
+		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison)
 		{
 			comparison = comparison ?? new ComparisonBuilder().Create();
 
@@ -18,7 +24,12 @@
 			return result != ComparisonResult.Fail;
 		}
 
-		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison = null)
+		public static void ShouldDeepEqual(this object actual, object expected)
+		{
+			ShouldDeepEqual(actual, expected, null);
+		}
+
+		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison)
 		{
 			comparison = comparison ?? new ComparisonBuilder().Create();
 
