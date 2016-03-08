@@ -1,13 +1,12 @@
-﻿namespace DeepEqual.Test.Syntax
+﻿// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+
+namespace DeepEqual.Test.Syntax
 {
 	using System;
 
 	using DeepEqual.Syntax;
-	using DeepEqual.Test.Helper;
 
 	using Moq;
-
-	using Shouldly;
 
 	using Xunit;
 
