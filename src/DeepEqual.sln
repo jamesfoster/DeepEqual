@@ -18,6 +18,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Benchmark", "Deep
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F0A9EE3-A674-48E8-97B5-D15F7DC35CD7}"
+	ProjectSection(SolutionItems) = preProject
+		DeepEqual.snk = DeepEqual.snk
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
