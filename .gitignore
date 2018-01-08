@@ -24,4 +24,5 @@ _NCrunch_*/
 
 .DS_Store
 desktop.ini
-Thumbs.db
+Thumbs.db.vs/
+.vs/
