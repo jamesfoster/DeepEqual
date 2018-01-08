@@ -9,7 +9,6 @@ namespace DeepEqual
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Runtime.CompilerServices;
-	using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 	using Microsoft.CSharp.RuntimeBinder;
 

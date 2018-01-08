@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FC56EB7E-42BE-4EA2-A0C4-1766D453F866}"
 	ProjectSection(SolutionItems) = preProject
@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		DeepEqual.snk = DeepEqual.snk
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual.NetStandard", "DeepEqual.NetStandard\DeepEqual.NetStandard.csproj", "{9E67E52D-E871-456F-AD5A-0FA3B60426EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,8 +47,15 @@ Global
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9E67E52D-E871-456F-AD5A-0FA3B60426EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E67E52D-E871-456F-AD5A-0FA3B60426EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E67E52D-E871-456F-AD5A-0FA3B60426EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E67E52D-E871-456F-AD5A-0FA3B60426EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DAF9EC68-EA9A-4C76-99E2-25C75C40C895}
 	EndGlobalSection
 EndGlobal
