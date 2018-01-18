@@ -1,4 +1,8 @@
-﻿namespace DeepEqual
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("DeepEqual.Test")]
+
+namespace DeepEqual
 {
 	using System;
 	using System.Collections.Generic;

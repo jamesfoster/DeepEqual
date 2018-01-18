@@ -5,15 +5,15 @@
 
 	using DeepEqual;
 
-	using Ploeh.AutoFixture;
+	using AutoFixture;
 
 	using Shouldly;
 
 	using Xbehave;
 
-	using Xunit.Extensions;
+    using Xunit;
 
-	public class EnumComparisonTests
+    public class EnumComparisonTests
 	{
 		protected Fixture Fixture { get; set; }
 
@@ -27,55 +27,55 @@
 		public void Creating_an_EnumComparer()
 		{
 			"When creating a EnumComperer"
-				.When(() => SUT = new EnumComparison());
+				.x(() => SUT = new EnumComparison());
 
 			"it should implement IComparer"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+				.x(() => SUT.ShouldBeAssignableTo<IComparison>());
 		}
 
 		[Scenario]
-		[PropertyData("CanCompareTypesTestData")]
+		[MemberData("CanCompareTypesTestData")]
 		public void Can_compare_types(Type type1, Type type2, bool expected)
 		{
 			"Given a Fixture"
-				.Given(() => Fixture = new Fixture());
+				.x(() => Fixture = new Fixture());
 
 			"And an EnumComparer"
-				.And(() => SUT = Fixture.Create<EnumComparison>());
+				.x(() => SUT = Fixture.Create<EnumComparison>());
 
 			"When calling CanCompare({0}, {1})"
-				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+				.x(() => CanCompareResult = SUT.CanCompare(type1, type2));
 
 			"It should return {2}"
-				.Then(() => CanCompareResult.ShouldBe(expected));
+				.x(() => CanCompareResult.ShouldBe(expected));
 		}
 
 		[Scenario]
-		[PropertyData("CompareTestData")]
+		[MemberData("CompareTestData")]
 		public void Comparing_values(object value1, object value2, ComparisonResult expected)
 		{
 			"Given a Fixture"
-				.Given(() => Fixture = new Fixture());
+				.x(() => Fixture = new Fixture());
 
 			"And an EnumComparer"
-				.And(() => SUT = Fixture.Create<EnumComparison>());
+				.x(() => SUT = Fixture.Create<EnumComparison>());
 
 			"And a Comparison context object"
-				.And(() =>
+				.x(() =>
 					{
 						Context = new ComparisonContext("Property");
 					});
 
 			"When calling Compare({0}, {1})"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return {2}"
-				.Then(() => Result.ShouldBe(expected));
+				.x(() => Result.ShouldBe(expected));
 
 			if (expected == ComparisonResult.Pass)
 			{
 				"And it should not add any differences"
-					.And(() => Context.Differences.Count.ShouldBe(0));
+					.x(() => Context.Differences.Count.ShouldBe(0));
 			}
 			else
 			{
@@ -87,7 +87,7 @@
 					};
 
 				"And it should add a differences"
-					.And(() => Context.Differences[0].ShouldBe(expectedDifference));
+					.x(() => Context.Differences[0].ShouldBe(expectedDifference));
 			}
 		}
 

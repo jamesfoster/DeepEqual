@@ -16,13 +16,13 @@
 		public void Creating_a_builder()
 		{
 			"When creating a builder"
-				.When(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"Then there should be no custom comparisons"
-				.Then(() => SUT.CustomComparisons.ShouldBeEmpty());
+				.x(() => SUT.CustomComparisons.ShouldBeEmpty());
 
 			"And UnmatchedPropertiesIgnored should be false"
-				.And(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(false));
+				.x(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(false));
 		}
 		
 		[Scenario]
@@ -32,22 +32,22 @@
 			var custom = default (IComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"And a custom comparison"
-				.And(() => custom = new Mock<IComparison>().Object);
+				.x(() => custom = new Mock<IComparison>().Object);
 
 			"When adding the custom comparison"
-				.When(() => result = SUT.WithCustomComparison(custom));
+				.x(() => result = SUT.WithCustomComparison(custom));
 
 			"Then there should be a custom comparison"
-				.Then(() => SUT.CustomComparisons.Count.ShouldBe(1));
+				.x(() => SUT.CustomComparisons.Count.ShouldBe(1));
 
 			"And it should be the correct comparison"
-				.And(() => SUT.CustomComparisons[0].ShouldBeSameAs(custom));
+				.x(() => SUT.CustomComparisons[0].ShouldBeSameAs(custom));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -56,16 +56,16 @@
 			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When ignoring unmatched properties"
-				.When(() => result = SUT.IgnoreUnmatchedProperties());
+				.x(() => result = SUT.IgnoreUnmatchedProperties());
 
 			"Then UnmatchedPropertiesIgnored should be true"
-				.Then(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true));
+				.x(() => SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -74,23 +74,23 @@
 			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When ignoring the Major property of Version"
-				.When(() => result = SUT.IgnoreProperty<Version>(x => x.Major));
+				.x(() => result = SUT.IgnoreProperty<Version>(x => x.Major));
 
 			"Then it should add an IgnoredProperty"
-				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1));
+				.x(() => SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1));
 
-			"And it should return true for the Major property of the Version type"
-				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
+			"Then it should return true for the Major property of the Version type"
+				.x(() => SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
 					{
 						DeclaringType = typeof(Version),
 						Name = "Major"
 					}).ShouldBe(true));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -99,22 +99,22 @@
 			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When ignoring the Major property of Version"
-				.When(() => result = SUT.IgnoreProperty(x => x.Name == "Major"));
+				.x(() => result = SUT.IgnoreProperty(x => x.Name == "Major"));
 
 			"Then it should add an IgnoredProperty"
-				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1));
+				.x(() => SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1));
 
-			"And it should return true for the Major property of the Version type"
-				.Then(() => SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
+			"Then it should return true for the Major property of the Version type"
+				.x(() => SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
 					{
 						Name = "Major"
 					}).ShouldBe(true));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -123,16 +123,16 @@
 			var result = default (ComparisonBuilder);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When skipping the default comparison fer Version"
-				.When(() => result = SUT.SkipDefault<Version>());
+				.x(() => result = SUT.SkipDefault<Version>());
 
 			"Then SkippedTypes should contain Version"
-				.Then(() => SUT.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version)));
+				.x(() => SUT.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version)));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -142,17 +142,18 @@
 			var properties = default (PropertyReader[]);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When exposing the internals of Version"
-				.When(() => result = SUT.ExposeInternalsOf<Version>())
-				.And("", () => properties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)));
+				.x(() => result = SUT.ExposeInternalsOf<Version>());
 
-			"Then ReflectionCache should contain the private properties of Version"
-				.Then(() => properties.ShouldContain(x => x.Name == "_Major"));
+            "And".x(() => properties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)));
+
+            "Then ReflectionCache should contain the private properties of Version"
+				.x(() => properties.ShouldContain(x => x.Name == "_Major"));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 		
 		[Scenario]
@@ -163,21 +164,23 @@
 			var uriProperties = default (PropertyReader[]);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
-			"When exposing the internals of Version"
-				.When(() => result = SUT.ExposeInternalsOf(typeof(Version), typeof(Uri)))
-				.And("", () => versionProperties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)))
-				.And("", () => uriProperties = ReflectionCache.GetProperties(new Uri("http://google.com")));
+            "When exposing the internals of Version"
+                .x(() => result = SUT.ExposeInternalsOf(typeof(Version), typeof(Uri)));
 
-			"Then ReflectionCache should contain the private properties of Version"
-				.Then(() => versionProperties.ShouldContain(x => x.Name == "_Major"));
+            "And".x(() => versionProperties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4)));
+
+            "And".x(() => uriProperties = ReflectionCache.GetProperties(new Uri("http://google.com")));
+
+            "Then ReflectionCache should contain the private properties of Version"
+				.x(() => versionProperties.ShouldContain(x => x.Name == "_Major"));
 
 			"And ReflectionCache should contain the private properties of Uri"
-				.Then(() => uriProperties.ShouldContain(x => x.Name == "m_Syntax"));
+				.x(() => uriProperties.ShouldContain(x => x.Name == "m_Syntax"));
 
 			"And it should return the builder"
-				.And(() => result.ShouldBeSameAs(SUT));
+				.x(() => result.ShouldBeSameAs(SUT));
 		}
 
 		[Scenario]
@@ -186,49 +189,49 @@
 			var result = default (CompositeComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"When calling Create"
-				.When(() => result = SUT.Create());
+				.x(() => result = SUT.Create());
 
 			"Then it not return null"
-				.Then(() => result.ShouldNotBe(null));
+				.x(() => result.ShouldNotBe(null));
 
 			"And the 1st comparer is the DefaultComparison"
-				.And(() => result.Comparisons[0].ShouldBeTypeOf<DefaultComparison>());
+				.x(() => result.Comparisons[0].ShouldBeOfType<DefaultComparison>());
 
 			"And the 2nd comparer is the EnumComparison"
-				.And(() => result.Comparisons[1].ShouldBeTypeOf<EnumComparison>());
+				.x(() => result.Comparisons[1].ShouldBeOfType<EnumComparison>());
 			
 			"And the 3rd comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[2].ShouldBeTypeOf<DictionaryComparison>());
+				.x(() => result.Comparisons[2].ShouldBeOfType<DictionaryComparison>());
 			
 			"... with a DefaultComparison as the key comparer"
-				.And(() => ((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeTypeOf<DefaultComparison>());
+				.x(() => ((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeOfType<DefaultComparison>());
 			
 			"... and the value comparer is the result"
-				.And(() => ((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result));
+				.x(() => ((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result));
 			
 			"And the 4th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[3].ShouldBeTypeOf<SetComparison>());
+				.x(() => result.Comparisons[3].ShouldBeOfType<SetComparison>());
 			
 			"... and the inner comparer is the result"
-				.And(() => ((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result));
+				.x(() => ((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result));
 			
 			"And the 5th comparer is the DictionaryComparison"
-				.And(() => result.Comparisons[4].ShouldBeTypeOf<ListComparison>());
+				.x(() => result.Comparisons[4].ShouldBeOfType<ListComparison>());
 			
 			"... and the inner comparer is the result"
-				.And(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
+				.x(() => ((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result));
 			
 			"And the 6th comparer is the ComplexObjectComparison"
-				.And(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
+				.x(() => result.Comparisons[5].ShouldBeOfType<ComplexObjectComparison>());
 			
 			"... and the inner comparer is the result"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
+				.x(() => ((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result));
 			
 			"... and IgnoreUnmatchedProperties should be false"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(false));
+				.x(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(false));
 		}
 
 		[Scenario]
@@ -238,10 +241,10 @@
 			var custom = default (IComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"And a custom comparison"
-				.And(() =>
+				.x(() =>
 					{
 						custom = new Mock<IComparison>().Object;
 
@@ -249,10 +252,10 @@
 					});
 
 			"When calling Create"
-				.When(() => result = SUT.Create());
+				.x(() => result = SUT.Create());
 
 			"Then the 1st comparer is the custom comparison"
-				.Then(() => result.Comparisons[0].ShouldBeSameAs(custom));
+				.x(() => result.Comparisons[0].ShouldBeSameAs(custom));
 		}
 
 		[Scenario]
@@ -261,19 +264,19 @@
 			var result = default (CompositeComparison);
 
 			"Given a builder"
-				.Given(() => SUT = new ComparisonBuilder());
+				.x(() => SUT = new ComparisonBuilder());
 
 			"And we call IgnoreUnmatchedProperties"
-				.And(() => SUT.IgnoreUnmatchedProperties());
+				.x(() => SUT.IgnoreUnmatchedProperties());
 
 			"When calling Create"
-				.When(() => result = SUT.Create());
+				.x(() => result = SUT.Create());
 
 			"Then the 6th comparer is the ComplexObjectComparison"
-				.Then(() => result.Comparisons[5].ShouldBeTypeOf<ComplexObjectComparison>());
+				.x(() => result.Comparisons[5].ShouldBeOfType<ComplexObjectComparison>());
 			
 			"... and IgnoreUnmatchedProperties should be true"
-				.And(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(true));
+				.x(() => ((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(true));
 		}
 	}
 }

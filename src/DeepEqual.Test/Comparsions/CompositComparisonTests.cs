@@ -9,8 +9,8 @@
 
 	using Moq;
 
-	using Ploeh.AutoFixture;
-	using Ploeh.AutoFixture.AutoMoq;
+	using AutoFixture;
+	using AutoFixture.AutoMoq;
 
 	using Shouldly;
 
@@ -30,14 +30,14 @@
 		public void SetUp()
 		{
 			"Given a fixture"
-				.Given(() =>
+				.x(() =>
 					{
 						Fixture = new Fixture();
 						Fixture.Customize(new AutoMoqCustomization());
 					});
 
 			"And some mock comparers"
-				.And(() =>
+				.x(() =>
 					{
 						Inner = Fixture.Freeze<IEnumerable<IComparison>>()
 						               .Select(Mock.Get)
@@ -53,7 +53,7 @@
 					});
 
 			"And a CompositeComparer"
-				.And(() => SUT = Fixture.Build<CompositeComparison>()
+				.x(() => SUT = Fixture.Build<CompositeComparison>()
 				                        .With(x => x.Comparisons)
 				                        .Create());
 		}
@@ -62,133 +62,133 @@
 		public void When_creating_a_CompositeComparer()
 		{
 			"When creating a CompostieComperer"
-				.When(() => SUT = new CompositeComparison());
+				.x(() => SUT = new CompositeComparison());
 
 			"it should implement IComparer"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+				.x(() => SUT.ShouldBeAssignableTo<IComparison>());
 
 			"CanCompare should always true"
-				.And(() => SUT.CanCompare(null, null).ShouldBe(true));
+				.x(() => SUT.CanCompare(null, null).ShouldBe(true));
 		}
 
 		[Scenario]
 		public void When_adding_a_caomparison()
 		{
 			"Given a CompostieComperer"
-				.Given(() => SUT = new CompositeComparison());
+				.x(() => SUT = new CompositeComparison());
 
 			"When adding a comparer"
-				.Then(() => SUT.Add(Mock.Of<IComparison>()));
+				.x(() => SUT.Add(Mock.Of<IComparison>()));
 
 			"Then there should be one comparison"
-				.Then(() => SUT.Comparisons.Count.ShouldBe(1));
+				.x(() => SUT.Comparisons.Count.ShouldBe(1));
 		}
 
 		[Scenario]
 		public void When_testing_equality_if_a_comparer_returns_Inconclusive(object value1, object value2)
 		{
 			"Given the first comparer can compare the values"
-				.Given(() => Inner[0]
+				.x(() => Inner[0]
 					             .Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
 					             .Returns(true));
 
 			"... and returns Inconclusive"
-				.And(() => Inner[0]
+				.x(() => Inner[0]
 					           .Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
 					           .Returns(ComparisonResult.Inconclusive));
 
 			"And some values to compare"
-				.And(() =>
+				.x(() =>
 					{
 						value1 = new object();
 						value2 = new object();
 					});
 
 			"And a Comparison context object"
-				.And(() => Context = Fixture.Create<Mock<IComparisonContext>>());
+				.x(() => Context = Fixture.Create<Mock<IComparisonContext>>());
 
 			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context.Object, value1, value2));
+				.x(() => Result = SUT.Compare(Context.Object, value1, value2));
 
 			"Then it should call CanCompare on all inner comparisons"
-				.Then(() => Inner.VerifyAll(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
+				.x(() => Inner.VerifyAll(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
 
 			"and it should call Compare on the first inner comparison"
-				.And(() => Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once()));
+				.x(() => Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once()));
 
 			"but it shouldn't call the other comparisons Compare"
-				.But(() => Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never()));
+				.x(() => Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never()));
 
 			"and it should return Inconclusive"
-				.And(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+				.x(() => Result.ShouldBe(ComparisonResult.Inconclusive));
 		}
 
 		[Scenario]
 		public void When_testing_equality_if_a_comparer_returns_Pass(object value1, object value2)
 		{
 			"Given the first comparer can compare the values"
-				.Given(() => Inner[0]
+				.x(() => Inner[0]
 					             .Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
 					             .Returns(true));
 
 			"... and returns Pass"
-				.And(() => Inner[0]
+				.x(() => Inner[0]
 					           .Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
 					           .Returns(ComparisonResult.Pass));
 
 			"And some values to compare"
-				.And(() =>
+				.x(() =>
 					{
 						value1 = new object();
 						value2 = new object();
 					});
 
 			"And a Comparison context object"
-				.And(() => Context = Fixture.Create<Mock<IComparisonContext>>());
+				.x(() => Context = Fixture.Create<Mock<IComparisonContext>>());
 
 			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context.Object, value1, value2));
+				.x(() => Result = SUT.Compare(Context.Object, value1, value2));
 
 			"Then it should call CanCompare on the first inner comparisons"
-				.Then(() => Inner[0].Verify(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
+				.x(() => Inner[0].Verify(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
 
 			"and it should call Compare on the first inner comparison"
-				.And(() => Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once()));
+				.x(() => Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once()));
 
 			"but it shouldn't call the other comparisons CanCompare"
-				.But(() => Inner.Skip(1).VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never()));
+				.x(() => Inner.Skip(1).VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never()));
 
 			"and it shouldn't call the other comparisons Compare"
-				.And(() => Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never()));
+				.x(() => Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never()));
 
 			"and it should return Pass"
-				.And(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
 		public void When_testing_equality_if_all_comparers_cant_compare_the_values(object value1, object value2)
 		{
 			"Given some values to compare"
-				.Given(() =>
+				.x(() =>
 					{
 						value1 = Fixture.Create<object>();
 						value2 = Fixture.Create<object>();
 					});
 
 			"And a Comparison context object"
-				.And(() => Context = Fixture.Create<Mock<IComparisonContext>>());
+				.x(() => Context = Fixture.Create<Mock<IComparisonContext>>());
 
 			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context.Object, value1, value2));
+				.x(() => Result = SUT.Compare(Context.Object, value1, value2));
 
 			"it should call the inner comparers CanCompare"
-				.Then(() => Inner.VerifyAll(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
+				.x(() => Inner.VerifyAll(c => c.CanCompare(typeof (object), typeof (object)), Times.Once()));
 
 			"it should not call the inner comparers Compare"
-				.Then(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
+				.x(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
 
 			"and it should return false"
-				.And(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+				.x(() => Result.ShouldBe(ComparisonResult.Inconclusive));
 		}
 
 		[Scenario]
@@ -198,19 +198,19 @@
 		public void When_testing_nulls(object value1, object value2, ComparisonResult expected)
 		{
 			"Given a Comparison context object"
-				.Given(() => Context = Fixture.Create<Mock<IComparisonContext>>());
+				.x(() => Context = Fixture.Create<Mock<IComparisonContext>>());
 
 			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context.Object, value1, value2));
+				.x(() => Result = SUT.Compare(Context.Object, value1, value2));
 			
 			"Then it should return {2}"
-				.And(() => Result.ShouldBe(expected));
+				.x(() => Result.ShouldBe(expected));
 
 			"And it should not call the inner comparers CanCompare"
-				.And(() => Inner.VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never()));
+				.x(() => Inner.VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never()));
 
 			"And it should not call the inner comparers Compare"
-				.And(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
+				.x(() => Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never()));
 		}
 	}
 }

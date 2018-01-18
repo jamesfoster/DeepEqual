@@ -10,16 +10,16 @@
 
 	using Moq;
 
-	using Ploeh.AutoFixture;
-	using Ploeh.AutoFixture.AutoMoq;
+	using AutoFixture;
+	using AutoFixture.AutoMoq;
 
 	using Xbehave;
 
 	using Shouldly;
 
-	using Xunit.Extensions;
+    using Xunit;
 
-	public class ListComparisonTests
+    public class ListComparisonTests
 	{
 		protected Fixture Fixture { get; set; }
 
@@ -36,35 +36,35 @@
 		public void Creating_an_EnumerableComparison()
 		{
 			"Given a fixture"
-				.Given(() =>
+				.x(() =>
 					{
 						Fixture = new Fixture();
 						Fixture.Customize(new AutoMoqCustomization());
 					});
 
 			"When creating an ListComparison"
-				.When(() => SUT = Fixture.Create<ListComparison>());
+				.x(() => SUT = Fixture.Create<ListComparison>());
 
 			"Then it should implement IComparison"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+				.x(() => SUT.ShouldBeAssignableTo<IComparison>());
 		}
 
 		[Scenario]
-		[PropertyData("IntTestData")]
+		[MemberData("IntTestData")]
 		public void When_comparing_enumerables(IEnumerable value1, IEnumerable value2, ComparisonResult expected)
 		{
 			var list1 = value1.Cast<object>().ToArray();
 			var list2 = value2.Cast<object>().ToArray();
 
 			"Given a fixture"
-				.Given(() =>
+				.x(() =>
 					{
 						Fixture = new Fixture();
 						Fixture.Customize(new AutoMoqCustomization());
 					});
 
 			"And an inner comparison"
-				.And(() =>
+				.x(() =>
 					{
 						Inner = Fixture.Freeze<Mock<IComparison>>();
 
@@ -78,21 +78,21 @@
 					});
 
 			"And a ListComparison"
-				.And(() => SUT = Fixture.Create<ListComparison>());
+				.x(() => SUT = Fixture.Create<ListComparison>());
 
 			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext("List"));
+				.x(() => Context = new ComparisonContext("List"));
 
 			"When comparing enumerables"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return {2}"
-				.Then(() => Result.ShouldBe(expected));
+				.x(() => Result.ShouldBe(expected));
 
 			if (list1.Length == list2.Length)
 			{
 				"And it should call the inner comparison Compare for each element in the list"
-					.And(() =>
+					.x(() =>
 						{
 							var pairs = list1.Zip(list2, Tuple.Create).ToList();
 							for (var i = 0; i < pairs.Count; i++)
@@ -116,23 +116,23 @@
 					};
 
 				"And it should add a Difference"
-					.And(() => Context.Differences[0].ShouldBe(expectedDifference));
+					.x(() => Context.Differences[0].ShouldBe(expectedDifference));
 			}
 		}
 
 		[Scenario]
-		[PropertyData("CanCompareTypesTestData")]
+		[MemberData("CanCompareTypesTestData")]
 		public void Can_compare_types(Type type1, Type type2, Type elementType1, Type elementType2, bool expected)
 		{
 			"Given a fixture"
-				.Given(() =>
+				.x(() =>
 					{
 						Fixture = new Fixture();
 						Fixture.Customize(new AutoMoqCustomization());
 					});
 
 			"And an inner comparison"
-				.And(() =>
+				.x(() =>
 					{
 						Inner = Fixture.Freeze<Mock<IComparison>>();
 
@@ -142,18 +142,18 @@
 					});
 
 			"And an ListComparison"
-				.And(() => SUT = Fixture.Create<ListComparison>());
+				.x(() => SUT = Fixture.Create<ListComparison>());
 
 			"When calling CanCompare({0}, {1})"
-				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+				.x(() => CanCompareResult = SUT.CanCompare(type1, type2));
 
 			"It should return {2}"
-				.Then(() => CanCompareResult.ShouldBe(expected));
+				.x(() => CanCompareResult.ShouldBe(expected));
 
 			if (expected)
 			{
 				"and it should call CanCompare on the inner comparer"
-					.And(() => Inner.Verify(x => x.CanCompare(elementType1, elementType2)));
+					.x(() => Inner.Verify(x => x.CanCompare(elementType1, elementType2)));
 			}
 		}
 
