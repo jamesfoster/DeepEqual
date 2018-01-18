@@ -1,6 +1,5 @@
 DeepEqual
 =
-This is a Net Standard 2.0 compatible fork of James Foster's [DeepEqual][1].
 
 DeepEqual is an extensible deep equality comparison library.
 
@@ -34,5 +33,3 @@ object1.WithDeepEqual(object2)
        .IgnoreSourceProperty(x => x.Id)
        .Assert()
 ```
-
-[1]: https://github.com/jamesfoster/DeepEqual
