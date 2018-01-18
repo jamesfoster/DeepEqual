@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FC56EB7E-42BE-4EA2-A0C4-1766D453F866}"
 	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
@@ -17,9 +15,6 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F0A9EE3-A674-48E8-97B5-D15F7DC35CD7}"
-	ProjectSection(SolutionItems) = preProject
-		DeepEqual.snk = DeepEqual.snk
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual", "DeepEqual\DeepEqual.csproj", "{ADBD3C3B-B232-4BBE-BAC7-B7498B747B4E}"
 EndProject
