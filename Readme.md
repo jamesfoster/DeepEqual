@@ -33,5 +33,3 @@ object1.WithDeepEqual(object2)
        .IgnoreSourceProperty(x => x.Id)
        .Assert()
 ```
-
-

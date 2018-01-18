@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{FC56EB7E-42BE-4EA2-A0C4-1766D453F866}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Test", "DeepEqual.Test\DeepEqual.Test.csproj", "{941815E1-B504-4C64-B6E6-4E8C68421516}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Benchmark", "DeepEqual.Benchmark\DeepEqual.Benchmark.csproj", "{E85D1A5D-F779-474F-857A-2A0D1AAB9880}"
@@ -15,6 +10,12 @@ EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F0A9EE3-A674-48E8-97B5-D15F7DC35CD7}"
+	ProjectSection(SolutionItems) = preProject
+		..\.gitattributes = ..\.gitattributes
+		..\.gitignore = ..\.gitignore
+		..\LICENSE.txt = ..\LICENSE.txt
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual", "DeepEqual\DeepEqual.csproj", "{ADBD3C3B-B232-4BBE-BAC7-B7498B747B4E}"
 EndProject
