@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>2.0.0</Version>
+    <Authors>James Foster</Authors>
+    <Company />
+    <Description>Deep object comparison for .NET</Description>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/jamesfoster/DeepEqual/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jamesfoster/DeepEqual</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
