@@ -7,14 +7,15 @@
 
 	using Moq;
 
-	using Ploeh.AutoFixture;
-	using Ploeh.AutoFixture.AutoMoq;
+	using AutoFixture;
+	using AutoFixture.AutoMoq;
 
 	using Shouldly;
 
 	using Xbehave;
 
 	using Xunit.Extensions;
+	using Xunit;
 
 	public class ComplexObjectComparisonTests
 	{
@@ -32,23 +33,23 @@
 		public void Creating_a_ComplexObjectComparer()
 		{
 			"When creating a ComplexObjectComparison"
-				.When(() => SUT = new ComplexObjectComparison(null));
+				.x(() => SUT = new ComplexObjectComparison(null));
 
 			"It should be an IComparison"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+				.x(() => SUT.ShouldBeAssignableTo<IComparison>());
 		}
 
-		public void SetUp()
+		private void SetUp()
 		{
 			"Given a fixture"
-				.Given(() =>
+				.x(() =>
 					{
 						Fixture = new Fixture();
 						Fixture.Customize(new AutoMoqCustomization());
 					});
 
 			"And an inner comparison"
-				.And(() =>
+				.x(() =>
 				{
 					Inner = Fixture.Freeze<Mock<IComparison>>();
 
@@ -67,42 +68,42 @@
 				});
 
 			"And a ComplexObjectComparison"
-				.And(() => SUT = Fixture.Build<ComplexObjectComparison>()
+				.x(() => SUT = Fixture.Build<ComplexObjectComparison>()
 				                        .OmitAutoProperties()
 				                        .Create());
 
 			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext("Property"));
+				.x(() => Context = new ComparisonContext("Property"));
 		}
 
 		[Scenario]
-		[PropertyData("SimilarObjectsTestData")]
+		[MemberData(nameof(SimilarObjectsTestData))]
 		public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
 		{
 			SetUp();
 
 			"And IgnoreUnmatchedProperties is set to {0}"
-				.And(() => SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties);
+				.x(() => SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties);
 
 			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"It should return {3}"
-				.Then(() => Result.ShouldBe(expected));
+				.x(() => Result.ShouldBe(expected));
 
 			if (expected == ComparisonResult.Fail)
 			{
 				"And it should add a difference to the context"
-					.And(() => Context.Differences.Count.ShouldBe(1));
+					.x(() => Context.Differences.Count.ShouldBe(1));
 			}
 			else
 			{
 				"And there should be no differences in the context"
-					.And(() => Context.Differences.Count.ShouldBe(0));
+					.x(() => Context.Differences.Count.ShouldBe(0));
 			}
 
 			"And it should call Compare on the inner comparison for each property"
-				.And(() =>
+				.x(() =>
 					{
 						var properties1 = value1.GetType().GetProperties();
 						var properties2 = value2.GetType().GetProperties().ToDictionary(x => x.Name);
@@ -130,10 +131,10 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+				.x(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1 is provided"
-				.And(() => value1 = new A
+				.x(() => value1 = new A
 					{
 						X = Fixture.Create<string>(),
 						Y = Fixture.Create<string>(),
@@ -141,17 +142,17 @@
 					});
 
 			"And value2 is equivalent to value1"
-				.And(() => value2 = new
+				.x(() => value2 = new
 					{
 						value1.X,
 						value1.Y
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -163,10 +164,10 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+				.x(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1 is a MyClass instance"
-				.And(() => value1 = new A
+				.x(() => value1 = new A
 					{
 						X = Fixture.Create<string>(),
 						Y = Fixture.Create<string>(),
@@ -174,7 +175,7 @@
 					});
 
 			"And value2 is equivalent to value1"
-				.And(() => value2 = new
+				.x(() => value2 = new
 					{
 						value1.X,
 						value1.Y,
@@ -182,10 +183,10 @@
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -197,10 +198,10 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+				.x(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value2"
-				.And(() => value2 = new A
+				.x(() => value2 = new A
 					{
 						X = Fixture.Create<string>(),
 						Y = Fixture.Create<string>(),
@@ -208,17 +209,17 @@
 					});
 
 			"And value1 is equivalent to value2"
-				.And(() => value1 = new
+				.x(() => value1 = new
 					{
 						value2.X,
 						value2.Y
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -230,10 +231,10 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+				.x(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value2"
-				.And(() => value2 = new A
+				.x(() => value2 = new A
 					{
 						X = Fixture.Create<string>(),
 						Y = Fixture.Create<string>(),
@@ -241,7 +242,7 @@
 					});
 
 			"And value1 is equivalent to value2"
-				.And(() => value1 = new
+				.x(() => value1 = new
 					{
 						value2.X,
 						value2.Y,
@@ -249,10 +250,10 @@
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -264,10 +265,10 @@
 			SetUp();
 
 			"And the IgnoreMe property is ignored"
-				.And(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
+				.x(() => SUT.IgnoreProperty<A>(x => x.IgnoreMe));
 
 			"And value1"
-				.And(() => value1 = new B
+				.x(() => value1 = new B
 					{
 						X = Fixture.Create<string>(),
 						Y = Fixture.Create<string>(),
@@ -275,7 +276,7 @@
 					});
 
 			"And value2 is equivalent to value1"
-				.And(() => value2 = new
+				.x(() => value2 = new
 					{
 						value1.X,
 						value1.Y,
@@ -283,10 +284,10 @@
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -298,17 +299,17 @@
 			SetUp();
 			
 			"And two values"
-				.And(() =>
+				.x(() =>
 					{
 						value1 = new Derived ();
 						value2 = new {Property = "abc"};
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		[Scenario]
@@ -320,7 +321,7 @@
 			SetUp();
 			
 			"And a dynamic object"
-				.And(() =>
+				.x(() =>
 					{
 						value1 = new ExpandoObject();
 						value1.Foo = "abc";
@@ -328,7 +329,7 @@
 					});
 			
 			"And a static object"
-				.And(() =>
+				.x(() =>
 					{
 						value2 = new
 						{
@@ -338,10 +339,10 @@
 					});
 
 			"When comparing the 2 values"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+				.x(() => Result = SUT.Compare(Context, value1, value2));
 
 			"Then it should return a Pass"
-				.Then(() => Result.ShouldBe(ComparisonResult.Pass));
+				.x(() => Result.ShouldBe(ComparisonResult.Pass));
 		}
 
 		private class A

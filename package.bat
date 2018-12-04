@@ -1,9 +1,7 @@
 @echo off
 
-call msbuild src\DeepEqual\DeepEqual.csproj /t:rebuild /p:Configuration=Release
-
 echo.
-NuGet pack src\DeepEqual\DeepEqual.csproj -Prop Configuration=Release
+dotnet pack --include-symbols --include-source --configuration Release src\DeepEqual\DeepEqual.csproj
 
 echo.
 pause

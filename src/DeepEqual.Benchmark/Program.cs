@@ -6,8 +6,6 @@
 
 	using Syntax;
 
-	using Test;
-
 	internal class Program
 	{
 		private static void Main(string[] args)
@@ -37,7 +35,7 @@
 				Int = 1,
 				Enum = "Absolute",
 				List = new[] {1, 2, 3},
-				Inner = new TestType
+				Inner = new Point
 				{
 					X = 1,
 					Y = 2,
@@ -68,5 +66,12 @@
 				Console.WriteLine("{0}ms", sw.ElapsedMilliseconds);
 			}
 		}
+	}
+
+	class Point
+	{
+		public int X { get; set; }
+		public int Y { get; set; }
+		public int Z { get; set; }
 	}
 }
