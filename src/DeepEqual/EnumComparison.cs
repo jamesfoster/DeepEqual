@@ -14,28 +14,26 @@ namespace DeepEqual
 				(type2.IsEnum || type2 == typeof(string) || type2 == typeof(int));
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			var value1IsEnum = value1.GetType().IsEnum;
 			var value2IsEnum = value2.GetType().IsEnum;
 
 			if (value1IsEnum && value2IsEnum)
 			{
-				if (value1.ToString() == value2.ToString())
-					return ComparisonResult.Pass;
-
-				context.AddDifference(value1, value2);
-				return ComparisonResult.Fail;
+				return value1.ToString() == value2.ToString()
+					? (ComparisonResult.Pass, context)
+					: (ComparisonResult.Fail, context.AddDifference(value1, value2));
 			}
 
-			var result = value1IsEnum
+			var areEqual = value1IsEnum
 				? CompareEnumWithConversion(value1, value2)
 				: CompareEnumWithConversion(value2, value1);
 
-			if (!result)
-				context.AddDifference(value1, value2);
+			return areEqual
+				? (ComparisonResult.Pass, context)
+				: (ComparisonResult.Fail, context.AddDifference(value1, value2));
 
-			return result ? ComparisonResult.Pass : ComparisonResult.Fail;
 		}
 
 		private static bool CompareEnumWithConversion(object value1, object value2)

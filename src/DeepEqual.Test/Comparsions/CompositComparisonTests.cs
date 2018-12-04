@@ -1,14 +1,19 @@
 ﻿namespace DeepEqual.Test.Comparsions
 {
-	using AutoFixture;
-	using AutoFixture.AutoMoq;
-	using DeepEqual;
-	using DeepEqual.Test.Helper;
-	using Moq;
-	using Shouldly;
 	using System;
 	using System.Collections.Generic;
 	using System.Linq;
+
+	using DeepEqual;
+	using DeepEqual.Test.Helper;
+
+	using AutoFixture;
+	using AutoFixture.AutoMoq;
+
+	using Moq;
+
+	using Shouldly;
+
 	using Xbehave;
 
 	public class CompositComparisonTests
@@ -30,19 +35,27 @@
 				Fixture.Customize(new AutoMoqCustomization());
 			});
 
-			"And some mock comparers".x(() =>
+			"And some inner comparers".x(() =>
 			{
-				Inner = Fixture.Freeze<IEnumerable<IComparison>>()
-								.Select(Mock.Get)
-								.ToList();
+				Inner = Fixture
+					.Freeze<IEnumerable<IComparison>>()
+					.Select(Mock.Get)
+					.ToList();
 
 				Inner.ForEach(
-					m => m.Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
-							.Returns(false));
+					m => m
+						.Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
+						.Returns(false)
+				);
+			});
 
+			"... which by default return Inconclusive".x(() =>
+			{
 				Inner.ForEach(
-					m => m.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-							.Returns(ComparisonResult.Inconclusive));
+					m => m
+						.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
+						.Returns<IComparisonContext, object, object>((c, v1, v2) => (ComparisonResult.Inconclusive, c))
+				);
 			});
 
 			"And a CompositeComparer".x(() =>
@@ -97,7 +110,7 @@
 			"... and returns Inconclusive".x(() => 
 				Inner[0]
 					.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-					.Returns(ComparisonResult.Inconclusive)
+					.Returns<IComparisonContext, object, object>((c, v1, v2) => (ComparisonResult.Inconclusive, c))
 			);
 
 			"And some values to compare".x(() =>
@@ -111,7 +124,7 @@
 			);
 
 			"When calling Compare".x(() =>
-				Result = SUT.Compare(Context.Object, value1, value2)
+				(Result, _) = SUT.Compare(Context.Object, value1, value2)
 			);
 
 			"Then it should call CanCompare on all inner comparisons".x(() =>
@@ -143,7 +156,7 @@
 			"... and returns Pass".x(() => 
 				Inner[0]
 					.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-					.Returns(ComparisonResult.Pass)
+					.Returns<IComparisonContext, object, object>((c, v1, v2) => (ComparisonResult.Pass, c))
 			);
 
 			"And some values to compare".x(() =>
@@ -157,7 +170,7 @@
 			);
 
 			"When calling Compare".x(() =>
-				Result = SUT.Compare(Context.Object, value1, value2)
+				(Result, _) = SUT.Compare(Context.Object, value1, value2)
 			);
 
 			"Then it should call CanCompare on the first inner comparisons".x(() =>
@@ -195,7 +208,7 @@
 			);
 
 			"When calling Compare".x(() =>
-				Result = SUT.Compare(Context.Object, value1, value2)
+				(Result, _) = SUT.Compare(Context.Object, value1, value2)
 			);
 
 			"it should call the inner comparers CanCompare".x(() =>
@@ -222,7 +235,7 @@
 			);
 
 			"When calling Compare".x(() =>
-				Result = SUT.Compare(Context.Object, value1, value2)
+				(Result, _) = SUT.Compare(Context.Object, value1, value2)
 			);
 
 			"Then it should return {2}".x(() =>

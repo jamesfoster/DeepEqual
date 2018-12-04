@@ -20,8 +20,8 @@
 		[Fact]
 		public void Null_difference()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(null, new object());
+			var context = new ComparisonContext()
+				.AddDifference(null, new object());
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -31,8 +31,8 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Single_string_difference()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference("a", "b");
+			var context = new ComparisonContext()
+				.AddDifference("a", "b");
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -42,8 +42,8 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Single_int_difference()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(1, 2);
+			var context = new ComparisonContext()
+				.AddDifference(1, 2);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -53,11 +53,16 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void List_int_difference()
 		{
-			var context = new ComparisonContext();
-			var innerContext = context.VisitingIndex(2);
-			innerContext.AddDifference(1, 2);
-			innerContext = context.VisitingIndex(4);
-			innerContext.AddDifference(4, 5);
+			var root = new ComparisonContext();
+			var childContext1 = root
+				.VisitingIndex(2)
+				.AddDifference(1, 2);
+			var childContext2 = root
+				.VisitingIndex(4)
+				.AddDifference(4, 5);
+			var context = root
+				.MergeDifferencesFrom(childContext1)
+				.MergeDifferencesFrom(childContext2);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 2 differences were found.
@@ -68,10 +73,11 @@ Comparison Failed: The following 2 differences were found.
 		[Fact]
 		public void Long_string_difference_start()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(
-				"01234567890123456789012345678901234567890123456789",
-				"abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij");
+			var context = new ComparisonContext()
+				.AddDifference(
+					"01234567890123456789012345678901234567890123456789",
+					"abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij"
+				);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -81,10 +87,11 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Long_string_difference_middle()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(
-				"01234567890123456789012345first678901234567890123456789",
-				"01234567890123456789012345second678901234567890123456789");
+			var context = new ComparisonContext()
+				.AddDifference(
+					"01234567890123456789012345first678901234567890123456789",
+					"01234567890123456789012345second678901234567890123456789"
+				);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -94,10 +101,11 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Long_string_difference_end()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(
-				"01234567890123456789012345678901234567890123456789a",
-				"01234567890123456789012345678901234567890123456789b");
+			var context = new ComparisonContext()
+				.AddDifference(
+					"01234567890123456789012345678901234567890123456789a",
+					"01234567890123456789012345678901234567890123456789b"
+				);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -107,10 +115,11 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Long_string_difference_end_2()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(
-				"01234567890123456789012345678901234567890123",
-				"01234567890123456789012345678901234567890123456789");
+			var context = new ComparisonContext()
+				.AddDifference(
+					"01234567890123456789012345678901234567890123",
+					"01234567890123456789012345678901234567890123456789"
+				);
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -124,10 +133,11 @@ Comparison Failed: The following 1 differences were found.
 		[InlineData("012345678901234567890", "0123456789012345678", "...12345678901234567890", "0123456789012345678")]
 		public void Strings_around_same_length_as_max_length(string value1, string value2, string expected1, string expected2)
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(
-				value1,
-				value2);
+			var context = new ComparisonContext()
+				.AddDifference(
+					value1,
+					value2
+				);
 
 			AssertExceptionMessage(context, $@"
 Comparison Failed: The following 1 differences were found.
@@ -137,13 +147,13 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Missing_expected_entry()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(new MissingEntryDifference
-			{
-				Side = MissingSide.Expected,
-				Key = "Index",
-				Value = "Value"
-			});
+			var context = new ComparisonContext()
+				.AddDifference(new MissingEntryDifference(
+					breadcrumb: "",
+					side: MissingSide.Expected,
+					key: "Index",
+					value: "Value"
+				));
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -153,12 +163,13 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Missing_actual_entry()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(new MissingEntryDifference {
-				Side = MissingSide.Actual,
-				Key = "Index",
-				Value = "Value"
-			});
+			var context = new ComparisonContext()
+				.AddDifference(new MissingEntryDifference(
+					breadcrumb: "",
+					side: MissingSide.Actual,
+					key: "Index",
+					value: "Value"
+				));
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -168,13 +179,12 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Set_difference_expected()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(new SetDifference
-			{
-				Breadcrumb = ".Set",
-				Expected = new List<object> { 1, 2, 3 },
-				Extra = new List<object>()
-			});
+			var context = new ComparisonContext()
+				.AddDifference(new SetDifference(
+					breadcrumb: ".Set",
+					expected: new List<object> { 1, 2, 3 },
+					extra: new List<object>()
+				));
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -188,13 +198,12 @@ Comparison Failed: The following 1 differences were found.
 		[Fact]
 		public void Set_difference_actual()
 		{
-			var context = new ComparisonContext();
-			context.AddDifference(new SetDifference
-			{
-				Breadcrumb = ".Set",
-				Expected = new List<object>(),
-				Extra = new List<object> {1, 2, 3}
-			});
+			var context = new ComparisonContext()
+				.AddDifference(new SetDifference(
+					breadcrumb: ".Set",
+					expected: new List<object>(),
+					extra: new List<object> {1, 2, 3}
+				));
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -205,7 +214,7 @@ Comparison Failed: The following 1 differences were found.
 			3");
 		}
 
-		private static void AssertExceptionMessage(ComparisonContext context, string expectedMessage)
+		private static void AssertExceptionMessage(IComparisonContext context, string expectedMessage)
 		{
 			expectedMessage = expectedMessage.Trim().Replace("\r\n", "\n");
 

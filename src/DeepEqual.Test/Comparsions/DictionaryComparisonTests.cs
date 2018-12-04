@@ -3,7 +3,8 @@
 	using System;
 	using System.Collections;
 	using System.Collections.Generic;
-	using Moq;
+
+	using DeepEqual.Test.Helper;
 
 	using AutoFixture;
 	using AutoFixture.AutoMoq;
@@ -19,9 +20,7 @@
 
 		protected DictionaryComparison SUT { get; set; }
 
-		protected Mock<IComparison> Inner { get; set; }
 		protected ComparisonContext Context { get; set; }
-		protected IDictionary<string, Mock<IComparisonContext>> IndexContexts { get; set; }
 
 		protected ComparisonResult Result { get; set; }
 		protected bool CanCompareResult { get; set; }
@@ -29,25 +28,11 @@
 		private void SetUp()
 		{
 			"Given a fixture".x(() =>
-			{
-				Fixture = new Fixture();
-				Fixture.Customize(new AutoMoqCustomization());
-			});
-
-			"And an inner comparison".x(() => 
-				Inner = Fixture.Freeze<Mock<IComparison>>()
+				Fixture = new Fixture()
 			);
 
-			"And the inner comparison can compare any type".x(() => 
-				Inner
-					.Setup(x => x.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
-					.Returns(true)
-			);
-
-			"And the inner comparison calls .Equals()".x(() => 
-				Inner
-					.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-					.Returns<IComparisonContext, object, object>((c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail)
+			"And an inner comparison".x(() =>
+				Fixture.Register<IComparison>(() => new MockComparison())
 			);
 
 			"And an ListComparison".x(() => 
@@ -98,8 +83,8 @@
 		{
 			SetUp();
 
-			"When comparing dictionaries".x(() => 
-				Result = SUT.Compare(Context, value1, value2)
+			"When comparing dictionaries".x(() =>
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return {2}".x(() => 

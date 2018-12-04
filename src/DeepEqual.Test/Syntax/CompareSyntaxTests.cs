@@ -10,13 +10,16 @@ namespace DeepEqual.Test.Syntax
 
 	using Xunit;
 
-	public class CompareSyntaxTests
+	public class CompareSyntaxTests : IDisposable
 	{
 		private readonly A a = new A();
+
 		private readonly B b = new B();
 
 		private readonly CompareSyntax<A, B> syntax;
+
 		private readonly Mock<IComparisonBuilder<ComparisonBuilder>> builder;
+
 		private readonly CompositeComparison comparison;
 
 		public CompareSyntaxTests()
@@ -32,6 +35,11 @@ namespace DeepEqual.Test.Syntax
 			ComparisonBuilder.Get = () => builder.Object;
 
 			syntax = a.WithDeepEqual(b);
+		}
+
+		public void Dispose()
+		{
+			ComparisonBuilder.Reset();
 		}
 
 		[Fact]

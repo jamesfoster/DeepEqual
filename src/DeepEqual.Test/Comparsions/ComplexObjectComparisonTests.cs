@@ -5,7 +5,7 @@
 	using System.Dynamic;
 	using System.Linq;
 
-	using Moq;
+	using DeepEqual.Test.Helper;
 
 	using AutoFixture;
 	using AutoFixture.AutoMoq;
@@ -21,12 +21,10 @@
 		protected Fixture Fixture { get; set; }
 
 		protected ComplexObjectComparison SUT { get; set; }
-		protected Mock<IComparison> Inner { get; set; }
-		protected ComparisonContext Context { get; set; }
+		protected MockComparison Inner { get; set; }
+		protected IComparisonContext Context { get; set; }
 
 		protected ComparisonResult Result { get; set; }
-
-		protected InvalidOperationException Exception { get; set; }
 
 		[Scenario]
 		public void Creating_a_ComplexObjectComparer()
@@ -50,20 +48,8 @@
 
 			"And an inner comparison".x(() =>
 			{
-				Inner = Fixture.Freeze<Mock<IComparison>>();
-
-				Inner.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-						.Returns<IComparisonContext, object, object>(
-							(c, v1, v2) =>
-							{
-								if (v1.Equals(v2))
-								{
-									return ComparisonResult.Pass;
-								}
-
-								c.AddDifference(new BasicDifference());
-								return ComparisonResult.Fail;
-							});
+				Inner = new MockComparison();
+				Fixture.Inject<IComparison>(Inner);
 			});
 
 			"And a ComplexObjectComparison".x(() =>
@@ -88,8 +74,11 @@
 			);
 
 			"When calling Compare".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
-			);
+			{
+				var (result, context) = SUT.Compare(Context, value1, value2);
+				Result = result;
+				Context = context;
+			});
 
 			"It should return {3}".x(() =>
 				Result.ShouldBe(expected)
@@ -122,7 +111,12 @@
 
 					var v1 = p1.GetValue(value1);
 					var v2 = p2.GetValue(value2);
-					Inner.Verify(x => x.Compare(It.Is<IComparisonContext>(c => c.Breadcrumb == "Property." + p1.Name), v1, v2), Times.Once());
+
+					Inner.CompareCalls.ShouldContain(call => 
+						call.context.Breadcrumb == "Property." + p1.Name &&
+						call.value1.Equals(v1) &&
+						call.value2.Equals(v2)
+					);
 				}
 			});
 		}
@@ -157,7 +151,7 @@
 			);
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -196,7 +190,7 @@
 			);
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -234,7 +228,7 @@
 			);
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -273,7 +267,7 @@
 			);
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -312,7 +306,7 @@
 			);
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -335,7 +329,7 @@
 			});
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>
@@ -346,16 +340,18 @@
 		[Scenario]
 		public void Comparing_dynamic_object_with_static_object_succeeds()
 		{
-			dynamic value1 = null;
+			object value1 = null;
 			object value2 = null;
 
 			SetUp();
 
 			"And a dynamic object".x(() =>
 			{
-				value1 = new ExpandoObject();
-				value1.Foo = "abc";
-				value1.Bar = 123;
+				dynamic value = new ExpandoObject();
+				value.Foo = "abc";
+				value.Bar = 123;
+
+				value1 = value;
 			});
 
 			"And a static object".x(() =>
@@ -368,7 +364,7 @@
 			});
 
 			"When comparing the 2 values".x(() =>
-				Result = SUT.Compare(Context, value1, value2)
+				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
 			"Then it should return a Pass".x(() =>

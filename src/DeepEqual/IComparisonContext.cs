@@ -1,13 +1,14 @@
 ﻿namespace DeepEqual
 {
-	using System.Collections.Generic;
+	using System.Collections.Immutable;
 
 	public interface IComparisonContext
 	{
-		List<Difference> Differences { get; }
+		ImmutableList<Difference> Differences { get; }
 		string Breadcrumb { get; }
 
-		void AddDifference(Difference difference);
+		IComparisonContext AddDifference(Difference difference);
+		IComparisonContext SetBreadcrumb(string breadcrumb);
 
 		IComparisonContext VisitingProperty(string propertyName);
 		IComparisonContext VisitingIndex(object index);
