@@ -45,9 +45,12 @@
 
 				if (key == null)
 				{
-					var difference = new MissingEntryDifference(MissingSide.Expected, entry.Key, entry.Value)
+					var difference = new MissingEntryDifference
 					{
 						Breadcrumb = context.Breadcrumb,
+						Side = MissingSide.Expected,
+						Key = entry.Key,
+						Value = entry.Value
 					};
 
 					context.AddDifference(difference);
@@ -66,11 +69,14 @@
 			if(dict2.Count == 0)
 				return results.ToResult();
 
-			foreach (var pair in dict2)
+			foreach (var entry in dict2)
 			{
-				var difference = new MissingEntryDifference(MissingSide.Actual, pair.Key, pair.Value)
+				var difference = new MissingEntryDifference
 				{
 					Breadcrumb = context.Breadcrumb,
+					Side = MissingSide.Actual,
+					Key = entry.Key,
+					Value = entry.Value
 				};
 
 				context.AddDifference(difference);

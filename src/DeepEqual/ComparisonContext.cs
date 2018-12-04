@@ -5,8 +5,8 @@
 
 	public class ComparisonContext : IComparisonContext
 	{
-		public List<Difference> Differences { get; private set; }
-		public string Breadcrumb { get; private set; }
+		public List<Difference> Differences { get; }
+		public string Breadcrumb { get; }
 
 		public ComparisonContext() : this(string.Empty) {}
 

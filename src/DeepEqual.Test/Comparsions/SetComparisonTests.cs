@@ -5,6 +5,8 @@
 	using System.Collections.Generic;
 	using System.Linq;
 
+	using DeepEqual.Syntax;
+
 	using Moq;
 
 	using AutoFixture;
@@ -23,7 +25,6 @@
 
 		protected Mock<IComparison> Inner { get; set; }
 		protected ComparisonContext Context { get; set; }
-		protected IDictionary<string, Mock<IComparisonContext>> IndexContexts { get; set; }
 
 		protected ComparisonResult Result { get; set; }
 		protected bool CanCompareResult { get; set; }
@@ -151,7 +152,7 @@
 			}
 			else
 			{
-				var expectedDifference = new Difference
+				var expectedDifference = new BasicDifference
 					{
 						Breadcrumb = "Set",
 						ChildProperty = "Count",
@@ -160,7 +161,7 @@
 					};
 
 				"And it should add a Difference".x(() =>
-					Context.Differences[0].ShouldBe(expectedDifference)
+					Context.Differences[0].ShouldDeepEqual(expectedDifference)
 				);
 			}
 		}

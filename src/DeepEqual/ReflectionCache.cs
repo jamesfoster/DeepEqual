@@ -114,12 +114,11 @@ namespace DeepEqual
 
 		public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)
 		{
-			Func<Type, PropertyReader[]> getAllProperties =
-				t => GetPropertiesAndFields(t, CacheBehaviour.IncludePrivate);
+			PropertyReader[] GetAllProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.IncludePrivate);
 
 			foreach (var type in types)
 			{
-				PropertyCache.AddOrUpdate(type, getAllProperties, (t, value) => getAllProperties(t));
+				PropertyCache.AddOrUpdate(type, GetAllProperties, (t, value) => GetAllProperties(t));
 			}
 		}
 

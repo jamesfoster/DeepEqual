@@ -61,7 +61,7 @@
 									return ComparisonResult.Pass;
 								}
 
-								c.AddDifference(new Difference());
+								c.AddDifference(new BasicDifference());
 								return ComparisonResult.Fail;
 							});
 			});

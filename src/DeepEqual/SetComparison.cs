@@ -70,12 +70,19 @@
 				else
 					extra.Add(obj);
 			}
-			
+
 			var equal = expected.Count == 0 && extra.Count == 0;
 
 			if (!equal)
 			{
-				context.AddDifference(new SetDifference(context.Breadcrumb, expected, extra));
+				context.AddDifference(
+					new SetDifference
+					{
+						Breadcrumb = context.Breadcrumb,
+						Expected = expected,
+						Extra = extra
+					}
+				);
 			}
 
 			return equal;

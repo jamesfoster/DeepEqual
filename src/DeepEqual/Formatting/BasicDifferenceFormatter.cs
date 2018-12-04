@@ -10,21 +10,24 @@ namespace DeepEqual.Formatting
 
 		public override string Format(Difference difference)
 		{
+			var basicDifference = difference as BasicDifference 
+				?? throw new ArgumentException("Invalid difference type", nameof(difference));
+
 			var format = "Actual{0}.{1} != Expected{0}.{1} ({2} != {3})";
 
-			if (difference.ChildProperty == null)
+			if (basicDifference.ChildProperty == null)
 				format = "Actual{0} != Expected{0} ({2} != {3})";
 
-			var value1 = difference.Value1;
-			var value2 = difference.Value2;
+			var value1 = basicDifference.Value1;
+			var value2 = basicDifference.Value2;
 
 			if (value1 is string str1 && value2 is string str2)
 				(value1, value2) = FixLongStringDifference(str1, str2);
 
 			return string.Format(
 				format,
-				difference.Breadcrumb,
-				difference.ChildProperty,
+				basicDifference.Breadcrumb,
+				basicDifference.ChildProperty,
 				Prettify(value1),
 				Prettify(value2)
 			);
