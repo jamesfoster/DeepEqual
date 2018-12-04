@@ -1,4 +1,4 @@
-﻿namespace DeepEqual.Test.Bug
+﻿namespace DeepEqual.Test.Features
 {
 	using DeepEqual.Syntax;
 	using DeepEqual.Test.Helper;

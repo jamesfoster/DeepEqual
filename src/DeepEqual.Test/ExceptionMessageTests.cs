@@ -1,12 +1,12 @@
-﻿using Xunit.Extensions;
-
-namespace DeepEqual.Test
+﻿namespace DeepEqual.Test
 {
 	using System.Collections.Generic;
 
 	using DeepEqual.Formatting;
 
 	using Xunit;
+	using Xunit.Extensions;
+
 
 	public class ExceptionMessageTests
 	{

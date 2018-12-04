@@ -11,7 +11,6 @@
 
 	using Xbehave;
 	using Xunit;
-	using Xunit.Extensions;
 
 	public class EnumComparisonTests
 	{
@@ -114,52 +113,40 @@
 			B = 3
 		}
 
-		public static IEnumerable<object[]> CompareTestData
+		public static IEnumerable<object[]> CompareTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {TestEnum1.A, TestEnum1.A, ComparisonResult.Pass},
-						new object[] {TestEnum1.A, TestEnum2.A, ComparisonResult.Pass},
-						new object[] {TestEnum1.A, TestEnum1.B, ComparisonResult.Fail},
-						new object[] {TestEnum1.A, TestEnum2.B, ComparisonResult.Fail},
-						new object[] {TestEnum1.B, TestEnum2.B, ComparisonResult.Pass},
-						new object[] {TestEnum2.B, TestEnum2.B, ComparisonResult.Pass},
-						new object[] {TestEnum1.A, 1, ComparisonResult.Pass},
-						new object[] {TestEnum1.A, 2, ComparisonResult.Fail},
-						new object[] {TestEnum1.A, "A", ComparisonResult.Pass},
-						new object[] {TestEnum1.A, "AAA", ComparisonResult.Fail},
-						new object[] {2, TestEnum1.B, ComparisonResult.Pass},
-						new object[] {3, TestEnum1.B, ComparisonResult.Fail},
-						new object[] {3, TestEnum2.B, ComparisonResult.Pass},
-						new object[] {"B", TestEnum2.B, ComparisonResult.Pass}
-					};
-			}
-		}
+			new object[] {TestEnum1.A, TestEnum1.A, ComparisonResult.Pass},
+			new object[] {TestEnum1.A, TestEnum2.A, ComparisonResult.Pass},
+			new object[] {TestEnum1.A, TestEnum1.B, ComparisonResult.Fail},
+			new object[] {TestEnum1.A, TestEnum2.B, ComparisonResult.Fail},
+			new object[] {TestEnum1.B, TestEnum2.B, ComparisonResult.Pass},
+			new object[] {TestEnum2.B, TestEnum2.B, ComparisonResult.Pass},
+			new object[] {TestEnum1.A, 1, ComparisonResult.Pass},
+			new object[] {TestEnum1.A, 2, ComparisonResult.Fail},
+			new object[] {TestEnum1.A, "A", ComparisonResult.Pass},
+			new object[] {TestEnum1.A, "AAA", ComparisonResult.Fail},
+			new object[] {2, TestEnum1.B, ComparisonResult.Pass},
+			new object[] {3, TestEnum1.B, ComparisonResult.Fail},
+			new object[] {3, TestEnum2.B, ComparisonResult.Pass},
+			new object[] {"B", TestEnum2.B, ComparisonResult.Pass}
+		};
 
-		public static IEnumerable<object[]> CanCompareTypesTestData
+		public static IEnumerable<object[]> CanCompareTypesTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {typeof (TestEnum1), typeof (TestEnum1), true},
-						new object[] {typeof (TestEnum1), typeof (TestEnum2), true},
-						new object[] {typeof (object), typeof (object), false},
-						new object[] {typeof (object), typeof (int), false},
-						new object[] {typeof (int), typeof (int), false},
-						new object[] {typeof (int), typeof (string), false},
-						new object[] {typeof (TestEnum1), typeof (object), false},
-						new object[] {typeof (TestEnum1), typeof (int), true},
-						new object[] {typeof (TestEnum1), typeof (long), false},
-						new object[] {typeof (TestEnum1), typeof (string), true},
-						new object[] {typeof (object), typeof (TestEnum1), false},
-						new object[] {typeof (int), typeof (TestEnum1), true},
-						new object[] {typeof (long), typeof (TestEnum1), false},
-						new object[] {typeof (string), typeof (TestEnum1), true}
-					};
-			}
-		}
+			new object[] {typeof (TestEnum1), typeof (TestEnum1), true},
+			new object[] {typeof (TestEnum1), typeof (TestEnum2), true},
+			new object[] {typeof (object), typeof (object), false},
+			new object[] {typeof (object), typeof (int), false},
+			new object[] {typeof (int), typeof (int), false},
+			new object[] {typeof (int), typeof (string), false},
+			new object[] {typeof (TestEnum1), typeof (object), false},
+			new object[] {typeof (TestEnum1), typeof (int), true},
+			new object[] {typeof (TestEnum1), typeof (long), false},
+			new object[] {typeof (TestEnum1), typeof (string), true},
+			new object[] {typeof (object), typeof (TestEnum1), false},
+			new object[] {typeof (int), typeof (TestEnum1), true},
+			new object[] {typeof (long), typeof (TestEnum1), false},
+			new object[] {typeof (string), typeof (TestEnum1), true}
+		};
 	}
 }

@@ -25,14 +25,14 @@
 
 		public IComparisonContext VisitingProperty(string propertyName)
 		{
-			var newBreadcrumb = string.Format("{0}.{1}", Breadcrumb, propertyName);
+			var newBreadcrumb = $"{Breadcrumb}.{propertyName}";
 
 			return new ComparisonContext(Differences, newBreadcrumb);
 		}
 
 		public IComparisonContext VisitingIndex(object index)
 		{
-			var newBreadcrumb = string.Format(CultureInfo.InvariantCulture, "{0}[{1}]", Breadcrumb, index);
+			var newBreadcrumb = $"{Breadcrumb}[{index}]";
 
 			return new ComparisonContext(Differences, newBreadcrumb);
 		}

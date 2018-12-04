@@ -4,17 +4,17 @@ namespace DeepEqual.Formatting
 	{
 		public IDifferenceFormatter GetFormatter(Difference difference)
 		{
-			if (difference is MissingEntryDifference)
+			switch (difference)
 			{
-				return new MissingEntryDifferenceFormatter();
-			}
+				case MissingEntryDifference _:
+					return new MissingEntryDifferenceFormatter();
 
-			if (difference is SetDifference)
-			{
-				return new SetDifferenceFormatter();
-			}
+				case SetDifference _:
+					return new SetDifferenceFormatter();
 
-			return new BasicDifferenceFormatter();
+				default:
+					return new BasicDifferenceFormatter();
+			}
 		}
 	}
 }

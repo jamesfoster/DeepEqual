@@ -13,8 +13,6 @@
 	using Shouldly;
 
 	using Xbehave;
-
-	using Xunit.Extensions;
 	using Xunit;
 
 	public class SetComparisonTests
@@ -167,51 +165,39 @@
 			}
 		}
 
-		public static IEnumerable<object[]> IntTestData
+		public static IEnumerable<object[]> IntTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {new HashSet<int>(), new int[] {}, ComparisonResult.Pass},
-						new object[] {new HashSet<int>(), new List<int>(), ComparisonResult.Pass},
-						new object[] {new HashSet<int> {1}, new[] {1}, ComparisonResult.Pass},
-						new object[] {new HashSet<int> {1}, new[] {1}, ComparisonResult.Pass},
-						new object[] {new[] {1, 2, 3}, new HashSet<int> {1, 2, 3}, ComparisonResult.Pass},
-						new object[] {new SortedSet<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new HashSet<int>(), new int[] {}, ComparisonResult.Pass},
+			new object[] {new HashSet<int>(), new List<int>(), ComparisonResult.Pass},
+			new object[] {new HashSet<int> {1}, new[] {1}, ComparisonResult.Pass},
+			new object[] {new HashSet<int> {1}, new[] {1}, ComparisonResult.Pass},
+			new object[] {new[] {1, 2, 3}, new HashSet<int> {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new SortedSet<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
 						
-						new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 2}, ComparisonResult.Pass},
-						new object[] {new HashSet<int> {3, 2, 1}, new[] {1, 2, 3}, ComparisonResult.Pass},
-						new object[] {new HashSet<int> {3, 1, 2}, new[] {1, 3, 2}, ComparisonResult.Pass},
+			new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 2}, ComparisonResult.Pass},
+			new object[] {new HashSet<int> {3, 2, 1}, new[] {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new HashSet<int> {3, 1, 2}, new[] {1, 3, 2}, ComparisonResult.Pass},
 
-						new object[] {new HashSet<int> {1}, new[] {2}, ComparisonResult.Fail},
-						new object[] {new HashSet<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
-						new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 3}, ComparisonResult.Fail}
-					};
-			}
-		}
+			new object[] {new HashSet<int> {1}, new[] {2}, ComparisonResult.Fail},
+			new object[] {new HashSet<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
+			new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 3}, ComparisonResult.Fail}
+		};
 
-		public static IEnumerable<object[]> CanCompareTypesTestData
+		public static IEnumerable<object[]> CanCompareTypesTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {typeof (ISet<int>), typeof (ISet<int>), typeof (int), typeof (int), true},
-						new object[] {typeof (ISet<int>), typeof (IList), typeof (int), typeof (object), true},
-						new object[] {typeof (ISet<object>), typeof (IList<int>), typeof (object), typeof (int), true},
-						new object[] {typeof (ISet<object>), typeof (List<int>), typeof (object), typeof (int), true},
-						new object[] {typeof (ISet<object>), typeof (IEnumerable<int>), typeof (object), typeof (int), true},
+			new object[] {typeof (ISet<int>), typeof (ISet<int>), typeof (int), typeof (int), true},
+			new object[] {typeof (ISet<int>), typeof (IList), typeof (int), typeof (object), true},
+			new object[] {typeof (ISet<object>), typeof (IList<int>), typeof (object), typeof (int), true},
+			new object[] {typeof (ISet<object>), typeof (List<int>), typeof (object), typeof (int), true},
+			new object[] {typeof (ISet<object>), typeof (IEnumerable<int>), typeof (object), typeof (int), true},
 
-						new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), false},
-						new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), false},
-						new object[] {typeof (string), typeof (string), typeof (char), typeof (char), false},
-						new object[] {typeof (object), typeof (object), null, null, false},
-						new object[] {typeof (object), typeof (int), null, null, false},
-						new object[] {typeof (int), typeof (int), null, null, false},
-						new object[] {typeof (int), typeof (string), null, null, false}
-					};
-			}
-		}
+			new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), false},
+			new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), false},
+			new object[] {typeof (string), typeof (string), typeof (char), typeof (char), false},
+			new object[] {typeof (object), typeof (object), null, null, false},
+			new object[] {typeof (object), typeof (int), null, null, false},
+			new object[] {typeof (int), typeof (int), null, null, false},
+			new object[] {typeof (int), typeof (string), null, null, false}
+		};
 	}
 }

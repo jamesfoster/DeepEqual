@@ -85,7 +85,8 @@ namespace DeepEqual
 
 		private static bool IsSetTypeImpl(Type type)
 		{
-			Func<Type, bool> isSet = t => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISet<>);
+			bool isSet(Type t) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISet<>);
+
 			var equals = isSet(type);
 			var inherits = type.GetInterfaces().Any(isSet);
 
@@ -125,15 +126,14 @@ namespace DeepEqual
 		public static PropertyReader[] GetProperties(object obj)
 		{
 			// Dont cache dynamic properties
-			if (obj is IDynamicMetaObjectProvider)
+			if (obj is IDynamicMetaObjectProvider dyn)
 			{
-				return GetDynamicProperties(obj as IDynamicMetaObjectProvider);
+				return GetDynamicProperties(dyn);
 			}
 
 			var type = obj.GetType();
 
-			Func<Type, PropertyReader[]> getPublicProperties =
-				t => GetPropertiesAndFields(t, CacheBehaviour.PublicOnly);
+			PropertyReader[] getPublicProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.PublicOnly);
 
 			return PropertyCache.GetOrAdd(type, getPublicProperties);
 		}

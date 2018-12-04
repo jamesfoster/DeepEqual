@@ -10,7 +10,7 @@ namespace DeepEqual.Formatting
 				return "(null)";
 
 			if (value is string)
-				return string.Format("\"{0}\"", value);
+				return $"\"{value}\"";
 
 			return value.ToString();
 		}

@@ -1,8 +1,6 @@
 ﻿namespace DeepEqual.Syntax
 {
-	using System;
 	using System.Diagnostics.Contracts;
-	using System.Text;
 
 	public static class ObjectExtensions
 	{

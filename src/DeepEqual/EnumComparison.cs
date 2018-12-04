@@ -10,8 +10,8 @@ namespace DeepEqual
 				return false;
 
 			return
-				(type1.IsEnum || type1 == typeof (string) || type1 == typeof (int)) &&
-				(type2.IsEnum || type2 == typeof (string) || type2 == typeof (int));
+				(type1.IsEnum || type1 == typeof(string) || type1 == typeof(int)) &&
+				(type2.IsEnum || type2 == typeof(string) || type2 == typeof(int));
 		}
 
 		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
@@ -29,10 +29,10 @@ namespace DeepEqual
 			}
 
 			var result = value1IsEnum
-				             ? CompareEnumWithConversion(value1, value2)
-				             : CompareEnumWithConversion(value2, value1);
+				? CompareEnumWithConversion(value1, value2)
+				: CompareEnumWithConversion(value2, value1);
 
-			if(!result)
+			if (!result)
 				context.AddDifference(value1, value2);
 
 			return result ? ComparisonResult.Pass : ComparisonResult.Fail;
@@ -44,11 +44,11 @@ namespace DeepEqual
 
 			try
 			{
-				if (value2 is int)
-					value2 = Enum.ToObject(type, (int) value2);
+				if (value2 is int i)
+					value2 = Enum.ToObject(type, i);
 
-				if (value2 is string)
-					value2 = Enum.Parse(type, (string) value2);
+				if (value2 is string s)
+					value2 = Enum.Parse(type, s);
 			}
 			catch (Exception)
 			{
