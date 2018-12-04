@@ -8,7 +8,9 @@
     <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
     <Copyright>James Foster 2018</Copyright>
     <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
-    <Version>1.7.0</Version>
+    <Version>1.7.1</Version>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>../DeepEqual.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
