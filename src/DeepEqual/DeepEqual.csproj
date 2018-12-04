@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462;netcoreapp2.1</TargetFrameworks>
 
-    <Version>1.7.1</Version>
+    <Version>2.0.0-alpha1</Version>
     <Description>An extensible deep comparison library for .NET</Description>
     <Authors>James Foster</Authors>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
