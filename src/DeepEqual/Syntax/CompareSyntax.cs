@@ -15,7 +15,7 @@
 		{
 			Actual = actual;
 			Expected = expected;
-			Builder = new ComparisonBuilder();
+			Builder = ComparisonBuilder.Get();
 		}
 
 		[Pure]

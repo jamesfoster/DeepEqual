@@ -18,11 +18,13 @@
 		[Scenario]
 		public void Creating_a_DefaultComparison()
 		{
-			"When creating a DefaultComparison"
-				.When(() => SUT = new DefaultComparison());
+			"When creating a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"Then is should implement IComparison"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+			"Then is should implement IComparison".x(() => 
+				SUT.ShouldBeAssignableTo<IComparison>()
+			);
 		}
 
 		[Scenario]
@@ -34,14 +36,17 @@
 		[Example(typeof (int), typeof (long))]
 		public void Can_compare_any_type(Type type1, Type type2)
 		{
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"When calling CanCompare"
-				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+			"When calling CanCompare".x(() => 
+				CanCompareResult = SUT.CanCompare(type1, type2)
+			);
 
-			"Then the result should be true"
-				.Then(() => CanCompareResult.ShouldBe(true));
+			"Then the result should be true".x(() => 
+				CanCompareResult.ShouldBe(true)
+			);
 		}
 
 		[Scenario]
@@ -50,27 +55,31 @@
 			var object1 = default (CastSpy);
 			var object2 = default (string);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						object1 = new CastSpy("abc");
-						object2 = "abc";
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				object1 = new CastSpy("abc");
+				object2 = "abc";
+			});
 
-			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext());
+			"And a Comparison context object".x(() => 
+				Context = new ComparisonContext()
+			);
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, object1, object2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(Context, object1, object2)
+			);
 
-			"Then it should call the implicit operator"
-				.Then(() => object1.Called.ShouldBe(true));
+			"Then it should call the implicit operator".x(() => 
+				object1.Called.ShouldBe(true)
+			);
 
-			"And it should return Pass"
-				.And(() => Result.ShouldBe(ComparisonResult.Pass));
+			"And it should return Pass".x(() => 
+				Result.ShouldBe(ComparisonResult.Pass)
+			);
 		}
 
 		[Scenario]
@@ -79,27 +88,31 @@
 			var object1 = default (StringConvertibleSpy);
 			var object2 = default (string);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						object1 = new StringConvertibleSpy("abc");
-						object2 = "abc";
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				object1 = new StringConvertibleSpy("abc");
+				object2 = "abc";
+			});
 
-			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext());
+			"And a Comparison context object".x(() => 
+				Context = new ComparisonContext()
+			);
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, object1, object2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(Context, object1, object2)
+			);
 
-			"Then it should call IConvertible.ToString"
-				.Then(() => object1.Called.ShouldBe(true));
+			"Then it should call IConvertible.ToString".x(() => 
+				object1.Called.ShouldBe(true)
+			);
 
-			"And it should return Pass"
-				.And(() => Result.ShouldBe(ComparisonResult.Pass));
+			"And it should return Pass".x(() => 
+				Result.ShouldBe(ComparisonResult.Pass)
+			);
 		}
 
 		[Scenario]
@@ -108,24 +121,27 @@
 			var object1 = default (object);
 			var object2 = default (int);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						object1 = new object();
-						object2 = 123;
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				object1 = new object();
+				object2 = 123;
+			});
 
-			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext());
+			"And a Comparison context object".x(() => 
+				Context = new ComparisonContext()
+			);
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, object1, object2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(Context, object1, object2)
+			);
 
-			"Then it should return Inconclusive"
-				.Then(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+			"Then it should return Inconclusive".x(() => 
+				Result.ShouldBe(ComparisonResult.Inconclusive)
+			);
 		}
 
 		[Scenario]
@@ -134,24 +150,27 @@
 			var object1 = default (EqualsSpy);
 			var object2 = default (EqualsSpy);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						object1 = new EqualsSpy();
-						object2 = new EqualsSpy();
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				object1 = new EqualsSpy();
+				object2 = new EqualsSpy();
+			});
 
-			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext());
+			"And a Comparison context object".x(() => 
+				Context = new ComparisonContext()
+			);
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, object1, object2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(Context, object1, object2)
+			);
 
-			"Then it should call Equals"
-				.Then(() => object1.Calls[0].ShouldBeSameAs(object2));
+			"Then it should call Equals".x(() => 
+				object1.Calls[0].ShouldBeSameAs(object2)
+			);
 		}
 
 		[Scenario]
@@ -162,17 +181,21 @@
 		[Example("a", "b", false)]
 		public void Comparing_value_types_returns_Pass_or_Fail(object value1, object value2, bool expected)
 		{
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 			
-			"And a Comparison context object"
-				.And(() => Context = new ComparisonContext("Root"));
+			"And a Comparison context object".x(() => 
+				Context = new ComparisonContext("Root")
+			);
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(Context, value1, value2)
+			);
 
-			"The result should be Pass or Fail"
-				.Then(() => Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Fail));
+			"The result should be Pass or Fail".x(() => 
+				Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Fail)
+			);
 
 			if (!expected)
 			{
@@ -183,8 +206,9 @@
 						Value2 = value2
 					};
 
-				"And it should add a difference"
-					.And(() => Context.Differences[0].ShouldBe(expectedDifference));
+				"And it should add a difference".x(() => 
+					Context.Differences[0].ShouldBe(expectedDifference)
+				);
 			}
 		}
 
@@ -196,21 +220,23 @@
 			var value1 = default (EqualsSpy);
 			var value2 = default (EqualsSpy);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						value1 = new EqualsSpy(expected);
-						value2 = new EqualsSpy(expected);
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				value1 = new EqualsSpy(expected);
+				value2 = new EqualsSpy(expected);
+			});
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(null, value1, value2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(null, value1, value2)
+			);
 
-			"The result should be Pass or Fail"
-				.Then(() => Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Inconclusive));
+			"The result should be Pass or Fail".x(() => 
+				Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Inconclusive)
+			);
 		}
 
 		[Scenario]
@@ -221,17 +247,21 @@
 		[Example(typeof(AlwaysEqualAswell), typeof(object))]
 		public void Calling_CanCompare_on_ignored_types_returns_false(Type type1, Type type2)
 		{
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And the type is skipped"
-				.And(() => SUT.Skip<AlwaysEqual>());
+			"And the type is skipped".x(() => 
+				SUT.Skip<AlwaysEqual>()
+			);
 
-			"When calling Compare"
-				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+			"When calling Compare".x(() => 
+				CanCompareResult = SUT.CanCompare(type1, type2)
+			);
 
-			"The result should be false"
-				.Then(() => CanCompareResult.ShouldBe(false));
+			"The result should be false".x(() => 
+				CanCompareResult.ShouldBe(false)
+			);
 		}
 
 		[Scenario]
@@ -240,24 +270,27 @@
 			var value1 = default (AlwaysEqual);
 			var value2 = default (object);
 
-			"Given a DefaultComparison"
-				.Given(() => SUT = new DefaultComparison());
+			"Given a DefaultComparison".x(() => 
+				SUT = new DefaultComparison()
+			);
 
-			"And the type is skipped"
-				.And(() => SUT.Skip<AlwaysEqual>());
+			"And the type is skipped".x(() => 
+				SUT.Skip<AlwaysEqual>()
+			);
 
-			"And 2 objects to compare"
-				.And(() =>
-					{
-						value1 = new AlwaysEqual();
-						value2 = new AlwaysEqual();
-					});
+			"And 2 objects to compare".x(() =>
+			{
+				value1 = new AlwaysEqual();
+				value2 = new AlwaysEqual();
+			});
 
-			"When calling Compare"
-				.When(() => Result = SUT.Compare(null, value1, value2));
+			"When calling Compare".x(() => 
+				Result = SUT.Compare(null, value1, value2)
+			);
 
-			"The result should be Inconclusive"
-				.Then(() => Result.ShouldBe(ComparisonResult.Inconclusive));
+			"The result should be Inconclusive".x(() => 
+				Result.ShouldBe(ComparisonResult.Inconclusive)
+			);
 		}
 
 		private class AlwaysEqual
@@ -265,6 +298,11 @@
 			public override bool Equals(object obj)
 			{
 				return true;
+			}
+
+			public override int GetHashCode()
+			{
+				return 0;
 			}
 		}
 

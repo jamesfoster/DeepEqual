@@ -29,9 +29,9 @@ namespace DeepEqual.Test.Syntax
 				.Setup(x => x.Create())
 				.Returns(() => comparison);
 
-			syntax = a.WithDeepEqual(b);
+			ComparisonBuilder.Get = () => builder.Object;
 
-			syntax.Builder = builder.Object;
+			syntax = a.WithDeepEqual(b);
 		}
 
 		[Fact]

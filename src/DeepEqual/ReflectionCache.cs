@@ -9,7 +9,6 @@ namespace DeepEqual
 	using System.Linq.Expressions;
 	using System.Reflection;
 	using System.Runtime.CompilerServices;
-	using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 	using Microsoft.CSharp.RuntimeBinder;
 
@@ -123,7 +122,7 @@ namespace DeepEqual
 			}
 		}
 
-		internal static PropertyReader[] GetProperties(object obj)
+		public static PropertyReader[] GetProperties(object obj)
 		{
 			// Dont cache dynamic properties
 			if (obj is IDynamicMetaObjectProvider)

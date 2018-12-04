@@ -1,6 +1,6 @@
 ﻿namespace DeepEqual
 {
-	internal static class ComparisonContextExtensions
+	public static class ComparisonContextExtensions
 	{
 		public static void AddDifference(this IComparisonContext context, object value1, object value2)
 		{

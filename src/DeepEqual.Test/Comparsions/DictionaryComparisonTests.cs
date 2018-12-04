@@ -7,13 +7,13 @@
 
 	using Moq;
 
-	using Ploeh.AutoFixture;
-	using Ploeh.AutoFixture.AutoMoq;
+	using AutoFixture;
+	using AutoFixture.AutoMoq;
 
 	using Shouldly;
 
 	using Xbehave;
-
+	using Xunit;
 	using Xunit.Extensions;
 
 	public class DictionaryComparisonTests
@@ -31,74 +31,83 @@
 
 		private void SetUp()
 		{
-			"Given a fixture"
-				.Given(() =>
-					{
-						Fixture = new Fixture();
-						Fixture.Customize(new AutoMoqCustomization());
-					});
+			"Given a fixture".x(() =>
+			{
+				Fixture = new Fixture();
+				Fixture.Customize(new AutoMoqCustomization());
+			});
 
-			"And an inner comparison"
-				.And(() => Inner = Fixture.Freeze<Mock<IComparison>>());
+			"And an inner comparison".x(() => 
+				Inner = Fixture.Freeze<Mock<IComparison>>()
+			);
 
-			"And the inner comparison can compare any type"
-				.And(() => Inner
-					           .Setup(x => x.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
-					           .Returns(true));
+			"And the inner comparison can compare any type".x(() => 
+				Inner
+					.Setup(x => x.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
+					.Returns(true)
+			);
 
-			"And the inner comparison calls .Equals()"
-				.And(() => Inner
-					           .Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-					           .Returns<IComparisonContext, object, object>((c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail));
+			"And the inner comparison calls .Equals()".x(() => 
+				Inner
+					.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
+					.Returns<IComparisonContext, object, object>((c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail)
+			);
 
-			"And an ListComparison"
-				.And(() => SUT = Fixture.Create<DictionaryComparison>());
+			"And an ListComparison".x(() => 
+				SUT = Fixture.Create<DictionaryComparison>()
+			);
 
-			"And a ComparisonContext"
-				.And(() => Context = new ComparisonContext("Set"));
+			"And a ComparisonContext".x(() => 
+				Context = new ComparisonContext("Set")
+			);
 		}
 
 		[Scenario]
 		public void Creating_a_SetComparison()
 		{
-			"Given a fixture"
-				.Given(() =>
-					{
-						Fixture = new Fixture();
-						Fixture.Customize(new AutoMoqCustomization());
-					});
+			"Given a fixture".x(() =>
+			{
+				Fixture = new Fixture();
+				Fixture.Customize(new AutoMoqCustomization());
+			});
 
-			"When creating an SetComparison"
-				.When(() => SUT = Fixture.Create<DictionaryComparison>());
+			"When creating an SetComparison".x(() => 
+				SUT = Fixture.Create<DictionaryComparison>()
+			);
 
-			"Then it should implement IComparison"
-				.Then(() => SUT.ShouldBeTypeOf<IComparison>());
+			"Then it should implement IComparison".x(() => 
+				SUT.ShouldBeAssignableTo<IComparison>()
+			);
 		}
 
 		[Scenario]
-		[PropertyData("CanCompareTypesTestData")]
+		[MemberData(nameof(CanCompareTypesTestData))]
 		public void Can_compare_types(Type type1, Type type2, bool expected)
 		{
 			SetUp();
 
-			"When calling CanCompare({0}, {1})"
-				.When(() => CanCompareResult = SUT.CanCompare(type1, type2));
+			"When calling CanCompare({0}, {1})".x(() => 
+				CanCompareResult = SUT.CanCompare(type1, type2)
+			);
 
-			"It should return {2}"
-				.Then(() => CanCompareResult.ShouldBe(expected));
+			"It should return {2}".x(() => 
+				CanCompareResult.ShouldBe(expected)
+			);
 		}
 
 		[Scenario]
-		[PropertyData("IntTestData")]
+		[MemberData(nameof(IntTestData))]
 		public void When_comparing_sets(IDictionary value1, IDictionary value2, ComparisonResult expected)
 		{
 			SetUp();
 
-			"When comparing dictionaries"
-				.When(() => Result = SUT.Compare(Context, value1, value2));
+			"When comparing dictionaries".x(() => 
+				Result = SUT.Compare(Context, value1, value2)
+			);
 
-			"Then it should return {2}"
-				.Then(() => Result.ShouldBe(expected));
+			"Then it should return {2}".x(() => 
+				Result.ShouldBe(expected)
+			);
 		}
 
 		#region Test Data
