@@ -34,28 +34,25 @@
 			return Inner.CanCompare(elementType1, elementType2);
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			var set1 = ((IEnumerable) value1).Cast<object>().ToArray();
 			var set2 = ((IEnumerable) value2).Cast<object>().ToArray();
 
 			if (set1.Length != set2.Length)
 			{
-				context.AddDifference(set1.Length, set2.Length, "Count");
-				return ComparisonResult.Fail;
+				return (ComparisonResult.Fail, context.AddDifference(set1.Length, set2.Length, "Count"));
 			}
 
 			if (set1.Length == 0)
 			{
-				return ComparisonResult.Pass;
+				return (ComparisonResult.Pass, context);
 			}
 
-			var result = SetsEqual(context, set1, set2);
-
-			return result ? ComparisonResult.Pass : ComparisonResult.Fail;
+			return SetsEqual(context, set1, set2);
 		}
 
-		private bool SetsEqual(IComparisonContext context, object[] set1, object[] set2)
+		private (ComparisonResult result, IComparisonContext context) SetsEqual(IComparisonContext context, object[] set1, object[] set2)
 		{
 			var expected = set2.ToList();
 			var extra = new List<object>();
@@ -63,7 +60,7 @@
 			foreach (var obj in set1)
 			{
 				var innerContext = new ComparisonContext();
-				var found = expected.FirstOrDefault(e => Inner.Compare(innerContext, obj, e) == ComparisonResult.Pass);
+				var found = expected.FirstOrDefault(e => Inner.Compare(innerContext, obj, e).result == ComparisonResult.Pass);
 
 				if (found != null)
 					expected.RemoveAll(x => ReferenceEquals(x, found));
@@ -75,17 +72,19 @@
 
 			if (!equal)
 			{
-				context.AddDifference(
-					new SetDifference
-					{
-						Breadcrumb = context.Breadcrumb,
-						Expected = expected,
-						Extra = extra
-					}
+				return (
+					ComparisonResult.Fail,
+					context.AddDifference(
+						new SetDifference(
+							context.Breadcrumb,
+							expected,
+							extra
+						)
+					)
 				);
 			}
 
-			return equal;
+			return (ComparisonResult.Pass, context);
 		}
 	}
 }

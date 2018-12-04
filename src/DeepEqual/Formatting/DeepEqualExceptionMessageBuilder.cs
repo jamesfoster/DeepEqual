@@ -5,10 +5,10 @@ namespace DeepEqual.Formatting
 
 	public class DeepEqualExceptionMessageBuilder
 	{
-		private readonly ComparisonContext context;
+		private readonly IComparisonContext context;
 		private readonly DifferenceFormatterFactory formatterFactory;
 
-		public DeepEqualExceptionMessageBuilder(ComparisonContext context)
+		public DeepEqualExceptionMessageBuilder(IComparisonContext context)
 		{
 			this.context = context;
 			formatterFactory = new DifferenceFormatterFactory();

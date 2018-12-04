@@ -19,14 +19,14 @@
 			return !IsSkipped(type1) && !IsSkipped(type2);
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			var type1 = value1.GetType();
 			var type2 = value2.GetType();
 
 			if (IsSkipped(type1) || IsSkipped(type2))
 			{
-				return ComparisonResult.Inconclusive;
+				return (ComparisonResult.Inconclusive, context);
 			}
 
 			if (type1 != type2)
@@ -38,23 +38,22 @@
 
 					if (type1 != type2)
 					{
-						return ComparisonResult.Inconclusive;
+						return (ComparisonResult.Inconclusive, context);
 					}
 				}
 			}
 
 			if (value1.Equals(value2))
 			{
-				return ComparisonResult.Pass;
+				return (ComparisonResult.Pass, context);
 			}
 
 			if (ReflectionCache.IsValueType(type1))
 			{
-				context.AddDifference(value1, value2);
-				return ComparisonResult.Fail;
+				return (ComparisonResult.Fail, context.AddDifference(value1, value2));
 			}
 
-			return ComparisonResult.Inconclusive;
+			return (ComparisonResult.Inconclusive, context);
 		}
 
 		private bool IsSkipped(Type type)

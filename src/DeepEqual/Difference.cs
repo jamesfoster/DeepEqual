@@ -2,6 +2,11 @@
 {
 	public abstract class Difference
 	{
-		public string Breadcrumb { get; set; }
+		protected Difference(string breadcrumb)
+		{
+			Breadcrumb = breadcrumb;
+		}
+
+		public string Breadcrumb { get; }
 	}
 }

@@ -18,7 +18,7 @@
 		protected Fixture Fixture { get; set; }
 
 		protected EnumComparison SUT { get; set; }
-		protected ComparisonContext Context { get; set; }
+		protected IComparisonContext Context { get; set; }
 
 		protected ComparisonResult Result { get; set; }
 		protected bool CanCompareResult { get; set; }
@@ -73,9 +73,12 @@
 				Context = new ComparisonContext("Property");
 			});
 
-			"When calling Compare({0}, {1})".x(() => 
-				Result = SUT.Compare(Context, value1, value2)
-			);
+			"When calling Compare({0}, {1})".x(() =>
+			{
+				(var result, var context) = SUT.Compare(Context, value1, value2);
+				Result = result;
+				Context = context;
+			});
 
 			"Then it should return {2}".x(() => 
 				Result.ShouldBe(expected)
@@ -89,12 +92,12 @@
 			}
 			else
 			{
-				var expectedDifference = new BasicDifference
-					{
-						Breadcrumb = "Property",
-						Value1 = value1,
-						Value2 = value2
-					};
+				var expectedDifference = new BasicDifference(
+					breadcrumb: "Property",
+					value1: value1,
+					value2: value2,
+					childProperty: null
+				);
 
 				"And it should add a differences".x(() =>
 					Context.Differences[0].ShouldDeepEqual(expectedDifference)

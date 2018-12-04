@@ -22,9 +22,11 @@
 			results = new List<ComparisonResult>();
 		}
 
-		public ComparisonResult CompareObjects(IComparisonContext context, object source, object destination)
+		public (ComparisonResult, IComparisonContext) CompareObjects(IComparisonContext context, object source, object destination)
 		{
 			PreparePropertyInfo(source, destination);
+
+			var currentContext = context;
 
 			foreach (var pair in propertyMap)
 			{
@@ -37,43 +39,35 @@
 					continue;
 				}
 
-				if (HandleMissingValues(context, destinationValue, sourceValue))
+				if (SourceAndDestinationPresent())
 				{
-					continue;
+					var (result, innerContext) = inner.Compare(
+						context.VisitingProperty(currentPair.Name),
+						sourceValue.Value,
+						destinationValue.Value
+					);
+
+					results.Add(result);
+					currentContext = currentContext.MergeDifferencesFrom(innerContext);
+				}
+				else if (!ignoreUnmatchedProperties)
+				{
+					if (currentPair.Source == null)
+					{
+						currentContext = currentContext.AddDifference("(missing)", destinationValue.Value, currentPair.Name);
+						results.Add(ComparisonResult.Fail);
+					}
+
+					if (currentPair.Destination == null)
+					{
+						currentContext = currentContext.AddDifference(sourceValue.Value, "(missing)", currentPair.Name);
+						results.Add(ComparisonResult.Fail);
+					}
 				}
 
-				var innerContext = context.VisitingProperty(currentPair.Name);
-				results.Add(inner.Compare(innerContext, sourceValue.Value, destinationValue.Value));
 			}
 
-			return results.ToResult();
-		}
-
-		private bool HandleMissingValues(IComparisonContext context, Lazy<object> destinationValue, Lazy<object> sourceValue)
-		{
-			if (SourceAndDestinationPresent())
-			{
-				return false;
-			}
-
-			if (ignoreUnmatchedProperties)
-			{
-				return true;
-			}
-
-			if (currentPair.Source == null)
-			{
-				context.AddDifference("(missing)", destinationValue.Value, currentPair.Name);
-				results.Add(ComparisonResult.Fail);
-			}
-
-			if (currentPair.Destination == null)
-			{
-				context.AddDifference(sourceValue.Value, "(missing)", currentPair.Name);
-				results.Add(ComparisonResult.Fail);
-			}
-
-			return true;
+			return (results.ToResult(), currentContext);
 		}
 
 		private bool SourceAndDestinationPresent()

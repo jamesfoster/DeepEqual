@@ -23,7 +23,7 @@
 			return type1.IsClass && type2.IsClass;
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			var comparer = new ComplexObjectComparer(Inner, IgnoreUnmatchedProperties, IgnoredProperties);
 

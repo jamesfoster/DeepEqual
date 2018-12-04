@@ -17,7 +17,7 @@
 
 			var context = new ComparisonContext();
 
-			var result = comparison.Compare(context, actual, expected);
+			var (result, _) = comparison.Compare(context, actual, expected);
 
 			return result != ComparisonResult.Fail;
 		}
@@ -33,20 +33,21 @@
 
 			var context = new ComparisonContext();
 
-			var result = comparison.Compare(context, actual, expected);
+			var (result, newContext) = comparison.Compare(context, actual, expected);
 
 			if (result != ComparisonResult.Fail)
 			{
 				return;
 			}
 
-			throw new DeepEqualException(context);
+			throw new DeepEqualException(newContext);
 		}
 
 		[Pure]
 		public static CompareSyntax<TActual, TExpected> WithDeepEqual<TActual, TExpected>(
 			this TActual actual,
-			TExpected expected)
+			TExpected expected
+		)
 		{
 			return new CompareSyntax<TActual, TExpected>(actual, expected);
 		}

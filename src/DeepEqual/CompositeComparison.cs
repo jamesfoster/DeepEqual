@@ -30,17 +30,16 @@
 			return true;
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			if (value1 == null && value2 == null)
 			{
-				return ComparisonResult.Pass;
+				return (ComparisonResult.Pass, context);
 			}
 
 			if (value1 == null || value2 == null)
 			{
-				context.AddDifference(value1, value2);
-				return ComparisonResult.Fail;
+				return (ComparisonResult.Fail, context.AddDifference(value1, value2));
 			}
 
 			foreach (var c in Comparisons)
@@ -48,13 +47,14 @@
 				if(!c.CanCompare(value1.GetType(), value2.GetType()))
 					continue;
 
-				var result = c.Compare(context, value1, value2);
+				var (result, newContext) = c.Compare(context, value1, value2);
+				context = newContext;
 
 				if (result != ComparisonResult.Inconclusive)
-					return result;
+					return (result, context);
 			}
 
-			return ComparisonResult.Inconclusive;
+			return (ComparisonResult.Inconclusive, context);
 		}
 	}
 }

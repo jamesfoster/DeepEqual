@@ -74,7 +74,7 @@
 			);
 
 			"When calling Compare".x(() => 
-				Result = SUT.Compare(Context, object1, object2)
+				(Result, _) = SUT.Compare(Context, object1, object2)
 			);
 
 			"Then it should call the implicit operator".x(() => 
@@ -106,8 +106,8 @@
 				Context = new ComparisonContext()
 			);
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(Context, object1, object2)
+			"When calling Compare".x(() =>
+				(Result, _) = SUT.Compare(Context, object1, object2)
 			);
 
 			"Then it should call IConvertible.ToString".x(() => 
@@ -139,8 +139,8 @@
 				Context = new ComparisonContext()
 			);
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(Context, object1, object2)
+			"When calling Compare".x(() =>
+				(Result, _) = SUT.Compare(Context, object1, object2)
 			);
 
 			"Then it should return Inconclusive".x(() => 
@@ -168,8 +168,8 @@
 				Context = new ComparisonContext()
 			);
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(Context, object1, object2)
+			"When calling Compare".x(() =>
+				(Result, _) = SUT.Compare(Context, object1, object2)
 			);
 
 			"Then it should call Equals".x(() => 
@@ -178,13 +178,15 @@
 		}
 
 		[Scenario]
-		[Example(1, 1, true)]
-		[Example(1, 2, false)]
-		[Example(2, 2, true)]
-		[Example("a", "a", true)]
-		[Example("a", "b", false)]
-		public void Comparing_value_types_returns_Pass_or_Fail(object value1, object value2, bool expected)
+		[Example(1, 1, ComparisonResult.Pass)]
+		[Example(1, 2, ComparisonResult.Fail)]
+		[Example(2, 2, ComparisonResult.Pass)]
+		[Example("a", "a", ComparisonResult.Pass)]
+		[Example("a", "b", ComparisonResult.Fail)]
+		public void Comparing_value_types_returns_Pass_or_Fail(object value1, object value2, ComparisonResult expectedResult)
 		{
+			var newContext = default(IComparisonContext);
+
 			"Given a DefaultComparison".x(() => 
 				SUT = new DefaultComparison()
 			);
@@ -193,25 +195,25 @@
 				Context = new ComparisonContext("Root")
 			);
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(Context, value1, value2)
+			"When calling Compare".x(() =>
+				(Result, newContext) = SUT.Compare(Context, value1, value2)
 			);
 
 			"The result should be Pass or Fail".x(() => 
-				Result.ShouldBe(expected ? ComparisonResult.Pass : ComparisonResult.Fail)
+				Result.ShouldBe(expectedResult)
 			);
 
-			if (!expected)
+			if (expectedResult == ComparisonResult.Fail)
 			{
-				var expectedDifference = new BasicDifference
-					{
-						Breadcrumb = "Root",
-						Value1 = value1,
-						Value2 = value2
-					};
+				var expectedDifference = new BasicDifference(
+					breadcrumb: "Root",
+					value1: value1,
+					value2: value2,
+					childProperty: null
+				);
 
-				"And it should add a difference".x(() => 
-					Context.Differences[0].ShouldDeepEqual(expectedDifference)
+				"And it should add a difference".x(() =>
+					newContext.Differences[0].ShouldDeepEqual(expectedDifference)
 				);
 			}
 		}
@@ -234,8 +236,8 @@
 				value2 = new EqualsSpy(expected);
 			});
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(null, value1, value2)
+			"When calling Compare".x(() =>
+				(Result, _) = SUT.Compare(null, value1, value2)
 			);
 
 			"The result should be Pass or Fail".x(() => 
@@ -288,8 +290,8 @@
 				value2 = new AlwaysEqual();
 			});
 
-			"When calling Compare".x(() => 
-				Result = SUT.Compare(null, value1, value2)
+			"When calling Compare".x(() =>
+				(Result, _) = SUT.Compare(null, value1, value2)
 			);
 
 			"The result should be Inconclusive".x(() => 

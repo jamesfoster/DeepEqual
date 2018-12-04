@@ -22,20 +22,19 @@
 			return CheckInnerCanCompare(type1, type2);
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
 			var list1 = ((IEnumerable) value1).Cast<object>().ToArray();
 			var list2 = ((IEnumerable) value2).Cast<object>().ToArray();
 
 			if (list1.Length != list2.Length)
 			{
-				context.AddDifference(list1.Length, list2.Length, "Count");
-				return ComparisonResult.Fail;
+				return (ComparisonResult.Fail, context.AddDifference(list1.Length, list2.Length, "Count"));
 			}
 
 			if (list1.Length == 0)
 			{
-				return ComparisonResult.Pass;
+				return (ComparisonResult.Pass, context);
 			}
 
 			var zip = list1.Zip(list2, Tuple.Create).ToArray();
@@ -44,11 +43,13 @@
 			var i = 0;
 			foreach (var p in zip)
 			{
-				var innerContext = context.VisitingIndex(i++);
-				results.Add(Inner.Compare(innerContext, p.Item1, p.Item2));
+				var (result, innerContext) = Inner.Compare(context.VisitingIndex(i++), p.Item1, p.Item2);
+
+				results.Add(result);
+				context = context.MergeDifferencesFrom(innerContext);
 			}
 
-			return results.ToResult();
+			return (results.ToResult(), context);
 		}
 
 		private bool CheckInnerCanCompare(Type listType1, Type listType2)

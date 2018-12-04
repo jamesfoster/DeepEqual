@@ -8,6 +8,7 @@
 
 	using DeepEqual;
 	using DeepEqual.Syntax;
+	using DeepEqual.Test.Helper;
 
 	using Moq;
 
@@ -25,8 +26,8 @@
 
 		protected ListComparison SUT { get; set; }
 
-		protected Mock<IComparison> Inner { get; set; }
-		protected ComparisonContext Context { get; set; }
+		protected MockComparison Inner { get; set; }
+		protected IComparisonContext Context { get; set; }
 		protected IDictionary<string, Mock<IComparisonContext>> IndexContexts { get; set; }
 
 		protected ComparisonResult Result { get; set; }
@@ -58,22 +59,13 @@
 			var list2 = value2.Cast<object>().ToArray();
 
 			"Given a fixture".x(() =>
-			{
-				Fixture = new Fixture();
-				Fixture.Customize(new AutoMoqCustomization());
-			});
+				Fixture = new Fixture()
+			);
 
 			"And an inner comparison".x(() =>
 			{
-				Inner = Fixture.Freeze<Mock<IComparison>>();
-
-				Inner
-					.Setup(x => x.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
-					.Returns(true);
-
-				Inner
-					.Setup(x => x.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
-					.Returns<IComparisonContext, object, object>((c, v1, v2) => v1.Equals(v2) ? ComparisonResult.Pass : ComparisonResult.Fail);
+				Inner = new MockComparison();
+				Fixture.Inject<IComparison>(Inner);
 			});
 
 			"And a ListComparison".x(() => 
@@ -84,9 +76,12 @@
 				Context = new ComparisonContext("List")
 			);
 
-			"When comparing enumerables".x(() => 
-				Result = SUT.Compare(Context, value1, value2)
-			);
+			"When comparing enumerables".x(() =>
+			{
+				(var result, var context) = SUT.Compare(Context, value1, value2);
+				Result = result;
+				Context = context;
+			});
 
 			"Then it should return {2}".x(() => 
 				Result.ShouldBe(expected)
@@ -100,16 +95,19 @@
 					for (var i = 0; i < pairs.Count; i++)
 					{
 						var p = pairs[i];
-						Inner.Verify(x => x.Compare(
-							It.Is<IComparisonContext>(c => c.Breadcrumb == "List[" + i + "]"),
-							p.Item1,
-							p.Item2), Times.Once());
+						var index = i;
+
+						Inner.CompareCalls.ShouldContain(call =>
+							call.context.Breadcrumb == $"List[{index}]" &&
+							call.value1.Equals(p.Item1) &&
+							call.value2.Equals(p.Item2)
+						);
 					}
 				});
 			}
 			else
 			{
-				var expectedDifference = new BasicDifference
+				var expectedDifference = new
 					{
 						Breadcrumb = "List",
 						ChildProperty = "Count",
@@ -130,16 +128,12 @@
 			"Given a fixture".x(() =>
 			{
 				Fixture = new Fixture();
-				Fixture.Customize(new AutoMoqCustomization());
 			});
 
 			"And an inner comparison".x(() =>
 			{
-				Inner = Fixture.Freeze<Mock<IComparison>>();
-
-				Inner
-					.Setup(x => x.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
-					.Returns(true);
+				Inner = new MockComparison();
+				Fixture.Inject<IComparison>(Inner);
 			});
 
 			"And an ListComparison".x(() => 
@@ -157,7 +151,7 @@
 			if (expected)
 			{
 				"and it should call CanCompare on the inner comparer".x(() => 
-					Inner.Verify(x => x.CanCompare(elementType1, elementType2))
+					Inner.CanCompareCalls.ShouldContain(call => call.type1 == elementType1 && call.type2 == elementType2)
 				);
 			}
 		}

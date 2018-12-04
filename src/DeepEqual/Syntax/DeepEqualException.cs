@@ -9,9 +9,9 @@ namespace DeepEqual.Syntax
 
 	public class DeepEqualException : Exception
 	{
-		public ComparisonContext Context { get; set; }
+		public IComparisonContext Context { get; set; }
 
-		public DeepEqualException(ComparisonContext context)
+		public DeepEqualException(IComparisonContext context)
 			: this(new DeepEqualExceptionMessageBuilder(context).GetMessage())
 		{
 			Context = context;

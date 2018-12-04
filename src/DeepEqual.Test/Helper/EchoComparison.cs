@@ -16,9 +16,9 @@ namespace DeepEqual.Test.Helper
 			return true;
 		}
 
-		public ComparisonResult Compare(IComparisonContext context, object value1, object value2)
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
 		{
-			return result;
+			return (result, context);
 		}
 	}
 }

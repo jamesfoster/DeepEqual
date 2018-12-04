@@ -14,7 +14,10 @@
 		public ComplexObjectComparison ComplexObjectComparison { get; set; }
 		public DefaultComparison DefaultComparison { get; set; }
 
-		public static Func<IComparisonBuilder<ComparisonBuilder>> Get { get; set; } = () => new ComparisonBuilder();
+		private static readonly Func<IComparisonBuilder<ComparisonBuilder>> DefaultGet = () => new ComparisonBuilder();
+		public static Func<IComparisonBuilder<ComparisonBuilder>> Get { get; set; } = DefaultGet;
+		public static void Reset() => Get = DefaultGet;
+
 
 		public ComparisonBuilder()
 		{
