@@ -2,11 +2,13 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics.CodeAnalysis;
 
 	using Xbehave;
 
 	using Shouldly;
 
+	[SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
 	public class DefaultComparisonTests
 	{
 		protected DefaultComparison SUT { get; set; }

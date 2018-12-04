@@ -16,8 +16,6 @@
 	using Xbehave;
 
 	using Shouldly;
-
-	using Xunit.Extensions;
 	using Xunit;
 
 	public class ListComparisonTests
@@ -163,27 +161,21 @@
 			}
 		}
 
-		public static IEnumerable<object[]> IntTestData
+		public static IEnumerable<object[]> IntTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {new List<int>(), new int[] {}, ComparisonResult.Pass},
-						new object[] {new List<int>(), new List<int>(), ComparisonResult.Pass},
-						new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
-						new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
-						new object[] {new[] {1, 2, 3}, new List<int> {1, 2, 3}, ComparisonResult.Pass},
-						new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
-						new object[] {new Collection<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
-						new object[] {Enumerate(1, 2, 3), new[] {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new List<int>(), new int[] {}, ComparisonResult.Pass},
+			new object[] {new List<int>(), new List<int>(), ComparisonResult.Pass},
+			new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
+			new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
+			new object[] {new[] {1, 2, 3}, new List<int> {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {new Collection<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
+			new object[] {Enumerate(1, 2, 3), new[] {1, 2, 3}, ComparisonResult.Pass},
 
-						new object[] {new List<int> {1}, new[] {2}, ComparisonResult.Fail},
-						new object[] {new List<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
-						new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 2}, ComparisonResult.Fail}
-					};
-			}
-		}
+			new object[] {new List<int> {1}, new[] {2}, ComparisonResult.Fail},
+			new object[] {new List<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
+			new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 2}, ComparisonResult.Fail}
+		};
 
 		private static IEnumerable<T> Enumerate<T>(params T[] values)
 		{
@@ -193,24 +185,18 @@
 			}
 		}
 
-		public static IEnumerable<object[]> CanCompareTypesTestData
+		public static IEnumerable<object[]> CanCompareTypesTestData => new[]
 		{
-			get
-			{
-				return new[]
-					{
-						new object[] {typeof (IList), typeof (IList), typeof (object), typeof (object), true},
-						new object[] {typeof (IList<int>), typeof (IList<int>), typeof (int), typeof (int), true},
-						new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), true},
-						new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), true},
-						new object[] {typeof (string), typeof (string), typeof (char), typeof (char), true},
+			new object[] {typeof (IList), typeof (IList), typeof (object), typeof (object), true},
+			new object[] {typeof (IList<int>), typeof (IList<int>), typeof (int), typeof (int), true},
+			new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), true},
+			new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), true},
+			new object[] {typeof (string), typeof (string), typeof (char), typeof (char), true},
 
-						new object[] {typeof (object), typeof (object), null, null, false},
-						new object[] {typeof (object), typeof (int), null, null, false},
-						new object[] {typeof (int), typeof (int), null, null, false},
-						new object[] {typeof (int), typeof (string), null, null, false}
-					};
-			}
-		}
+			new object[] {typeof (object), typeof (object), null, null, false},
+			new object[] {typeof (object), typeof (int), null, null, false},
+			new object[] {typeof (int), typeof (int), null, null, false},
+			new object[] {typeof (int), typeof (string), null, null, false}
+		};
 	}
 }

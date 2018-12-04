@@ -7,7 +7,7 @@
 
 	public class ListComparison : IComparison
 	{
-		public IComparison Inner { get; private set; }
+		public IComparison Inner { get; }
 
 		public ListComparison(IComparison inner)
 		{

@@ -37,7 +37,7 @@
 				new SetComparison(Root),
 				new ListComparison(Root),
 				ComplexObjectComparison
-				);
+			);
 
 			return Root;
 		}

@@ -1,7 +1,5 @@
 ﻿namespace DeepEqual.Test.Helper
 {
-	using System;
-
 	using DeepEqual.Syntax;
 
 	using Shouldly;

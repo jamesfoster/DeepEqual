@@ -34,21 +34,17 @@
 		{
 			var exp = property.Body;
 
-			if (exp is UnaryExpression)
+			if (exp is UnaryExpression cast)
 			{
-				exp = ((UnaryExpression) exp).Operand; // implicit cast to object
+				exp = cast.Operand; // implicit cast to object
 			}
 
-			var member = exp as MemberExpression;
-
-			if (member == null)
+			if (exp is MemberExpression member)
 			{
-				return;
+				var propertyName = member.Member.Name;
+
+				IgnoreProperty(typeof(T), propertyName);
 			}
-
-			var propertyName = member.Member.Name;
-
-			IgnoreProperty(typeof (T), propertyName);
 		}
 
 		private void IgnoreProperty(Type type, string propertyName)

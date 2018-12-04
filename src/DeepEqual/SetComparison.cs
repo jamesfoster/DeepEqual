@@ -23,10 +23,10 @@
 				return false;
 
 			if (!isSetType1 && !ReflectionCache.IsListType(type1))
-					return false;
+				return false;
 
 			if (!isSetType2 && !ReflectionCache.IsListType(type2))
-					return false;
+				return false;
 
 			var elementType1 = ReflectionCache.GetEnumerationType(type1);
 			var elementType2 = ReflectionCache.GetEnumerationType(type2);
@@ -60,14 +60,13 @@
 			var expected = set2.ToList();
 			var extra = new List<object>();
 
-			for (int i = 0; i < set1.Length; i++)
+			foreach (var obj in set1)
 			{
-				var obj = set1[i];
 				var innerContext = new ComparisonContext();
 				var found = expected.FirstOrDefault(e => Inner.Compare(innerContext, obj, e) == ComparisonResult.Pass);
 
 				if (found != null)
-					expected.RemoveAll(x => x.Equals(found));
+					expected.RemoveAll(x => ReferenceEquals(x, found));
 				else
 					extra.Add(obj);
 			}

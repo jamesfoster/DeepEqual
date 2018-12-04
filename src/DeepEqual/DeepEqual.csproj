@@ -2,25 +2,31 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462;netcoreapp2.1</TargetFrameworks>
+
+    <Version>1.7.1</Version>
     <Description>An extensible deep comparison library for .NET</Description>
     <Authors>James Foster</Authors>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
     <Copyright>James Foster 2018</Copyright>
     <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
-    <Version>1.7.1</Version>
+    
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../DeepEqual.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="DeepEqual.v2.ncrunchproject" />
+    <None Remove="DeepEqual.netcoreapp2.1.v3.ncrunchproject" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
+    <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+  </ItemGroup>
+  
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
