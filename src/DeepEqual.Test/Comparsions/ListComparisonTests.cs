@@ -7,6 +7,7 @@
 	using System.Linq;
 
 	using DeepEqual;
+	using DeepEqual.Syntax;
 
 	using Moq;
 
@@ -108,7 +109,7 @@
 			}
 			else
 			{
-				var expectedDifference = new Difference
+				var expectedDifference = new BasicDifference
 					{
 						Breadcrumb = "List",
 						ChildProperty = "Count",
@@ -117,7 +118,7 @@
 					};
 
 				"And it should add a Difference".x(() => 
-					Context.Differences[0].ShouldBe(expectedDifference)
+					Context.Differences[0].ShouldDeepEqual(expectedDifference)
 				);
 			}
 		}

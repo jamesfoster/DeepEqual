@@ -9,7 +9,7 @@
 
 		public static void AddDifference(this IComparisonContext context, object value1, object value2, string childProperty)
 		{
-			context.AddDifference(new Difference
+			context.AddDifference(new BasicDifference
 				{
 					Breadcrumb = context.Breadcrumb,
 					Value1 = value1,

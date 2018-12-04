@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 
 	using DeepEqual;
+	using DeepEqual.Syntax;
 
 	using AutoFixture;
 
@@ -88,7 +89,7 @@
 			}
 			else
 			{
-				var expectedDifference = new Difference
+				var expectedDifference = new BasicDifference
 					{
 						Breadcrumb = "Property",
 						Value1 = value1,
@@ -96,7 +97,7 @@
 					};
 
 				"And it should add a differences".x(() =>
-					Context.Differences[0].ShouldBe(expectedDifference)
+					Context.Differences[0].ShouldDeepEqual(expectedDifference)
 				);
 			}
 		}

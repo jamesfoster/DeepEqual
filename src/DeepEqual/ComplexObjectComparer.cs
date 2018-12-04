@@ -140,9 +140,9 @@
 				Name = name;
 			}
 
-			public PropertyReader Source { get; private set; }
-			public PropertyReader Destination { get; private set; }
-			public string Name { get; private set; }
+			public PropertyReader Source { get; }
+			public PropertyReader Destination { get; }
+			public string Name { get; }
 		}
 	}
 }

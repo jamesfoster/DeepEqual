@@ -5,7 +5,6 @@
 	using DeepEqual.Formatting;
 
 	using Xunit;
-	using Xunit.Extensions;
 
 
 	public class ExceptionMessageTests
@@ -19,7 +18,7 @@
 		}
 
 		[Fact]
-		public void null_difference()
+		public void Null_difference()
 		{
 			var context = new ComparisonContext();
 			context.AddDifference(null, new object());
@@ -130,16 +129,21 @@ Comparison Failed: The following 1 differences were found.
 				value1,
 				value2);
 
-			AssertExceptionMessage(context, string.Format(@"
+			AssertExceptionMessage(context, $@"
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""{0}"" != ""{1}"")", expected1, expected2));
+	Actual != Expected (""{expected1}"" != ""{expected2}"")");
 		}
 
 		[Fact]
 		public void Missing_expected_entry()
 		{
 			var context = new ComparisonContext();
-			context.AddDifference(new MissingEntryDifference(MissingSide.Expected, "Index", "Value"));
+			context.AddDifference(new MissingEntryDifference
+			{
+				Side = MissingSide.Expected,
+				Key = "Index",
+				Value = "Value"
+			});
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -150,7 +154,11 @@ Comparison Failed: The following 1 differences were found.
 		public void Missing_actual_entry()
 		{
 			var context = new ComparisonContext();
-			context.AddDifference(new MissingEntryDifference(MissingSide.Actual, "Index", "Value"));
+			context.AddDifference(new MissingEntryDifference {
+				Side = MissingSide.Actual,
+				Key = "Index",
+				Value = "Value"
+			});
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -161,7 +169,12 @@ Comparison Failed: The following 1 differences were found.
 		public void Set_difference_expected()
 		{
 			var context = new ComparisonContext();
-			context.AddDifference(new SetDifference(".Set", new List<object>{1,2,3}, new List<object>()));
+			context.AddDifference(new SetDifference
+			{
+				Breadcrumb = ".Set",
+				Expected = new List<object> { 1, 2, 3 },
+				Extra = new List<object>()
+			});
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.
@@ -176,7 +189,12 @@ Comparison Failed: The following 1 differences were found.
 		public void Set_difference_actual()
 		{
 			var context = new ComparisonContext();
-			context.AddDifference(new SetDifference(".Set", new List<object>(), new List<object>{1,2,3}));
+			context.AddDifference(new SetDifference
+			{
+				Breadcrumb = ".Set",
+				Expected = new List<object>(),
+				Extra = new List<object> {1, 2, 3}
+			});
 
 			AssertExceptionMessage(context, @"
 Comparison Failed: The following 1 differences were found.

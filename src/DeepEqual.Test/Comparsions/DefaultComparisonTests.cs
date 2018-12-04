@@ -4,6 +4,8 @@
 	using System.Collections.Generic;
 	using System.Diagnostics.CodeAnalysis;
 
+	using DeepEqual.Syntax;
+
 	using Xbehave;
 
 	using Shouldly;
@@ -201,7 +203,7 @@
 
 			if (!expected)
 			{
-				var expectedDifference = new Difference
+				var expectedDifference = new BasicDifference
 					{
 						Breadcrumb = "Root",
 						Value1 = value1,
@@ -209,7 +211,7 @@
 					};
 
 				"And it should add a difference".x(() => 
-					Context.Differences[0].ShouldBe(expectedDifference)
+					Context.Differences[0].ShouldDeepEqual(expectedDifference)
 				);
 			}
 		}
@@ -315,8 +317,8 @@
 
 		private class EqualsSpy
 		{
-			private bool Result { get; set; }
-			public List<object> Calls { get; private set; }
+			private bool Result { get; }
+			public List<object> Calls { get; }
 
 			public EqualsSpy(bool result = false)
 			{

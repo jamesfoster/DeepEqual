@@ -31,7 +31,7 @@
 
 			if (type1 != type2)
 			{
-				if (CoerceValues(ref value1, ref value2))
+				if (CanCoerceValues(ref value1, ref value2))
 				{
 					type1 = value1.GetType();
 					type2 = value2.GetType();
@@ -67,7 +67,7 @@
 			SkippedTypes.Add(typeof (T));
 		}
 
-		private bool CoerceValues(ref object value1, ref object value2)
+		private static bool CanCoerceValues(ref object value1, ref object value2)
 		{
 			try
 			{
@@ -94,15 +94,17 @@
 
 			var type = value.GetType();
 
-			var conversionMethod = type.GetMethods()
-			                           .Where(x => x.Name == "op_Implicit" || x.Name == "op_Explicit")
-			                           .FirstOrDefault(x => x.ReturnType == destType);
+			var conversionMethod = type
+				.GetMethods()
+				.Where(x => x.Name == "op_Implicit" || x.Name == "op_Explicit")
+				.FirstOrDefault(x => x.ReturnType == destType);
 
 			if (conversionMethod == null)
 			{
-				conversionMethod = destType.GetMethods()
-			                           .Where(x => x.Name == "op_Implicit" || x.Name == "op_Explicit")
-			                           .FirstOrDefault(x => x.GetParameters().First().ParameterType == type);
+				conversionMethod = destType
+					.GetMethods()
+					.Where(x => x.Name == "op_Implicit" || x.Name == "op_Explicit")
+					.FirstOrDefault(x => x.GetParameters().First().ParameterType == type);
 			}
 
 			if (conversionMethod == null)
