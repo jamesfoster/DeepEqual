@@ -2,6 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462;netcoreapp2.1</TargetFrameworks>
+    <Description>An extensible deep comparison library for .NET</Description>
+    <Authors>James Foster</Authors>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
+    <Copyright>James Foster 2018</Copyright>
+    <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
+    <Version>1.6.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
