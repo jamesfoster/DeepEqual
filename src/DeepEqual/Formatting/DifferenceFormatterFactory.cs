@@ -1,5 +1,7 @@
 namespace DeepEqual.Formatting
 {
+	using System;
+
 	public class DifferenceFormatterFactory
 	{
 		public IDifferenceFormatter GetFormatter(Difference difference)
@@ -12,8 +14,11 @@ namespace DeepEqual.Formatting
 				case SetDifference _:
 					return new SetDifferenceFormatter();
 
-				default:
+				case BasicDifference _:
 					return new BasicDifferenceFormatter();
+
+				default:
+					return new BreadcrumbDifferenceFormatter();
 			}
 		}
 	}
