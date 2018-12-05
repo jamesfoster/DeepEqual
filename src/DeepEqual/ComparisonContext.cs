@@ -28,19 +28,5 @@
 		{
 			return new ComparisonContext(Differences, breadcrumb);
 		}
-
-		public IComparisonContext VisitingProperty(string propertyName)
-		{
-			var newBreadcrumb = $"{Breadcrumb}.{propertyName}";
-
-			return new ComparisonContext(Differences, newBreadcrumb);
-		}
-
-		public IComparisonContext VisitingIndex(object index)
-		{
-			var newBreadcrumb = $"{Breadcrumb}[{index}]";
-
-			return new ComparisonContext(Differences, newBreadcrumb);
-		}
 	}
 }
