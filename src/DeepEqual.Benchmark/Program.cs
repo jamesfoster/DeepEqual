@@ -27,7 +27,8 @@
 					{2, 3},
 					{123, 234},
 					{345, 456}
-				}
+				},
+				Custom = new Custom { Value = 10 }
 			};
 
 			var object2 = new
@@ -47,7 +48,8 @@
 					{123, 234},
 					{345, 456},
 					{2, 3}
-				}
+				},
+				Custom = new Custom { Value = 101 }
 			};
 
 			var sw = new Stopwatch();
@@ -58,7 +60,10 @@
 
 				for (int j = 0; j < 100; j++)
 				{
-					object1.ShouldDeepEqual(object2);
+					object1
+						.WithDeepEqual(object2)
+						.WithCustomComparison(new CustomComparison())
+						.Assert();
 				}
 
 				sw.Stop();
@@ -73,5 +78,34 @@
 		public int X { get; set; }
 		public int Y { get; set; }
 		public int Z { get; set; }
+	}
+
+	public class Custom
+	{
+		public int Value { get; set; }
+	}
+
+	public class CustomComparison : IComparison
+	{
+		public bool CanCompare(Type type1, Type type2)
+		{
+			return type1 == typeof(Custom) && type1 == type2;
+		}
+
+		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+		{
+			var custom1 = (Custom) value1;
+			var custom2 = (Custom) value2;
+
+			var str1 = custom1.Value.ToString();
+			var str2 = custom2.Value.ToString();
+
+			if (str1.StartsWith(str2) || str2.StartsWith(str1))
+			{
+				return (ComparisonResult.Pass, context);
+			}
+
+			return (ComparisonResult.Fail, context.AddDifference(value1, value2));
+		}
 	}
 }
