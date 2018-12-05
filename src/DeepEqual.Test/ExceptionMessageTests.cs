@@ -214,6 +214,27 @@ Comparison Failed: The following 1 differences were found.
 			3");
 		}
 
+		[Fact]
+		public void Custom_difference_type()
+		{
+			var context = new ComparisonContext()
+				.AddDifference(new CustomDifference(".Custom", 123));
+
+			AssertExceptionMessage(context, @"
+Comparison Failed: The following 1 differences were found.
+	Actual.Custom != Expected.Custom");
+		}
+
+		public class CustomDifference : Difference
+		{
+			public int Foo { get; }
+
+			public CustomDifference(string breadcrumb, int foo) : base(breadcrumb)
+			{
+				Foo = foo;
+			}
+		}
+
 		private static void AssertExceptionMessage(IComparisonContext context, string expectedMessage)
 		{
 			expectedMessage = expectedMessage.Trim().Replace("\r\n", "\n");

@@ -10,7 +10,7 @@ namespace DeepEqual.Formatting
 
 		public override string Format(Difference difference)
 		{
-			var basicDifference = difference as BasicDifference 
+			var basicDifference = difference as BasicDifference
 				?? throw new ArgumentException("Invalid difference type", nameof(difference));
 
 			var format = "Actual{0}.{1} != Expected{0}.{1} ({2} != {3})";
