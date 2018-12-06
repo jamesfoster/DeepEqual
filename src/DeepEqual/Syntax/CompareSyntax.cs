@@ -82,6 +82,13 @@
 		}
 
 		[Pure]
+		public CompareSyntax<TActual, TExpected> WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f)
+		{
+			Builder.WithFloatingPointTolerance(doubleTolerance, singleTolerance);
+			return this;
+		}
+
+		[Pure]
 		public bool Compare()
 		{
 			return Actual.IsDeepEqual(Expected, Builder.Create());
