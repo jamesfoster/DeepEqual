@@ -14,6 +14,9 @@
 		public ComplexObjectComparison ComplexObjectComparison { get; set; }
 		public DefaultComparison DefaultComparison { get; set; }
 
+		public double DoubleTolerance { get; set; } = 1e-15d;
+		public float SingleTolerance { get; set; } = 1e-6f;
+
 		private static readonly Func<IComparisonBuilder<ComparisonBuilder>> DefaultGet = () => new ComparisonBuilder();
 		public static Func<IComparisonBuilder<ComparisonBuilder>> Get { get; set; } = DefaultGet;
 		public static void Reset() => Get = DefaultGet;
@@ -34,6 +37,7 @@
 			Root.AddRange(CustomComparisons.ToArray());
 
 			Root.AddRange(
+				new FloatComparison(DoubleTolerance, SingleTolerance),
 				DefaultComparison,
 				new EnumComparison(),
 				new DictionaryComparison(new DefaultComparison(), Root),

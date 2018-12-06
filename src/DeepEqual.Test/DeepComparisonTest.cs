@@ -17,6 +17,8 @@
 					A = 1,
 					B = UriKind.Absolute,
 					C = new List<int> {1, 2, 3},
+					Float = 1.111_111_8f,
+					Double = 1.111_111_111_111_118d,
 					Inner = new
 						{
 							X = 1,
@@ -37,6 +39,8 @@
 					A = 1,
 					B = "Absolute",
 					C = new[] {1, 2, 3},
+					Float = 1.111_111_9m,
+					Double = 1.111_111_111_111_119m,
 					Inner = new TestType
 						{
 							X = 1,
