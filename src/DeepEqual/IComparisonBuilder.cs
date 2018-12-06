@@ -17,5 +17,6 @@
 		TBuilder SkipDefault<T>();
 		TBuilder ExposeInternalsOf<T>();
 		TBuilder ExposeInternalsOf(params Type[] types);
+		TBuilder WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f);
 	}
 }

@@ -20,11 +20,9 @@ namespace DeepEqual.Test.Syntax
 
 		private readonly Mock<IComparisonBuilder<ComparisonBuilder>> builder;
 
-		private readonly CompositeComparison comparison;
-
 		public CompareSyntaxTests()
 		{
-			comparison = new CompositeComparison();
+			var comparison = new CompositeComparison();
 
 			builder = new Mock<IComparisonBuilder<ComparisonBuilder>>();
 
@@ -116,6 +114,14 @@ namespace DeepEqual.Test.Syntax
 			syntax.ExposeInternalsOf(typeof(Version), typeof(Uri));
 
 			builder.Verify(x => x.ExposeInternalsOf(typeof(Version), typeof(Uri)), Times.Once());
+		}
+
+		[Fact]
+		public void Delegates_WithFloatingPointTolerance()
+		{
+			syntax.WithFloatingPointTolerance(1, 2);
+
+			builder.Verify(x => x.WithFloatingPointTolerance(1, 2), Times.Once());
 		}
 
 		[Fact]

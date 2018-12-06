@@ -163,6 +163,46 @@
 		}
 		
 		[Scenario]
+		public void Setting_floating_point_tolerance()
+		{
+			var result = default (ComparisonBuilder);
+
+			"Given a builder".x(() => 
+				SUT = new ComparisonBuilder()
+			);
+
+			"When setting floating point tolerance".x(() => 
+				result = SUT.WithFloatingPointTolerance(0.001d, 0.2f)
+			);
+
+			"Then the tolerance should be set".x(() =>
+			{
+				SUT.DoubleTolerance.ShouldBe(0.001d);
+				SUT.SingleTolerance.ShouldBe(0.2f);
+			});
+
+			"And it should return the builder".x(() => 
+				result.ShouldBeSameAs(SUT)
+			);
+		}
+		
+		[Scenario]
+		public void Default_floating_point_tolerance()
+		{
+			var result = default (ComparisonBuilder);
+
+			"Given a builder".x(() => 
+				SUT = new ComparisonBuilder()
+			);
+
+			"Then the tolerance should be set".x(() =>
+			{
+				SUT.DoubleTolerance.ShouldBe(1e-15d);
+				SUT.SingleTolerance.ShouldBe(1e-6f);
+			});
+		}
+		
+		[Scenario]
 		public void Expoising_internals_of_a_given_type()
 		{
 			var result = default (ComparisonBuilder);

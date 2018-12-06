@@ -93,5 +93,12 @@
 			ReflectionCache.CachePrivatePropertiesOfTypes(types);
 			return this;
 		}
+
+		public ComparisonBuilder WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f)
+		{
+			DoubleTolerance = doubleTolerance;
+			SingleTolerance = singleTolerance;
+			return this;
+		}
 	}
 }
