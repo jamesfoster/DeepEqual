@@ -31,7 +31,7 @@
 
 			if (type1 != type2)
 			{
-				if (CanCoerceValues(ref value1, ref value2))
+				if (CoerceValues(ref value1, ref value2))
 				{
 					type1 = value1.GetType();
 					type2 = value2.GetType();
@@ -66,7 +66,7 @@
 			SkippedTypes.Add(typeof (T));
 		}
 
-		private static bool CanCoerceValues(ref object value1, ref object value2)
+		private static bool CoerceValues(ref object value1, ref object value2)
 		{
 			try
 			{

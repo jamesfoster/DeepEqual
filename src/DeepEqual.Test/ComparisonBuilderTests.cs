@@ -236,51 +236,55 @@
 			);
 
 			"And the 1st comparer is the DefaultComparison".x(() => 
-				result.Comparisons[0].ShouldBeAssignableTo<DefaultComparison>()
+				result.Comparisons[0].ShouldBeAssignableTo<FloatComparison>()
 			);
 
-			"And the 2nd comparer is the EnumComparison".x(() => 
-				result.Comparisons[1].ShouldBeAssignableTo<EnumComparison>()
+			"And the 2nd comparer is the DefaultComparison".x(() => 
+				result.Comparisons[1].ShouldBeAssignableTo<DefaultComparison>()
 			);
-			
-			"And the 3rd comparer is the DictionaryComparison".x(() => 
-				result.Comparisons[2].ShouldBeAssignableTo<DictionaryComparison>()
-			);
-			
-			"... with a DefaultComparison as the key comparer".x(() => 
-				((DictionaryComparison)result.Comparisons[2]).KeyComparer.ShouldBeAssignableTo<DefaultComparison>()
-			);
-			
-			"... and the value comparer is the result".x(() => 
-				((DictionaryComparison)result.Comparisons[2]).ValueComparer.ShouldBeSameAs(result)
+
+			"And the 3rd comparer is the EnumComparison".x(() => 
+				result.Comparisons[2].ShouldBeAssignableTo<EnumComparison>()
 			);
 			
 			"And the 4th comparer is the DictionaryComparison".x(() => 
-				result.Comparisons[3].ShouldBeAssignableTo<SetComparison>()
+				result.Comparisons[3].ShouldBeAssignableTo<DictionaryComparison>()
 			);
 			
-			"... and the inner comparer is the result".x(() => 
-				((SetComparison)result.Comparisons[3]).Inner.ShouldBeSameAs(result)
+			"... with a DefaultComparison as the key comparer".x(() => 
+				((DictionaryComparison)result.Comparisons[3]).KeyComparer.ShouldBeAssignableTo<DefaultComparison>()
+			);
+			
+			"... and the value comparer is the result".x(() => 
+				((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(result)
 			);
 			
 			"And the 5th comparer is the DictionaryComparison".x(() => 
-				result.Comparisons[4].ShouldBeAssignableTo<ListComparison>()
+				result.Comparisons[4].ShouldBeAssignableTo<SetComparison>()
 			);
 			
 			"... and the inner comparer is the result".x(() => 
-				((ListComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result)
+				((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result)
 			);
 			
-			"And the 6th comparer is the ComplexObjectComparison".x(() => 
-				result.Comparisons[5].ShouldBeAssignableTo<ComplexObjectComparison>()
+			"And the 6th comparer is the DictionaryComparison".x(() => 
+				result.Comparisons[5].ShouldBeAssignableTo<ListComparison>()
 			);
 			
 			"... and the inner comparer is the result".x(() => 
-				((ComplexObjectComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result)
+				((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result)
+			);
+			
+			"And the 7th comparer is the ComplexObjectComparison".x(() => 
+				result.Comparisons[6].ShouldBeAssignableTo<ComplexObjectComparison>()
+			);
+			
+			"... and the inner comparer is the result".x(() => 
+				((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(result)
 			);
 			
 			"... and IgnoreUnmatchedProperties should be false".x(() => 
-				((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(false)
+				((ComplexObjectComparison)result.Comparisons[6]).IgnoreUnmatchedProperties.ShouldBe(false)
 			);
 		}
 
@@ -328,11 +332,11 @@
 			);
 
 			"Then the 6th comparer is the ComplexObjectComparison".x(() => 
-				result.Comparisons[5].ShouldBeAssignableTo<ComplexObjectComparison>()
+				result.Comparisons[6].ShouldBeAssignableTo<ComplexObjectComparison>()
 			);
 			
 			"... and IgnoreUnmatchedProperties should be true".x(() => 
-				((ComplexObjectComparison)result.Comparisons[5]).IgnoreUnmatchedProperties.ShouldBe(true)
+				((ComplexObjectComparison)result.Comparisons[6]).IgnoreUnmatchedProperties.ShouldBe(true)
 			);
 		}
 	}
