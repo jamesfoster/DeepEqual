@@ -5,9 +5,12 @@
 	using System.Linq;
 	using System.Linq.Expressions;
 
+	using DeepEqual.Formatting;
+
 	public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 	{
 		public IList<IComparison> CustomComparisons { get; set; }
+		public IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
 
 		protected CompositeComparison Root { get; set; }
 
@@ -25,6 +28,7 @@
 		public ComparisonBuilder()
 		{
 			CustomComparisons = new List<IComparison>();
+			CustomFormatters = new Dictionary<Type, IDifferenceFormatter>();
 
 			Root = new CompositeComparison();
 
@@ -49,6 +53,11 @@
 			return Root;
 		}
 
+		public IDifferenceFormatterFactory GetFormatterFactory()
+		{
+			return new DifferenceFormatterFactory(CustomFormatters);
+		}
+
 		public ComparisonBuilder IgnoreUnmatchedProperties()
 		{
 			ComplexObjectComparison.IgnoreUnmatchedProperties = true;
@@ -59,6 +68,14 @@
 		public ComparisonBuilder WithCustomComparison(IComparison comparison)
 		{
 			CustomComparisons.Add(comparison);
+
+			return this;
+		}
+
+		public ComparisonBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter) 
+			where TDifference : Difference
+		{
+			CustomFormatters[typeof(TDifference)] = formatter;
 
 			return this;
 		}

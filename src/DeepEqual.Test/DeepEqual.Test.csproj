@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="ApprovalTests" Version="3.0.18" />
     <PackageReference Include="AutoFixture" Version="4.5.1" />
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.5.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />

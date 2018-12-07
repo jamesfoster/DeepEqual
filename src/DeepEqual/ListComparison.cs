@@ -2,7 +2,6 @@
 {
 	using System;
 	using System.Collections;
-	using System.Collections.Generic;
 	using System.Linq;
 
 	public class ListComparison : IComparison
@@ -19,7 +18,15 @@
 			if (!ReflectionCache.IsListType(type1) || !ReflectionCache.IsListType(type2))
 				return false;
 
-			return CheckInnerCanCompare(type1, type2);
+			return checkInnerCanCompare();
+
+			bool checkInnerCanCompare()
+			{
+				var innerType1 = ReflectionCache.GetEnumerationType(type1);
+				var innerType2 = ReflectionCache.GetEnumerationType(type2);
+
+				return Inner.CanCompare(innerType1, innerType2);
+			}
 		}
 
 		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
@@ -27,37 +34,29 @@
 			var list1 = ((IEnumerable) value1).Cast<object>().ToArray();
 			var list2 = ((IEnumerable) value2).Cast<object>().ToArray();
 
-			if (list1.Length != list2.Length)
+			var length = list1.Length;
+
+			if (length != list2.Length)
 			{
-				return (ComparisonResult.Fail, context.AddDifference(list1.Length, list2.Length, "Count"));
+				return (ComparisonResult.Fail, context.AddDifference(length, list2.Length, "Count"));
 			}
 
-			if (list1.Length == 0)
+			if (length == 0)
 			{
 				return (ComparisonResult.Pass, context);
 			}
 
-			var zip = list1.Zip(list2, Tuple.Create).ToArray();
-
-			var results = new List<ComparisonResult>();
-			var i = 0;
-			foreach (var p in zip)
-			{
-				var (result, innerContext) = Inner.Compare(context.VisitingIndex(i++), p.Item1, p.Item2);
-
-				results.Add(result);
-				context = context.MergeDifferencesFrom(innerContext);
-			}
-
-			return (results.ToResult(), context);
-		}
-
-		private bool CheckInnerCanCompare(Type listType1, Type listType2)
-		{
-			var type1 = ReflectionCache.GetEnumerationType(listType1);
-			var type2 = ReflectionCache.GetEnumerationType(listType2);
-
-			return Inner.CanCompare(type1, type2);
+			return Enumerable
+				.Range(0, length)
+				.Select(i => (value1: list1[i], value2: list2[i], index: i))
+				.Aggregate(
+					(result: ComparisonResult.Inconclusive, context: context),
+					(acc, x) =>
+					{
+						var (newResult, newContext) = Inner.Compare(context.VisitingIndex(x.index), x.value1, x.value2);
+						return (acc.result.Plus(newResult), acc.context.MergeDifferencesFrom(newContext));
+					}
+				);
 		}
 	}
 }

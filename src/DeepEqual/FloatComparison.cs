@@ -1,7 +1,6 @@
 ﻿namespace DeepEqual
 {
 	using System;
-	using System.Data;
 	using System.Diagnostics.CodeAnalysis;
 
 	[SuppressMessage("ReSharper", "CompareOfFloatsByEqualityOperator")]

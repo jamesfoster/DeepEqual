@@ -6,12 +6,12 @@ namespace DeepEqual.Formatting
 	public class DeepEqualExceptionMessageBuilder
 	{
 		private readonly IComparisonContext context;
-		private readonly DifferenceFormatterFactory formatterFactory;
+		private readonly IDifferenceFormatterFactory formatterFactory;
 
-		public DeepEqualExceptionMessageBuilder(IComparisonContext context)
+		public DeepEqualExceptionMessageBuilder(IComparisonContext context, IDifferenceFormatterFactory formatterFactory)
 		{
 			this.context = context;
-			formatterFactory = new DifferenceFormatterFactory();
+			this.formatterFactory = formatterFactory;
 		}
 
 		public string GetMessage()
@@ -38,6 +38,8 @@ namespace DeepEqual.Formatting
 
 		private static string Indent(string differenceString)
 		{
+			differenceString = differenceString
+				.Replace(Environment.NewLine, "\n");
 			return string.Join("\n\t\t", differenceString.Split(new[] {"\n"}, StringSplitOptions.None));
 		}
 
