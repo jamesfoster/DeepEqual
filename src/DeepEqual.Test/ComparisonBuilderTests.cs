@@ -189,8 +189,6 @@
 		[Scenario]
 		public void Default_floating_point_tolerance()
 		{
-			var result = default (ComparisonBuilder);
-
 			"Given a builder".x(() => 
 				SUT = new ComparisonBuilder()
 			);

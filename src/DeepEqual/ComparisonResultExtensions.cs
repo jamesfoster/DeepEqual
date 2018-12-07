@@ -18,5 +18,13 @@
 
 			return foundPass ? ComparisonResult.Pass : ComparisonResult.Inconclusive;
 		}
+
+		internal static ComparisonResult Plus(this ComparisonResult result, ComparisonResult other)
+		{
+			if (result == ComparisonResult.Fail || other == ComparisonResult.Fail)
+				return ComparisonResult.Fail;
+
+			return result == ComparisonResult.Inconclusive ? other : result;
+		}
 	}
 }

@@ -3,6 +3,8 @@
 	using System;
 	using System.Linq.Expressions;
 
+	using DeepEqual.Formatting;
+
 	/// <summary>
 	/// This interface exists solely to keep ComparisonBuilder and CompareSyntax in sync.
 	/// </summary>
@@ -10,8 +12,11 @@
 		where TBuilder : IComparisonBuilder<TBuilder>
 	{
 		CompositeComparison Create();
+		IDifferenceFormatterFactory GetFormatterFactory();
+
 		TBuilder IgnoreUnmatchedProperties();
 		TBuilder WithCustomComparison(IComparison comparison);
+		TBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter) where TDifference : Difference;
 		TBuilder IgnoreProperty<T>(Expression<Func<T, object>> property);
 		TBuilder IgnoreProperty(Func<PropertyReader, bool> func);
 		TBuilder SkipDefault<T>();

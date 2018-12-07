@@ -2,6 +2,8 @@
 {
 	using System.Diagnostics.Contracts;
 
+	using DeepEqual.Formatting;
+
 	public static class ObjectExtensions
 	{
 		[Pure]
@@ -24,12 +26,24 @@
 
 		public static void ShouldDeepEqual(this object actual, object expected)
 		{
-			ShouldDeepEqual(actual, expected, null);
+			ShouldDeepEqual(actual, expected, null, null);
 		}
 
 		public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison)
 		{
-			comparison = comparison ?? new ComparisonBuilder().Create();
+			ShouldDeepEqual(actual, expected, comparison, null);
+		}
+
+		public static void ShouldDeepEqual(
+			this object actual,
+			object expected,
+			IComparison comparison,
+			IDifferenceFormatterFactory formatterFactory)
+		{
+			var builder = new ComparisonBuilder();
+
+			comparison = comparison ?? builder.Create();
+			formatterFactory = formatterFactory ?? builder.GetFormatterFactory();
 
 			var context = new ComparisonContext();
 
@@ -40,14 +54,15 @@
 				return;
 			}
 
-			throw new DeepEqualException(newContext);
+			var message = new DeepEqualExceptionMessageBuilder(newContext, formatterFactory).GetMessage();
+
+			throw new DeepEqualException(message, newContext);
 		}
 
 		[Pure]
 		public static CompareSyntax<TActual, TExpected> WithDeepEqual<TActual, TExpected>(
 			this TActual actual,
-			TExpected expected
-		)
+			TExpected expected)
 		{
 			return new CompareSyntax<TActual, TExpected>(actual, expected);
 		}

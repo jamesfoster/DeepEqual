@@ -1,6 +1,5 @@
 ﻿namespace DeepEqual.Test.Features
 {
-	using DeepEqual.Syntax;
 	using DeepEqual.Test.Helper;
 	using DeepEqual.Test.VB;
 	using Xunit;

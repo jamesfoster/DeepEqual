@@ -4,6 +4,8 @@
 	using System.Diagnostics.Contracts;
 	using System.Linq.Expressions;
 
+	using DeepEqual.Formatting;
+
 	public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSyntax<TActual, TExpected>>
 	{
 		public TActual Actual { get; set; }
@@ -61,6 +63,14 @@
 		}
 
 		[Pure]
+		public CompareSyntax<TActual, TExpected> WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
+			where TDifference : Difference
+		{
+			Builder.WithCustomFormatter<TDifference>(formatter);
+			return this;
+		}
+
+		[Pure]
 		public CompareSyntax<TActual, TExpected> IgnoreUnmatchedProperties()
 		{
 			Builder.IgnoreUnmatchedProperties();
@@ -96,11 +106,16 @@
 
 		public void Assert()
 		{
-			Actual.ShouldDeepEqual(Expected, Builder.Create());
+			Actual.ShouldDeepEqual(Expected, Builder.Create(), Builder.GetFormatterFactory());
 		}
 
 		//ncrunch: no coverage start
 		CompositeComparison IComparisonBuilder<CompareSyntax<TActual, TExpected>>.Create()
+		{
+			throw new NotImplementedException();
+		}
+
+		IDifferenceFormatterFactory IComparisonBuilder<CompareSyntax<TActual, TExpected>>.GetFormatterFactory()
 		{
 			throw new NotImplementedException();
 		}
