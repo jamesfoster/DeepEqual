@@ -195,6 +195,7 @@ namespace DeepEqual
 
 			properties = RemoveHiddenProperties(properties);
 			properties = ExcludeIndexProperties(properties);
+			properties = ExcludeSetOnlyProperties(properties);
 
 			return properties
 				.Select(
@@ -217,6 +218,12 @@ namespace DeepEqual
 		{
 			return properties
 				.Where(x => !x.GetIndexParameters().Any());
+		}
+
+		private static IEnumerable<PropertyInfo> ExcludeSetOnlyProperties(IEnumerable<PropertyInfo> properties)
+		{
+			return properties
+				.Where(x => x.GetMethod != null);
 		}
 
 		private static IEnumerable<PropertyReader> GetFields(Type type, CacheBehaviour behaviour)
