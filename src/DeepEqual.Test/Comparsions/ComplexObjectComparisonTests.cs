@@ -336,6 +336,38 @@
 			);
 		}
 
+		[Scenario]
+		public void Properties_with_no_getter_are_ignored()
+		{
+			C value1 = null;
+			object value2 = null;
+
+			SetUp();
+
+			"And value1 is provided".x(() =>
+				value1 = new C
+				{
+					X = Fixture.Create<string>(),
+					SetOnly = Fixture.Create<string>()
+				}
+			);
+
+			"And value2 is equivalent to value1".x(() =>
+				value2 = new
+				{
+					value1.X,
+					value1.Y
+				}
+			);
+
+			"When comparing the 2 values".x(() =>
+				(Result, _) = SUT.Compare(Context, value1, value2)
+			);
+
+			"Then it should return a Pass".x(() =>
+				Result.ShouldBe(ComparisonResult.Pass)
+			);
+		}
 
 		[Scenario]
 		public void Comparing_dynamic_object_with_static_object_succeeds()
@@ -378,6 +410,18 @@
 		}
 
 		private class B : A { }
+
+		private class C
+		{
+			public string X { get; set; }
+
+			public string Y { get; set; }
+
+			public string SetOnly
+			{
+				set => Y = value;
+			}
+		}
 
 		public interface IFoo
 		{
