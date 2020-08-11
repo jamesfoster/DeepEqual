@@ -59,7 +59,7 @@
 				var value = dict2[key];
 				dict2.Remove(key);
 
-				var (result, innerContext) = ValueComparer.Compare(context.VisitingIndex(key), entry.Value, value);
+				var (result, innerContext) = ValueComparer.Compare(new ComparisonContext($"{(object) context.Breadcrumb}[{key}]"), entry.Value, value);
 
 				results.Add(result);
 				context = context.MergeDifferencesFrom(innerContext);
