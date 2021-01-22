@@ -1,0 +1,20 @@
+name: dotnet package
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core SDK 3.1.x
+      uses: actions/setup-dotnet@v1.6.0
+      with:
+        dotnet-version: "3.1.x"
+    - name: Install dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build -c Release --no-restore
+    - name: Test
+      run: dotnet test --no-restore --verbosity normal
