@@ -20,7 +20,9 @@
 
 		public bool CanCompare(Type type1, Type type2)
 		{
-			return type1.IsClass && type2.IsClass;
+			return (type1.IsClass && type2.IsClass) 
+				|| ReflectionCache.IsValueTypeWithReferenceFields(type1) 
+				|| ReflectionCache.IsValueTypeWithReferenceFields(type2);
 		}
 
 		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)

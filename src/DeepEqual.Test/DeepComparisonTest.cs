@@ -128,6 +128,24 @@
 
 			Approvals.Verify(exception.Message);
 		}
+
+		[Fact]
+		public void AssertOnTuple()
+		{
+			var left = new KeyValuePair<string, object>("1", new Model { Id = 10, Name = "1" });
+			var right = new KeyValuePair<string, object>("1", new Model { Id = 10, Name = "1" });
+			var left_struct = new KeyValuePair<string, int>("1", 1);
+			var right_struct = new KeyValuePair<string, int>("1", 1);
+
+			DeepAssert.AreEqual(left, right);
+			DeepAssert.AreEqual(left_struct, right_struct);
+		}
+
+		public class Model
+        {
+			public int Id { get; set;}
+			public string Name { get; set; }
+        }
 	}
 
 	public class TestType 

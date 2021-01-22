@@ -26,6 +26,8 @@ namespace DeepEqual
 			= new ConcurrentDictionary<Type, bool>();
 		private static readonly ConcurrentDictionary<Type, PropertyReader[]> PropertyCache
 			= new ConcurrentDictionary<Type, PropertyReader[]>();
+		private static readonly ConcurrentDictionary<Type, bool> ValueTypeWithReferenceFieldsCache
+			= new ConcurrentDictionary<Type, bool>();
 
 		public static void ClearCache()
 		{
@@ -65,7 +67,18 @@ namespace DeepEqual
 			return implements.GetGenericArguments()[0];
 		}
 
-		internal static bool IsListType(Type type)
+		internal static bool IsValueTypeWithReferenceFields(Type type)
+        {
+			return ValueTypeWithReferenceFieldsCache.GetOrAdd(type, IsValueTypeWithReferenceFieldsImpl);
+        }
+
+        private static bool IsValueTypeWithReferenceFieldsImpl(Type type)
+        {
+			if (!type.IsValueType) return false;
+			return type.GetProperties(GetBindingFlags(CacheBehaviour.IncludePrivate)).Any(x => x.PropertyType.IsClass);
+        }
+
+        internal static bool IsListType(Type type)
 		{
 			return IsListCache.GetOrAdd(type, IsListTypeImpl);
 		}
