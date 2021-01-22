@@ -6,6 +6,8 @@ jobs:
   build:
 
     runs-on: windows-latest
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK 2.1.x
