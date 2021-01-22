@@ -5,16 +5,18 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET Core SDK 2.1.x
       uses: actions/setup-dotnet@v1.7.2
       with:
         dotnet-version: "2.1.x"
+    - name: setup msbuild
+      uses: warrenbuckley/Setup-MSBuild@v1
     - name: Install dependencies
       run: dotnet restore src/DeepEqual.sln
     - name: Build
-      run: dotnet build src/DeepEqual.sln -f netcoreapp2.1 -c Release --no-restore
+      run: dotnet build src/DeepEqual.sln -c Release --no-restore
     - name: Test
       run: dotnet test src/DeepEqual.sln --no-restore --verbosity normal
