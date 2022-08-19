@@ -15,7 +15,7 @@
 		[Pure]
 		public static bool IsDeepEqual(this object actual, object expected, IComparison comparison)
 		{
-			comparison = comparison ?? new ComparisonBuilder().Create();
+			comparison ??= new ComparisonBuilder().Create();
 
 			var context = new ComparisonContext();
 
@@ -38,12 +38,13 @@
 			this object actual,
 			object expected,
 			IComparison comparison,
-			IDifferenceFormatterFactory formatterFactory)
+			IDifferenceFormatterFactory formatterFactory
+		)
 		{
 			var builder = new ComparisonBuilder();
 
-			comparison = comparison ?? builder.Create();
-			formatterFactory = formatterFactory ?? builder.GetFormatterFactory();
+			comparison ??= builder.Create();
+			formatterFactory ??= builder.GetFormatterFactory();
 
 			var context = new ComparisonContext();
 
@@ -62,7 +63,8 @@
 		[Pure]
 		public static CompareSyntax<TActual, TExpected> WithDeepEqual<TActual, TExpected>(
 			this TActual actual,
-			TExpected expected)
+			TExpected expected
+		)
 		{
 			return new CompareSyntax<TActual, TExpected>(actual, expected);
 		}
