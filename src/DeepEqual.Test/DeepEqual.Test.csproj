@@ -1,15 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="DeepEqual.Test.csproj.DotSettings" />
-    <None Remove="DeepEqual.Test.v2.ncrunchproject" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ApprovalTests" Version="3.0.18" />
@@ -26,10 +21,6 @@
   <ItemGroup>
     <ProjectReference Include="..\DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj" />
     <ProjectReference Include="..\DeepEqual\DeepEqual.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

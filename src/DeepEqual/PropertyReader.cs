@@ -1,11 +1,8 @@
-namespace DeepEqual
-{
-	using System;
+namespace DeepEqual;
 
-	public class PropertyReader
-	{
-		public string Name { get; set; }
-		public Func<object, object> Read { get; set; }
-		public Type DeclaringType { get; set; }
-	}
+public class PropertyReader
+{
+	public string Name { get; set; }
+	public Func<object, object> Read { get; set; }
+	public Type DeclaringType { get; set; }
 }

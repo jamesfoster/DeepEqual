@@ -1,32 +1,29 @@
-﻿namespace DeepEqual
+﻿namespace DeepEqual;
+
+public class ComparisonContext : IComparisonContext
 {
-	using System.Collections.Immutable;
+	public ImmutableList<Difference> Differences { get; }
+	public string Breadcrumb { get; }
 
-	public class ComparisonContext : IComparisonContext
+	public ComparisonContext() : this(string.Empty) {}
+
+	public ComparisonContext(string breadcrumb) : this(null, breadcrumb) {}
+
+	public ComparisonContext(ImmutableList<Difference> differences, string breadcrumb)
 	{
-		public ImmutableList<Difference> Differences { get; }
-		public string Breadcrumb { get; }
+		Differences = differences ?? ImmutableList<Difference>.Empty;
+		Breadcrumb = breadcrumb;
+	}
 
-		public ComparisonContext() : this(string.Empty) {}
+	public IComparisonContext AddDifference(Difference difference)
+	{
+		var newDifferences = Differences.Add(difference);
 
-		public ComparisonContext(string breadcrumb) : this(null, breadcrumb) {}
+		return new ComparisonContext(newDifferences, Breadcrumb);
+	}
 
-		public ComparisonContext(ImmutableList<Difference> differences, string breadcrumb)
-		{
-			Differences = differences ?? ImmutableList<Difference>.Empty;
-			Breadcrumb = breadcrumb;
-		}
-
-		public IComparisonContext AddDifference(Difference difference)
-		{
-			var newDifferences = Differences.Add(difference);
-
-			return new ComparisonContext(newDifferences, Breadcrumb);
-		}
-
-		public IComparisonContext SetBreadcrumb(string breadcrumb)
-		{
-			return new ComparisonContext(Differences, breadcrumb);
-		}
+	public IComparisonContext SetBreadcrumb(string breadcrumb)
+	{
+		return new ComparisonContext(Differences, breadcrumb);
 	}
 }
