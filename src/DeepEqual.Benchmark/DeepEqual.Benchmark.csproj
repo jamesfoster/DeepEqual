@@ -2,20 +2,11 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="DeepEqual.Benchmark.v2.ncrunchproject" />
-    <None Remove="DeepEqual.Benchmark.v3.ncrunchproject" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DeepEqual\DeepEqual.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

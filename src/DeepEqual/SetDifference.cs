@@ -1,18 +1,13 @@
-﻿using System.Collections.Immutable;
+﻿namespace DeepEqual;
 
-namespace DeepEqual
+public class SetDifference : Difference
 {
-	using System.Collections.Generic;
+	public ImmutableList<object> Expected { get; }
+	public ImmutableList<object> Extra { get; }
 
-	public class SetDifference : Difference
+	public SetDifference(string breadcrumb, IEnumerable<object> expected, IEnumerable<object> extra) : base(breadcrumb)
 	{
-		public ImmutableList<object> Expected { get; }
-		public ImmutableList<object> Extra { get; }
-
-		public SetDifference(string breadcrumb, IEnumerable<object> expected, IEnumerable<object> extra) : base(breadcrumb)
-		{
-			Expected = expected.ToImmutableList();
-			Extra = extra.ToImmutableList();
-		}
+		Expected = expected.ToImmutableList();
+		Extra = extra.ToImmutableList();
 	}
 }
