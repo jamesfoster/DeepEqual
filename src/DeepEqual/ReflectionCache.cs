@@ -206,7 +206,8 @@ public static class ReflectionCache
 						Name = x.Name,
 						DeclaringType = type,
 						Read = o => x.GetValue(o, null)
-					});
+					}
+			);
 	}
 
 	private static IEnumerable<PropertyInfo> RemoveHiddenProperties(IEnumerable<PropertyInfo> properties)
@@ -242,7 +243,8 @@ public static class ReflectionCache
 						Name = x.Name,
 						DeclaringType = type,
 						Read = o => x.GetValue(o)
-					});
+					}
+			);
 	}
 
 	private static IEnumerable<FieldInfo> RemoveHiddenFields(IEnumerable<FieldInfo> properties)

@@ -141,7 +141,6 @@ public class JsonDocumentComparisonTests
 		new object[] { """{ "a": true }""", """{ "a": true }""" },
 		new object[] { """{ "a": false }""", """{ "a": false }""" },
 		new object[] { """{ "a": null }""", """{ "a": null }""" },
-		new object[] { """{ "a": null }""", """{ "a": null }""" },
 		new object[]
         {
 			"""{ "a": 123, "b": "abc", "c": [1,2,3], "d": true, "f": false, "g": null }""",
