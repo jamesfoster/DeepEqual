@@ -26,11 +26,11 @@
 		[Scenario]
 		public void Creating_an_EnumComparer()
 		{
-			"When creating a EnumComperer".x(() => 
+			"When creating a EnumComperer".x(() =>
 				SUT = new EnumComparison()
 			);
 
-			"it should implement IComparer".x(() => 
+			"it should implement IComparer".x(() =>
 				SUT.ShouldBeAssignableTo<IComparison>()
 			);
 		}
@@ -39,19 +39,19 @@
 		[MemberData(nameof(CanCompareTypesTestData))]
 		public void Can_compare_types(Type type1, Type type2, bool expected)
 		{
-			"Given a Fixture".x(() => 
+			"Given a Fixture".x(() =>
 				Fixture = new Fixture()
 			);
 
-			"And an EnumComparer".x(() => 
+			"And an EnumComparer".x(() =>
 				SUT = Fixture.Create<EnumComparison>()
 			);
 
-			"When calling CanCompare({0}, {1})".x(() => 
+			"When calling CanCompare({0}, {1})".x(() =>
 				CanCompareResult = SUT.CanCompare(type1, type2)
 			);
 
-			"It should return {2}".x(() => 
+			"It should return {2}".x(() =>
 				CanCompareResult.ShouldBe(expected)
 			);
 		}
@@ -60,11 +60,11 @@
 		[MemberData(nameof(CompareTestData))]
 		public void Comparing_values(object value1, object value2, ComparisonResult expected)
 		{
-			"Given a Fixture".x(() => 
+			"Given a Fixture".x(() =>
 				Fixture = new Fixture()
 			);
 
-			"And an EnumComparer".x(() => 
+			"And an EnumComparer".x(() =>
 				SUT = Fixture.Create<EnumComparison>()
 			);
 
@@ -80,7 +80,7 @@
 				Context = context;
 			});
 
-			"Then it should return {2}".x(() => 
+			"Then it should return {2}".x(() =>
 				Result.ShouldBe(expected)
 			);
 

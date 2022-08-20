@@ -1,6 +1,6 @@
 ﻿Comparison Failed: The following 10 differences were found.
 	Actual.A != Expected.A (1 != 2)
-	Actual.B != Expected.B ("Absolute" != "Not Quite Absolute")
+	Actual.B != Expected.B (Absolute != "Not Quite Absolute")
 	Actual.C[0] != Expected.C[0] (1 != 3)
 	Actual.C[2] != Expected.C[2] (3 != 1)
 	Actual.Double != Expected.Double (1.111111111111116 != 1.111111111111119)

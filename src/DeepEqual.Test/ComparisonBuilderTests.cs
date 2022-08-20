@@ -277,12 +277,12 @@
 				result.Comparisons[0].ShouldBeAssignableTo<FloatComparison>()
 			);
 
-			"And the 2nd comparer is the DefaultComparison".x(() =>
-				result.Comparisons[1].ShouldBeAssignableTo<DefaultComparison>()
+			"And the 2nd comparer is the EnumComparison".x(() =>
+				result.Comparisons[1].ShouldBeAssignableTo<EnumComparison>()
 			);
 
-			"And the 3rd comparer is the EnumComparison".x(() =>
-				result.Comparisons[2].ShouldBeAssignableTo<EnumComparison>()
+			"And the 3rd comparer is the DefaultComparison".x(() =>
+				result.Comparisons[2].ShouldBeAssignableTo<DefaultComparison>()
 			);
 
 			"And the 4th comparer is the DictionaryComparison".x(() =>
