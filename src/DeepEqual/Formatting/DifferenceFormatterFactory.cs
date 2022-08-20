@@ -1,10 +1,12 @@
 namespace DeepEqual.Formatting;
 
+#nullable enable
+
 public class DifferenceFormatterFactory : IDifferenceFormatterFactory
 {
 	private readonly IDictionary<Type, IDifferenceFormatter> customFormatters;
 
-	public DifferenceFormatterFactory(IDictionary<Type, IDifferenceFormatter> customFormatters)
+	public DifferenceFormatterFactory(IDictionary<Type, IDifferenceFormatter>? customFormatters = null)
 	{
 		this.customFormatters = customFormatters ?? new Dictionary<Type, IDifferenceFormatter>();
 	}

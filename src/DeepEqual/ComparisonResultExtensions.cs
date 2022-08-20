@@ -2,9 +2,9 @@
 
 using System.Collections.Generic;
 
-internal static class ComparisonResultExtensions
+public static class ComparisonResultExtensions
 {
-	internal static ComparisonResult ToResult(this IEnumerable<ComparisonResult> results)
+	public static ComparisonResult ToResult(this IEnumerable<ComparisonResult> results)
 	{
 		var foundPass = false;
 		foreach (var result in results)
@@ -19,7 +19,7 @@ internal static class ComparisonResultExtensions
 		return foundPass ? ComparisonResult.Pass : ComparisonResult.Inconclusive;
 	}
 
-	internal static ComparisonResult Plus(this ComparisonResult result, ComparisonResult other)
+	public static ComparisonResult Plus(this ComparisonResult result, ComparisonResult other)
 	{
 		if (result == ComparisonResult.Fail || other == ComparisonResult.Fail)
 			return ComparisonResult.Fail;

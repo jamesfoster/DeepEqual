@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6</TargetFramework>
+    <LangVersion>preview</LangVersion>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
@@ -19,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DeepEqual.System.Text.Json\DeepEqual.System.Text.Json.csproj" />
     <ProjectReference Include="..\DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj" />
     <ProjectReference Include="..\DeepEqual\DeepEqual.csproj" />
   </ItemGroup>

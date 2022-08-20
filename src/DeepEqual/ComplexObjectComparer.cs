@@ -10,7 +10,11 @@ public class ComplexObjectComparer
 	private List<PropertyPair> propertyMap;
 	private PropertyPair currentPair;
 
-	public ComplexObjectComparer(IComparison inner, bool ignoreUnmatchedProperties, List<Func<PropertyReader, bool>> ignoredProperties)
+	public ComplexObjectComparer(
+		IComparison inner,
+		bool ignoreUnmatchedProperties,
+		List<Func<PropertyReader, bool>> ignoredProperties
+	)
 	{
 		this.inner = inner;
 		this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
@@ -18,9 +22,15 @@ public class ComplexObjectComparer
 		results = new List<ComparisonResult>();
 	}
 
-	public (ComparisonResult, IComparisonContext) CompareObjects(IComparisonContext context, object source, object destination)
+	public (ComparisonResult, IComparisonContext) CompareObjects(
+		IComparisonContext context,
+		object source,
+		object destination
+	)
 	{
 		PreparePropertyInfo(source, destination);
+
+		if (propertyMap.Count == 0) return (ComparisonResult.Pass, context);
 
 		var currentContext = context;
 

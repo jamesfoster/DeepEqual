@@ -8,7 +8,10 @@ namespace DeepEqual.Formatting
 		private readonly IComparisonContext context;
 		private readonly IDifferenceFormatterFactory formatterFactory;
 
-		public DeepEqualExceptionMessageBuilder(IComparisonContext context, IDifferenceFormatterFactory formatterFactory)
+		public DeepEqualExceptionMessageBuilder(
+			IComparisonContext context,
+			IDifferenceFormatterFactory formatterFactory
+		)
 		{
 			this.context = context;
 			this.formatterFactory = formatterFactory;
@@ -20,27 +23,29 @@ namespace DeepEqual.Formatting
 
 			sb.Append("Comparison Failed");
 
-			if (context.Differences.Count > 0)
+			var count = context.Differences.Count;
+			if (count > 0)
 			{
-				sb.AppendFormat(": The following {0} differences were found.", context.Differences.Count);
+				sb.Append($": The following {count} differences were found.");
 			}
 
 			foreach (var difference in context.Differences)
 			{
 				sb.Append("\n\t");
 
-				var text = Indent(FormatDifference(difference));
+				var text = IndentLines(FormatDifference(difference));
 				sb.Append(text);
 			}
 
 			return sb.ToString();
 		}
 
-		private static string Indent(string differenceString)
+		private static string IndentLines(string differenceString)
 		{
-			differenceString = differenceString
-				.Replace(Environment.NewLine, "\n");
-			return string.Join("\n\t\t", differenceString.Split(new[] {"\n"}, StringSplitOptions.None));
+			var lines = differenceString
+				.Replace(Environment.NewLine, "\n")
+				.Split('\n', StringSplitOptions.None);
+			return string.Join("\n\t\t", lines);
 		}
 
 		private string FormatDifference(Difference difference)
