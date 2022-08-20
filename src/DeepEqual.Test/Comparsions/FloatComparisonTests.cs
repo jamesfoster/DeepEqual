@@ -30,13 +30,13 @@
 		}
 
 		[Scenario]
-		[Example(typeof(float), typeof(int), true)]
-		[Example(typeof(double), typeof(int), true)]
-		[Example(typeof(double), typeof(float), true)]
-		[Example(typeof(byte), typeof(float), true)]
-		[Example(typeof(char), typeof(double), false)]
-		[Example(typeof(int), typeof(long), false)]
-		[Example(typeof(decimal), typeof(int), false)]
+		[Example(typeof(float),   typeof(int),    true)]
+		[Example(typeof(double),  typeof(int),    true)]
+		[Example(typeof(double),  typeof(float),  true)]
+		[Example(typeof(byte),    typeof(float),  true)]
+		[Example(typeof(char),    typeof(double), false)]
+		[Example(typeof(int),     typeof(long),   false)]
+		[Example(typeof(decimal), typeof(int),    false)]
 		public void Can_compare_float_types(Type type1, Type type2, bool canCompare)
 		{
 			"Given a FloatComparison".x(() =>
