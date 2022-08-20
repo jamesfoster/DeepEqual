@@ -7,6 +7,7 @@ bin/
 obj/
 packages/
 *.nupkg
+*.snupkg
 .vs/
 
 _ReSharper*/
