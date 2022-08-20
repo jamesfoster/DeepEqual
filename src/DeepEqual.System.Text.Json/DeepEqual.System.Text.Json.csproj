@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -15,6 +15,11 @@
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../DeepEqual.snk</AssemblyOriginatorKeyFile>
+    <RootNamespace>DeepEqual.SystemTextJson</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepEqual\DeepEqual.csproj" />
+  </ItemGroup>
 
 </Project>
