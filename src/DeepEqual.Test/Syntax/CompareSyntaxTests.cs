@@ -135,7 +135,7 @@ namespace DeepEqual.Test.Syntax
 		[Fact]
 		public void Calling_Assert_creates_the_comparison()
 		{
-			syntax.Assert();
+			try { syntax.Assert(); } catch { }
 
 			builder.Verify(x => x.Create(), Times.Once());
 		}
