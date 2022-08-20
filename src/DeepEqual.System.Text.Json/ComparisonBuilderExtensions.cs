@@ -11,7 +11,7 @@ public static class ComparisonBuilderExtensions
     }
 
     /// <summary>
-    /// Call ComparisonBuilder.Reset to remove all global customizations
+    /// Call <see cref="DeepEqual.ComparisonBuilder.Reset"/> to remove all global customizations
     /// </summary>
     public static void GloballyUseSystemTextJson()
     {
