@@ -33,7 +33,7 @@
 		{
 			var comparison = new EchoComparison(ComparisonResult.Inconclusive);
 
-			DeepAssert.AreEqual(a, b, comparison);
+			DeepAssert.AreNotEqual(a, b, comparison);
 		}
 
 		[Fact]

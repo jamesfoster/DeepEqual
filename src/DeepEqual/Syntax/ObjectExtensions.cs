@@ -21,7 +21,7 @@ public static class ObjectExtensions
 
 		var (result, _) = comparison.Compare(context, actual, expected);
 
-		return result != ComparisonResult.Fail;
+		return result == ComparisonResult.Pass;
 	}
 
 	public static void ShouldDeepEqual(this object actual, object expected)
@@ -50,7 +50,7 @@ public static class ObjectExtensions
 
 		var (result, newContext) = comparison.Compare(context, actual, expected);
 
-		if (result != ComparisonResult.Fail)
+		if (result == ComparisonResult.Pass)
 		{
 			return;
 		}
