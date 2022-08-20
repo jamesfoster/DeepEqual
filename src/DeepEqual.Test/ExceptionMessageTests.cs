@@ -28,9 +28,10 @@
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected ((null) != System.Object)");
+	Actual != Expected ((null) != System.Object)
+""");
 		}
 
 		[Fact]
@@ -41,9 +42,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""a"" != ""b"")");
+	Actual != Expected ("a" != "b")
+""");
 		}
 
 		[Fact]
@@ -54,9 +56,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (1 != 2)");
+	Actual != Expected (1 != 2)
+""");
 		}
 
 		[Fact]
@@ -75,10 +78,11 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 2 differences were found.
 	Actual[2] != Expected[2] (1 != 2)
-	Actual[4] != Expected[4] (4 != 5)");
+	Actual[4] != Expected[4] (4 != 5)
+""");
 		}
 
 		[Fact]
@@ -92,9 +96,10 @@ Comparison Failed: The following 2 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""01234567890123456789..."" != ""abcdefghijabcdefghij..."")");
+	Actual != Expected ("01234567890123456789..." != "abcdefghijabcdefghij...")
+""");
 		}
 
 		[Fact]
@@ -108,9 +113,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""...6789012345first67890..."" != ""...6789012345second6789..."")");
+	Actual != Expected ("...6789012345first67890..." != "...6789012345second6789...")
+""");
 		}
 
 		[Fact]
@@ -124,9 +130,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""...1234567890123456789a"" != ""...1234567890123456789b"")");
+	Actual != Expected ("...1234567890123456789a" != "...1234567890123456789b")
+""");
 		}
 
 		[Fact]
@@ -140,9 +147,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""...45678901234567890123"" != ""...01234567890123456789"")");
+	Actual != Expected ("...45678901234567890123" != "...01234567890123456789")
+""");
 		}
 
 		[Theory]
@@ -160,9 +168,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: $@"
+				expectedMessage: $"""
 Comparison Failed: The following 1 differences were found.
-	Actual != Expected (""{expected1}"" != ""{expected2}"")");
+	Actual != Expected ("{expected1}" != "{expected2}")
+""");
 		}
 
 		[Fact]
@@ -178,9 +187,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Expected[""Index""] not found (Actual[""Index""] = ""Value"")");
+	Expected["Index"] not found (Actual["Index"] = "Value")
+""");
 		}
 
 		[Fact]
@@ -196,9 +206,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual[""Index""] not found (Expected[""Index""] = ""Value"")");
+	Actual["Index"] not found (Expected["Index"] = "Value")
+""");
 		}
 
 		[Fact]
@@ -213,13 +224,14 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
 	Actual.Set != Expected.Set
 		Expected.Set contains the following unmatched elements:
 			1
 			2
-			3");
+			3
+""");
 		}
 
 		[Fact]
@@ -234,13 +246,14 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
 	Actual.Set != Expected.Set
 		Actual.Set contains the following unmatched elements:
 			1
 			2
-			3");
+			3
+""");
 		}
 
 		[Fact]
@@ -251,9 +264,10 @@ Comparison Failed: The following 1 differences were found.
 
 			AssertExceptionMessage(
 				context,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	Actual.Custom != Expected.Custom");
+	Actual.Custom != Expected.Custom
+""");
 		}
 
 		[Fact]
@@ -270,9 +284,10 @@ Comparison Failed: The following 1 differences were found.
 			AssertExceptionMessage(
 				context,
 				customFormatters: customFormatters,
-				expectedMessage: @"
+				expectedMessage: """
 Comparison Failed: The following 1 differences were found.
-	.Custom ==!123!==");
+	.Custom >>>123<<<
+""");
 		}
 
 		public class CustomDifference : Difference
@@ -291,7 +306,7 @@ Comparison Failed: The following 1 differences were found.
 			{
 				var customDifference = (CustomDifference) difference;
 
-				return $"{difference.Breadcrumb} ==!{customDifference.Foo}!==";
+				return $"{difference.Breadcrumb} >>>{customDifference.Foo}<<<";
 			}
 		}
 
@@ -302,7 +317,10 @@ Comparison Failed: The following 1 differences were found.
 		{
 			expectedMessage = expectedMessage.Trim().Replace("\r\n", "\n");
 
-			var messageBuilder = new DeepEqualExceptionMessageBuilder(context, new DifferenceFormatterFactory(customFormatters));
+			var messageBuilder = new DeepEqualExceptionMessageBuilder(
+				context,
+				new DifferenceFormatterFactory(customFormatters)
+			);
 
 			var message = messageBuilder.GetMessage().Replace("\r\n", "\n");
 

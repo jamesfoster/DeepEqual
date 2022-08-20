@@ -1,17 +1,15 @@
 ﻿namespace DeepEqual.Test.Comparsions
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Diagnostics.CodeAnalysis;
+    using Shouldly;
 
-	using Shouldly;
+    using System;
+    using System.Collections.Generic;
 
-	using Xbehave;
+    using Xbehave;
 
-	using Xunit;
+    using Xunit;
 
-	[SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
-	public class FloatComparisonTests
+    public class FloatComparisonTests
 	{
 		protected FloatComparison SUT { get; set; }
 		protected ComparisonContext Context { get; set; }
@@ -20,9 +18,9 @@
 		protected bool CanCompareResult { get; set; }
 
 		[Scenario]
-		public void Creating_a_DefaultComparison()
+		public void Creating_a_FloatComparison()
 		{
-			"When creating a DefaultComparison".x(() =>
+			"When creating a FloatComparison".x(() =>
 				SUT = new FloatComparison(0.1d, 0.1f)
 			);
 
@@ -41,7 +39,7 @@
 		[Example(typeof(decimal), typeof(int), false)]
 		public void Can_compare_float_types(Type type1, Type type2, bool canCompare)
 		{
-			"Given a DefaultComparison".x(() =>
+			"Given a FloatComparison".x(() =>
 				SUT = new FloatComparison(0.1d, 0.1f)
 			);
 
@@ -63,7 +61,7 @@
 			object value2,
 			ComparisonResult result)
 		{
-			"Given a DefaultComparison".x(() =>
+			"Given a FloatComparison".x(() =>
 				SUT = new FloatComparison(doubleTolerance, singleTolerance)
 			);
 

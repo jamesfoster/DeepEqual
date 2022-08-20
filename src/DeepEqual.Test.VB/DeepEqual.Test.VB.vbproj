@@ -2,11 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>DeepEqual.Test.VB</RootNamespace>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="DeepEqual.Test.VB.v2.ncrunchproject" />
-  </ItemGroup>
 
 </Project>

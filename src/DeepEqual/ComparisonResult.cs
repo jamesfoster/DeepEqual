@@ -1,9 +1,8 @@
-﻿namespace DeepEqual
+﻿namespace DeepEqual;
+
+public enum ComparisonResult
 {
-	public enum ComparisonResult
-	{
-		Inconclusive = 0,
-		Pass = 1,
-		Fail = 2
-	}
+	Inconclusive = 0,
+	Pass = 1,
+	Fail = 2
 }

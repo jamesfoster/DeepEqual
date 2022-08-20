@@ -35,11 +35,11 @@
 				Fixture.Register<IComparison>(() => new MockComparison())
 			);
 
-			"And an ListComparison".x(() => 
+			"And an ListComparison".x(() =>
 				SUT = Fixture.Create<DictionaryComparison>()
 			);
 
-			"And a ComparisonContext".x(() => 
+			"And a ComparisonContext".x(() =>
 				Context = new ComparisonContext("Set")
 			);
 		}
@@ -53,11 +53,11 @@
 				Fixture.Customize(new AutoMoqCustomization());
 			});
 
-			"When creating an SetComparison".x(() => 
+			"When creating an SetComparison".x(() =>
 				SUT = Fixture.Create<DictionaryComparison>()
 			);
 
-			"Then it should implement IComparison".x(() => 
+			"Then it should implement IComparison".x(() =>
 				SUT.ShouldBeAssignableTo<IComparison>()
 			);
 		}
@@ -68,11 +68,11 @@
 		{
 			SetUp();
 
-			"When calling CanCompare({0}, {1})".x(() => 
+			"When calling CanCompare({0}, {1})".x(() =>
 				CanCompareResult = SUT.CanCompare(type1, type2)
 			);
 
-			"It should return {2}".x(() => 
+			"It should return {2}".x(() =>
 				CanCompareResult.ShouldBe(expected)
 			);
 		}
@@ -87,7 +87,7 @@
 				(Result, _) = SUT.Compare(Context, value1, value2)
 			);
 
-			"Then it should return {2}".x(() => 
+			"Then it should return {2}".x(() =>
 				Result.ShouldBe(expected)
 			);
 		}

@@ -37,11 +37,11 @@
 				Fixture.Customize(new AutoMoqCustomization());
 			});
 
-			"When creating an SetComparison".x(() => 
+			"When creating an SetComparison".x(() =>
 				SUT = Fixture.Create<SetComparison>()
 			);
 
-			"Then it should implement IComparison".x(() => 
+			"Then it should implement IComparison".x(() =>
 				SUT.ShouldBeAssignableTo<IComparison>()
 			);
 		}
@@ -61,21 +61,21 @@
 				Fixture.Inject<IComparison>(Inner);
 			});
 
-			"And an ListComparison".x(() => 
+			"And an ListComparison".x(() =>
 				SUT = Fixture.Create<SetComparison>()
 			);
 
-			"When calling CanCompare({0}, {1})".x(() => 
+			"When calling CanCompare({0}, {1})".x(() =>
 				CanCompareResult = SUT.CanCompare(type1, type2)
 			);
 
-			"It should return {2}".x(() => 
+			"It should return {2}".x(() =>
 				CanCompareResult.ShouldBe(expected)
 			);
 
 			if (expected)
 			{
-				"and it should call CanCompare on the inner comparer".x(() => 
+				"and it should call CanCompare on the inner comparer".x(() =>
 					Inner.CanCompareCalls.ShouldContain((elementType1, elementType2))
 				);
 			}
@@ -99,11 +99,11 @@
 				Fixture.Inject<IComparison>(Inner);
 			});
 
-			"And a SetComparison".x(() => 
+			"And a SetComparison".x(() =>
 				SUT = Fixture.Create<SetComparison>()
 			);
 
-			"And a Comparison context object".x(() => 
+			"And a Comparison context object".x(() =>
 				Context = new ComparisonContext("Set")
 			);
 
@@ -114,7 +114,7 @@
 				Context = context;
 			});
 
-			"Then it should return {2}".x(() => 
+			"Then it should return {2}".x(() =>
 				Result.ShouldBe(expected)
 			);
 
@@ -160,7 +160,7 @@
 			new object[] {new HashSet<int> {1}, new[] {1}, ComparisonResult.Pass},
 			new object[] {new[] {1, 2, 3}, new HashSet<int> {1, 2, 3}, ComparisonResult.Pass},
 			new object[] {new SortedSet<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
-						
+
 			new object[] {new HashSet<int> {1, 2, 3}, new[] {1, 3, 2}, ComparisonResult.Pass},
 			new object[] {new HashSet<int> {3, 2, 1}, new[] {1, 2, 3}, ComparisonResult.Pass},
 			new object[] {new HashSet<int> {3, 1, 2}, new[] {1, 3, 2}, ComparisonResult.Pass},
@@ -172,19 +172,21 @@
 
 		public static IEnumerable<object[]> CanCompareTypesTestData => new[]
 		{
-			new object[] {typeof (ISet<int>), typeof (ISet<int>), typeof (int), typeof (int), true},
-			new object[] {typeof (ISet<int>), typeof (IList), typeof (int), typeof (object), true},
-			new object[] {typeof (ISet<object>), typeof (IList<int>), typeof (object), typeof (int), true},
-			new object[] {typeof (ISet<object>), typeof (List<int>), typeof (object), typeof (int), true},
-			new object[] {typeof (ISet<object>), typeof (IEnumerable<int>), typeof (object), typeof (int), true},
+			new object[] {typeof (ISet<int>),    typeof (ISet<int>),        typeof (int),    typeof (int),    true},
+			new object[] {typeof (ISet<int>),    typeof (IList),            typeof (int),    typeof (object), true},
+			new object[] {typeof (ISet<object>), typeof (IList<int>),       typeof (object), typeof (int),    true},
+			new object[] {typeof (ISet<object>), typeof (List<int>),        typeof (object), typeof (int),    true},
+			new object[] {typeof (ISet<object>), typeof (IEnumerable<int>), typeof (object), typeof (int),    true},
 
-			new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), false},
-			new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), false},
-			new object[] {typeof (string), typeof (string), typeof (char), typeof (char), false},
-			new object[] {typeof (object), typeof (object), null, null, false},
-			new object[] {typeof (object), typeof (int), null, null, false},
-			new object[] {typeof (int), typeof (int), null, null, false},
-			new object[] {typeof (int), typeof (string), null, null, false}
+			new object[] {typeof (List<int>),        typeof (List<int>),   typeof (int),  typeof (int),    false},
+			new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int),  typeof (object), false},
+			new object[] {typeof (string),           typeof (string),      typeof (char), typeof (char),   false},
+			new object[] {typeof (ISet<int>),        typeof (int),         null,          null,            false},
+			new object[] {typeof (int),              typeof (ISet<int>),   null,          null,            false},
+			new object[] {typeof (object),           typeof (object),      null,          null,            false},
+			new object[] {typeof (object),           typeof (int),         null,          null,            false},
+			new object[] {typeof (int),              typeof (int),         null,          null,            false},
+			new object[] {typeof (int),              typeof (string),      null,          null,            false}
 		};
 	}
 }

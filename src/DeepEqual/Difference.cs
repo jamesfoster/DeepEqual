@@ -1,12 +1,11 @@
-﻿namespace DeepEqual
-{
-	public abstract class Difference
-	{
-		protected Difference(string breadcrumb)
-		{
-			Breadcrumb = breadcrumb;
-		}
+﻿namespace DeepEqual;
 
-		public string Breadcrumb { get; }
+public abstract class Difference
+{
+	protected Difference(string breadcrumb)
+	{
+		Breadcrumb = breadcrumb;
 	}
+
+	public string Breadcrumb { get; }
 }
