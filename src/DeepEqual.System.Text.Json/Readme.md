@@ -37,7 +37,7 @@ object1.WithDeepEqual(object2)
     .Assert()
 ```
 
-3. Register the customization globally.
+3. (NOT RECOMMENDED) Register the customization globally.
 
 ```c#
 ComparisonBuilderExtensions.GloballyUseSystemTextJson();
@@ -45,8 +45,9 @@ ComparisonBuilderExtensions.GloballyUseSystemTextJson();
 bool result = object1.IsDeepEqual(object2);
 
 object1.ShouldDeepEqual(object2);
-
-// N.B. To remove global customizations call ComparisonBuilder.Reset()
 ```
 
+The reason this is not recommended is it will affect all tests and could cause
+internittent test failures when run in parallel.
+N.B. To remove global customizations call ComparisonBuilder.Reset()
 
