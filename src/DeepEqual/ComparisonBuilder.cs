@@ -35,8 +35,8 @@ public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 
 		Root.AddRange(
 			new FloatComparison(DoubleTolerance, SingleTolerance),
-			DefaultComparison,
 			new EnumComparison(),
+			DefaultComparison,
 			new DictionaryComparison(new DefaultComparison(), Root),
 			new SetComparison(Root),
 			new ListComparison(Root),
