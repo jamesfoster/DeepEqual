@@ -6,16 +6,21 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <!--Nullable>enable</Nullable-->
 
-    <Version>4.0.0</Version>
+    <Version>4.0.1</Version>
     <Description>An extensible deep comparison library for .NET</Description>
     <Authors>James Foster</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
+    <PackageReadmeFile>Readme.md</PackageReadmeFile>
     <Copyright>James Foster 2020</Copyright>
     <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
 
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../DeepEqual.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Readme.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
 
 </Project>
