@@ -30,13 +30,13 @@
 		}
 
 		[Scenario]
-		[Example(typeof (float),    typeof (int),    true)]
-		[Example(typeof (double),   typeof (int),    true)]
-		[Example(typeof (double),   typeof (float),  true)]
-		[Example(typeof (byte),     typeof (float),  true)]
-		[Example(typeof (char),     typeof (double), false)]
-		[Example(typeof (int),      typeof (long),   false)]
-		[Example(typeof (decimal),  typeof (int),    false)]
+		[Example(typeof(float),   typeof(int),    true)]
+		[Example(typeof(double),  typeof(int),    true)]
+		[Example(typeof(double),  typeof(float),  true)]
+		[Example(typeof(byte),    typeof(float),  true)]
+		[Example(typeof(char),    typeof(double), false)]
+		[Example(typeof(int),     typeof(long),   false)]
+		[Example(typeof(decimal), typeof(int),    false)]
 		public void Can_compare_float_types(Type type1, Type type2, bool canCompare)
 		{
 			"Given a FloatComparison".x(() =>
@@ -93,6 +93,10 @@
 			new object[] {1e-15, 1e-6, 100_000_100.0f, 100_000_000, ComparisonResult.Pass},
 			new object[] {1e-15, 1e-6, 100_000_000.0f, 100_000_200m, ComparisonResult.Fail},
 			new object[] {0.0001d, 0.01f, 10000.0d, 10001, ComparisonResult.Pass},
+			new object[] {0.0001d, 0.01f, float.NaN, float.NaN, ComparisonResult.Pass},
+			new object[] {0.0001d, 0.01f, double.NaN, double.NaN, ComparisonResult.Pass},
+			new object[] {0.0001d, 0.01f, 0.0f, float.NaN, ComparisonResult.Fail},
+			new object[] {0.0001d, 0.01f, double.NaN, 0.001d, ComparisonResult.Fail}
 		};
 	}
 }
