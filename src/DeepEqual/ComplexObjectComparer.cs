@@ -1,142 +1,147 @@
-﻿namespace DeepEqual
+﻿namespace DeepEqual;
+
+public class ComplexObjectComparer
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
+	private readonly IComparison inner;
+	private readonly bool ignoreUnmatchedProperties;
+	private readonly List<Func<PropertyReader, bool>> ignoredProperties;
 
-	public class ComplexObjectComparer
+	private readonly List<ComparisonResult> results;
+	private List<PropertyPair> propertyMap;
+	private PropertyPair currentPair;
+
+	public ComplexObjectComparer(
+		IComparison inner,
+		bool ignoreUnmatchedProperties,
+		List<Func<PropertyReader, bool>> ignoredProperties
+	)
 	{
-		private readonly IComparison inner;
-		private readonly bool ignoreUnmatchedProperties;
-		private readonly List<Func<PropertyReader, bool>> ignoredProperties;
+		this.inner = inner;
+		this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
+		this.ignoredProperties = ignoredProperties;
+		results = new List<ComparisonResult>();
+	}
 
-		private readonly List<ComparisonResult> results;
-		private List<PropertyPair> propertyMap;
-		private PropertyPair currentPair;
+	public (ComparisonResult, IComparisonContext) CompareObjects(
+		IComparisonContext context,
+		object source,
+		object destination
+	)
+	{
+		PreparePropertyInfo(source, destination);
 
-		public ComplexObjectComparer(IComparison inner, bool ignoreUnmatchedProperties, List<Func<PropertyReader, bool>> ignoredProperties)
+		if (propertyMap.Count == 0) return (ComparisonResult.Pass, context);
+
+		var currentContext = context;
+
+		foreach (var pair in propertyMap)
 		{
-			this.inner = inner;
-			this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
-			this.ignoredProperties = ignoredProperties;
-			results = new List<ComparisonResult>();
-		}
+			currentPair = pair;
+			var sourceValue = new Lazy<object>(() => currentPair.Source.Read(source));
+			var destinationValue = new Lazy<object>(() => currentPair.Destination.Read(destination));
 
-		public (ComparisonResult, IComparisonContext) CompareObjects(IComparisonContext context, object source, object destination)
-		{
-			PreparePropertyInfo(source, destination);
-
-			var currentContext = context;
-
-			foreach (var pair in propertyMap)
+			if (IsPropertyIgnored())
 			{
-				currentPair = pair;
-				var sourceValue = new Lazy<object>(() => currentPair.Source.Read(source));
-				var destinationValue = new Lazy<object>(() => currentPair.Destination.Read(destination));
-
-				if (IsPropertyIgnored())
-				{
-					continue;
-				}
-
-				if (SourceAndDestinationPresent())
-				{
-					var (result, innerContext) = inner.Compare(
-						context.VisitingProperty(currentPair.Name),
-						sourceValue.Value,
-						destinationValue.Value
-					);
-
-					results.Add(result);
-					currentContext = currentContext.MergeDifferencesFrom(innerContext);
-				}
-				else if (!ignoreUnmatchedProperties)
-				{
-					if (currentPair.Source == null)
-					{
-						currentContext = currentContext.AddDifference("(missing)", destinationValue.Value, currentPair.Name);
-						results.Add(ComparisonResult.Fail);
-					}
-
-					if (currentPair.Destination == null)
-					{
-						currentContext = currentContext.AddDifference(sourceValue.Value, "(missing)", currentPair.Name);
-						results.Add(ComparisonResult.Fail);
-					}
-				}
-
+				continue;
 			}
 
-			return (results.ToResult(), currentContext);
-		}
-
-		private bool SourceAndDestinationPresent()
-		{
-			return currentPair.Source != null && currentPair.Destination != null;
-		}
-
-		private void PreparePropertyInfo(object source, object destination)
-		{
-			var sourceProperties = ReflectionCache
-				.GetProperties(source);
-
-			var destinationProperties = ReflectionCache
-				.GetProperties(destination)
-				.ToDictionary(x => x.Name);
-
-			propertyMap = new List<PropertyPair>();
-
-			foreach (var property in sourceProperties)
+			if (SourceAndDestinationPresent())
 			{
-				var name = property.Name;
+				var (result, innerContext) = inner.Compare(
+					context.VisitingProperty(currentPair.Name),
+					sourceValue.Value,
+					destinationValue.Value
+				);
 
-				if (destinationProperties.ContainsKey(name))
+				results.Add(result);
+				currentContext = currentContext.MergeDifferencesFrom(innerContext);
+			}
+			else if (!ignoreUnmatchedProperties)
+			{
+				if (currentPair.Source == null)
 				{
-					propertyMap.Add(new PropertyPair(property, destinationProperties[name], name));
-					destinationProperties.Remove(name);
+					currentContext = currentContext.AddDifference("(missing)", destinationValue.Value, currentPair.Name);
+					results.Add(ComparisonResult.Fail);
 				}
-				else
+
+				if (currentPair.Destination == null)
 				{
-					propertyMap.Add(new PropertyPair(property, null, name));
+					currentContext = currentContext.AddDifference(sourceValue.Value, "(missing)", currentPair.Name);
+					results.Add(ComparisonResult.Fail);
 				}
 			}
 
-			foreach (var property in destinationProperties.Values)
-			{
-				propertyMap.Add(new PropertyPair(null, property, property.Name));
-			}
 		}
 
-		private bool IsPropertyIgnored()
+		return (results.ToResult(), currentContext);
+	}
+
+	private bool SourceAndDestinationPresent()
+	{
+		return currentPair.Source != null && currentPair.Destination != null;
+	}
+
+	private void PreparePropertyInfo(object source, object destination)
+	{
+		var sourceProperties = ReflectionCache
+			.GetProperties(source);
+
+		var destinationProperties = ReflectionCache
+			.GetProperties(destination)
+			.ToDictionary(x => x.Name);
+
+		propertyMap = new List<PropertyPair>();
+
+		foreach (var property in sourceProperties)
 		{
-			foreach (var ignoredProperty in ignoredProperties)
+			var name = property.Name;
+
+			if (destinationProperties.ContainsKey(name))
 			{
-				if (currentPair.Source != null && ignoredProperty(currentPair.Source))
-				{
-					return true;
-				}
-
-				if (currentPair.Destination != null && ignoredProperty(currentPair.Destination))
-				{
-					return true;
-				}
+				propertyMap.Add(new PropertyPair(property, destinationProperties[name], name));
+				destinationProperties.Remove(name);
 			}
-
-			return false;
+			else
+			{
+				propertyMap.Add(new PropertyPair(property, null, name));
+			}
 		}
 
-		private class PropertyPair
+		foreach (var property in destinationProperties.Values)
 		{
-			public PropertyPair(PropertyReader source, PropertyReader destination, string name)
+			propertyMap.Add(new PropertyPair(null, property, property.Name));
+		}
+	}
+
+	private bool IsPropertyIgnored()
+	{
+		foreach (var ignoredProperty in ignoredProperties)
+		{
+			if (currentPair.Source != null && ignoredProperty(currentPair.Source))
 			{
-				Source = source;
-				Destination = destination;
-				Name = name;
+				return true;
 			}
 
-			public PropertyReader Source { get; }
-			public PropertyReader Destination { get; }
-			public string Name { get; }
+			if (currentPair.Destination != null && ignoredProperty(currentPair.Destination))
+			{
+				return true;
+			}
 		}
+
+		return false;
+	}
+
+	private class PropertyPair
+	{
+		public PropertyPair(PropertyReader source, PropertyReader destination, string name)
+		{
+			Source = source;
+			Destination = destination;
+			Name = name;
+		}
+
+		public PropertyReader Source { get; }
+		public PropertyReader Destination { get; }
+		public string Name { get; }
 	}
 }

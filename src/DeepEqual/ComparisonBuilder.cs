@@ -1,121 +1,113 @@
-﻿namespace DeepEqual
+﻿namespace DeepEqual;
+
+public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq;
-	using System.Linq.Expressions;
+	public IList<IComparison> CustomComparisons { get; set; }
+	public IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
 
-	using DeepEqual.Formatting;
+	protected CompositeComparison Root { get; set; }
 
-	public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
+	public ComplexObjectComparison ComplexObjectComparison { get; set; }
+	public DefaultComparison DefaultComparison { get; set; }
+
+	public double DoubleTolerance { get; set; } = 1e-15d;
+	public float SingleTolerance { get; set; } = 1e-6f;
+
+	private static readonly Func<IComparisonBuilder<ComparisonBuilder>> DefaultGet = () => new ComparisonBuilder();
+	public static Func<IComparisonBuilder<ComparisonBuilder>> Get { get; set; } = DefaultGet;
+	public static void Reset() => Get = DefaultGet;
+
+
+	public ComparisonBuilder()
 	{
-		public IList<IComparison> CustomComparisons { get; set; }
-		public IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
+		CustomComparisons = new List<IComparison>();
+		CustomFormatters = new Dictionary<Type, IDifferenceFormatter>();
 
-		protected CompositeComparison Root { get; set; }
+		Root = new CompositeComparison();
 
-		public ComplexObjectComparison ComplexObjectComparison { get; set; }
-		public DefaultComparison DefaultComparison { get; set; }
+		ComplexObjectComparison = new ComplexObjectComparison(Root);
+		DefaultComparison = new DefaultComparison();
+	}
 
-		public double DoubleTolerance { get; set; } = 1e-15d;
-		public float SingleTolerance { get; set; } = 1e-6f;
+	public CompositeComparison Create()
+	{
+		Root.AddRange(CustomComparisons.ToArray());
 
-		private static readonly Func<IComparisonBuilder<ComparisonBuilder>> DefaultGet = () => new ComparisonBuilder();
-		public static Func<IComparisonBuilder<ComparisonBuilder>> Get { get; set; } = DefaultGet;
-		public static void Reset() => Get = DefaultGet;
+		Root.AddRange(
+			new FloatComparison(DoubleTolerance, SingleTolerance),
+			DefaultComparison,
+			new EnumComparison(),
+			new DictionaryComparison(new DefaultComparison(), Root),
+			new SetComparison(Root),
+			new ListComparison(Root),
+			ComplexObjectComparison
+		);
 
+		return Root;
+	}
 
-		public ComparisonBuilder()
-		{
-			CustomComparisons = new List<IComparison>();
-			CustomFormatters = new Dictionary<Type, IDifferenceFormatter>();
+	public IDifferenceFormatterFactory GetFormatterFactory()
+	{
+		return new DifferenceFormatterFactory(CustomFormatters);
+	}
 
-			Root = new CompositeComparison();
+	public ComparisonBuilder IgnoreUnmatchedProperties()
+	{
+		ComplexObjectComparison.IgnoreUnmatchedProperties = true;
 
-			ComplexObjectComparison = new ComplexObjectComparison(Root);
-			DefaultComparison = new DefaultComparison();
-		}
+		return this;
+	}
 
-		public CompositeComparison Create()
-		{
-			Root.AddRange(CustomComparisons.ToArray());
+	public ComparisonBuilder WithCustomComparison(IComparison comparison)
+	{
+		CustomComparisons.Add(comparison);
 
-			Root.AddRange(
-				new FloatComparison(DoubleTolerance, SingleTolerance),
-				DefaultComparison,
-				new EnumComparison(),
-				new DictionaryComparison(new DefaultComparison(), Root),
-				new SetComparison(Root),
-				new ListComparison(Root),
-				ComplexObjectComparison
-			);
+		return this;
+	}
 
-			return Root;
-		}
+	public ComparisonBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
+		where TDifference : Difference
+	{
+		CustomFormatters[typeof(TDifference)] = formatter;
 
-		public IDifferenceFormatterFactory GetFormatterFactory()
-		{
-			return new DifferenceFormatterFactory(CustomFormatters);
-		}
+		return this;
+	}
 
-		public ComparisonBuilder IgnoreUnmatchedProperties()
-		{
-			ComplexObjectComparison.IgnoreUnmatchedProperties = true;
+	public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object>> property)
+	{
+		ComplexObjectComparison.IgnoreProperty(property);
 
-			return this;
-		}
+		return this;
+	}
 
-		public ComparisonBuilder WithCustomComparison(IComparison comparison)
-		{
-			CustomComparisons.Add(comparison);
+	public ComparisonBuilder IgnoreProperty(Func<PropertyReader, bool> func)
+	{
+		ComplexObjectComparison.IgnoreProperty(func);
 
-			return this;
-		}
+		return this;
+	}
 
-		public ComparisonBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter) 
-			where TDifference : Difference
-		{
-			CustomFormatters[typeof(TDifference)] = formatter;
+	public ComparisonBuilder SkipDefault<T>()
+	{
+		DefaultComparison.Skip<T>();
+		return this;
+	}
 
-			return this;
-		}
+	public ComparisonBuilder ExposeInternalsOf<T>()
+	{
+		return ExposeInternalsOf(typeof(T));
+	}
 
-		public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object>> property)
-		{
-			ComplexObjectComparison.IgnoreProperty(property);
+	public ComparisonBuilder ExposeInternalsOf(params Type[] types)
+	{
+		ReflectionCache.CachePrivatePropertiesOfTypes(types);
+		return this;
+	}
 
-			return this;
-		}
-
-		public ComparisonBuilder IgnoreProperty(Func<PropertyReader, bool> func)
-		{
-			ComplexObjectComparison.IgnoreProperty(func);
-
-			return this;
-		}
-
-		public ComparisonBuilder SkipDefault<T>()
-		{
-			DefaultComparison.Skip<T>();
-			return this;
-		}
-
-		public ComparisonBuilder ExposeInternalsOf<T>()
-		{
-			return ExposeInternalsOf(typeof(T));
-		}
-
-		public ComparisonBuilder ExposeInternalsOf(params Type[] types)
-		{
-			ReflectionCache.CachePrivatePropertiesOfTypes(types);
-			return this;
-		}
-
-		public ComparisonBuilder WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f)
-		{
-			DoubleTolerance = doubleTolerance;
-			SingleTolerance = singleTolerance;
-			return this;
-		}
+	public ComparisonBuilder WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f)
+	{
+		DoubleTolerance = doubleTolerance;
+		SingleTolerance = singleTolerance;
+		return this;
 	}
 }

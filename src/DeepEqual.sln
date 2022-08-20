@@ -1,20 +1,22 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual", "DeepEqual\DeepEqual.csproj", "{5125DCF0-FAD0-412F-B06C-FF4CE289A844}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual", "DeepEqual\DeepEqual.csproj", "{5125DCF0-FAD0-412F-B06C-FF4CE289A844}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Test", "DeepEqual.Test\DeepEqual.Test.csproj", "{941815E1-B504-4C64-B6E6-4E8C68421516}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual.Test", "DeepEqual.Test\DeepEqual.Test.csproj", "{941815E1-B504-4C64-B6E6-4E8C68421516}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.Benchmark", "DeepEqual.Benchmark\DeepEqual.Benchmark.csproj", "{E85D1A5D-F779-474F-857A-2A0D1AAB9880}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepEqual.Benchmark", "DeepEqual.Benchmark\DeepEqual.Benchmark.csproj", "{E85D1A5D-F779-474F-857A-2A0D1AAB9880}"
 EndProject
-Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
+Project("{778DAE3C-4631-46EA-AA77-85C1314464D9}") = "DeepEqual.Test.VB", "DeepEqual.Test.VB\DeepEqual.Test.VB.vbproj", "{4DAB6570-DF99-4574-8BB0-99573D9C6224}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F0A9EE3-A674-48E8-97B5-D15F7DC35CD7}"
 	ProjectSection(SolutionItems) = preProject
 		DeepEqual.snk = DeepEqual.snk
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepEqual.System.Text.Json", "DeepEqual.System.Text.Json\DeepEqual.System.Text.Json.csproj", "{24E48117-84E2-4519-A4B6-4CBC6DEF02AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,6 +40,10 @@ Global
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4DAB6570-DF99-4574-8BB0-99573D9C6224}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24E48117-84E2-4519-A4B6-4CBC6DEF02AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24E48117-84E2-4519-A4B6-4CBC6DEF02AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24E48117-84E2-4519-A4B6-4CBC6DEF02AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24E48117-84E2-4519-A4B6-4CBC6DEF02AF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

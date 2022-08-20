@@ -1,36 +1,27 @@
-namespace DeepEqual.Formatting
+namespace DeepEqual.Formatting;
+
+#nullable enable
+
+public class DifferenceFormatterFactory : IDifferenceFormatterFactory
 {
-	using System;
-	using System.Collections.Generic;
+	private readonly IDictionary<Type, IDifferenceFormatter> customFormatters;
 
-	public class DifferenceFormatterFactory : IDifferenceFormatterFactory
+	public DifferenceFormatterFactory(IDictionary<Type, IDifferenceFormatter>? customFormatters = null)
 	{
-		private readonly IDictionary<Type, IDifferenceFormatter> customFormatters;
+		this.customFormatters = customFormatters ?? new Dictionary<Type, IDifferenceFormatter>();
+	}
 
-		public DifferenceFormatterFactory(IDictionary<Type, IDifferenceFormatter> customFormatters)
+	public IDifferenceFormatter GetFormatter(Difference difference)
+	{
+		if (customFormatters.TryGetValue(difference.GetType(), out var formatter))
+			return formatter;
+
+		return difference switch
 		{
-			this.customFormatters = customFormatters ?? new Dictionary<Type, IDifferenceFormatter>();
-		}
-
-		public IDifferenceFormatter GetFormatter(Difference difference)
-		{
-			if (customFormatters.TryGetValue(difference.GetType(), out var formatter))
-				return formatter;
-
-			switch (difference)
-			{
-				case MissingEntryDifference _:
-					return new MissingEntryDifferenceFormatter();
-
-				case SetDifference _:
-					return new SetDifferenceFormatter();
-
-				case BasicDifference _:
-					return new BasicDifferenceFormatter();
-
-				default:
-					return new BreadcrumbDifferenceFormatter();
-			}
-		}
+			MissingEntryDifference _ => new MissingEntryDifferenceFormatter(),
+			SetDifference _ => new SetDifferenceFormatter(),
+			BasicDifference _ => new BasicDifferenceFormatter(),
+			_ => new BreadcrumbDifferenceFormatter(),
+		};
 	}
 }

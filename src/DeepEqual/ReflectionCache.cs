@@ -1,284 +1,272 @@
-namespace DeepEqual
+namespace DeepEqual;
+
+using System.Collections.Concurrent;
+using System.Dynamic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+using Microsoft.CSharp.RuntimeBinder;
+
+using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
+
+public static class ReflectionCache
 {
-	using System;
-	using System.Collections;
-	using System.Collections.Concurrent;
-	using System.Collections.Generic;
-	using System.Dynamic;
-	using System.Linq;
-	using System.Linq.Expressions;
-	using System.Reflection;
-	using System.Runtime.CompilerServices;
+	private static readonly ConcurrentDictionary<Type, Type> EnumerationTypeCache = new();
+	private static readonly ConcurrentDictionary<Type, bool> IsListCache = new();
+	private static readonly ConcurrentDictionary<Type, bool> IsSetCache = new();
+	private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache = new();
+	private static readonly ConcurrentDictionary<Type, PropertyReader[]> PropertyCache = new();
+	private static readonly ConcurrentDictionary<Type, bool> ValueTypeWithReferenceFieldsCache = new();
 
-	using Microsoft.CSharp.RuntimeBinder;
-
-	using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
-
-	public static class ReflectionCache
+	public static void ClearCache()
 	{
-		private static readonly ConcurrentDictionary<Type, Type> EnumerationTypeCache
-			= new ConcurrentDictionary<Type, Type>();
-		private static readonly ConcurrentDictionary<Type, bool> IsListCache
-			= new ConcurrentDictionary<Type, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> IsSetCache
-			= new ConcurrentDictionary<Type, bool>();
-		private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache
-			= new ConcurrentDictionary<Type, bool>();
-		private static readonly ConcurrentDictionary<Type, PropertyReader[]> PropertyCache
-			= new ConcurrentDictionary<Type, PropertyReader[]>();
-		private static readonly ConcurrentDictionary<Type, bool> ValueTypeWithReferenceFieldsCache
-			= new ConcurrentDictionary<Type, bool>();
+		EnumerationTypeCache.Clear();
+		IsListCache.Clear();
+		IsSetCache.Clear();
+		IsDictionaryCache.Clear();
+		PropertyCache.Clear();
+	}
 
-		public static void ClearCache()
+	internal static Type GetEnumerationType(Type type)
+	{
+		return EnumerationTypeCache.GetOrAdd(type, GetEnumerationTypeImpl);
+	}
+
+	private static Type GetEnumerationTypeImpl(Type type)
+	{
+		if (type.IsArray)
 		{
-			EnumerationTypeCache.Clear();
-			IsListCache.Clear();
-			IsSetCache.Clear();
-			IsDictionaryCache.Clear();
-			PropertyCache.Clear();
+			return type.GetElementType();
 		}
 
-		internal static Type GetEnumerationType(Type type)
+		var implements = type
+			.GetInterfaces()
+			.Union(new[] {type})
+			.FirstOrDefault(
+				t =>
+					t.IsGenericType &&
+					t.GetGenericTypeDefinition() == typeof (IEnumerable<>)
+			);
+
+		if (implements == null)
 		{
-			return EnumerationTypeCache.GetOrAdd(type, GetEnumerationTypeImpl);
+			return typeof (object);
 		}
 
-		private static Type GetEnumerationTypeImpl(Type type)
+		return implements.GetGenericArguments()[0];
+	}
+
+	internal static bool IsListType(Type type)
+	{
+		return IsListCache.GetOrAdd(type, IsListTypeImpl);
+	}
+
+	private static bool IsListTypeImpl(Type type)
+	{
+		var equals = type == typeof(IEnumerable);
+		var inherits = type.GetInterface("IEnumerable") == typeof(IEnumerable);
+
+		return equals || inherits;
+	}
+
+	internal static bool IsSetType(Type type)
+	{
+		return IsSetCache.GetOrAdd(type, IsSetTypeImpl);
+	}
+
+	private static bool IsSetTypeImpl(Type type)
+	{
+		bool isSet(Type t) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISet<>);
+
+		var equals = isSet(type);
+		var inherits = type.GetInterfaces().Any(isSet);
+
+		return equals || inherits;
+	}
+
+	internal static bool IsDictionaryType(Type type)
+	{
+		return IsDictionaryCache.GetOrAdd(type, IsDictionaryTypeImpl);
+	}
+
+	private static bool IsDictionaryTypeImpl(Type type)
+	{
+		var equals = type == typeof(IDictionary);
+		var inherits = type.GetInterface("IDictionary") == typeof(IDictionary);
+
+		return equals || inherits;
+	}
+
+	internal static bool IsValueType(Type type)
+	{
+		return type.IsValueType ||
+		       type == typeof (string);
+	}
+
+	internal static bool IsValueTypeWithReferenceFields(Type type)
+	{
+		return ValueTypeWithReferenceFieldsCache.GetOrAdd(type, IsValueTypeWithReferenceFieldsImpl);
+	}
+
+	private static bool IsValueTypeWithReferenceFieldsImpl(Type type)
+	{
+		if (!type.IsValueType) return false;
+		return type.GetProperties(GetBindingFlags(CacheBehaviour.IncludePrivate)).Any(x => x.PropertyType.IsClass);
+	}
+
+	public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)
+	{
+		PropertyReader[] GetAllProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.IncludePrivate);
+
+		foreach (var type in types)
 		{
-			if (type.IsArray)
+			PropertyCache.AddOrUpdate(type, GetAllProperties, (t, value) => GetAllProperties(t));
+		}
+	}
+
+	public static PropertyReader[] GetProperties(object obj)
+	{
+		// Dont cache dynamic properties
+		if (obj is IDynamicMetaObjectProvider dyn)
+		{
+			return GetDynamicProperties(dyn);
+		}
+
+		var type = obj.GetType();
+
+		PropertyReader[] getPublicProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.PublicOnly);
+
+		return PropertyCache.GetOrAdd(type, getPublicProperties);
+	}
+
+	private static PropertyReader[] GetDynamicProperties(IDynamicMetaObjectProvider provider)
+	{
+		var metaObject = provider.GetMetaObject(Expression.Constant(provider));
+
+		// may return property names as well as method names, etc.
+		var memberNames = metaObject.GetDynamicMemberNames();
+
+		var result = new List<PropertyReader>();
+
+		foreach (var name in memberNames)
+		{
+			try
 			{
-				return type.GetElementType();
-			}
-
-			var implements = type
-				.GetInterfaces()
-				.Union(new[] {type})
-				.FirstOrDefault(
-					t =>
-						t.IsGenericType &&
-						t.GetGenericTypeDefinition() == typeof (IEnumerable<>)
-				);
-
-			if (implements == null)
-			{
-				return typeof (object);
-			}
-
-			return implements.GetGenericArguments()[0];
-		}
-
-		internal static bool IsValueTypeWithReferenceFields(Type type)
-        {
-			return ValueTypeWithReferenceFieldsCache.GetOrAdd(type, IsValueTypeWithReferenceFieldsImpl);
-        }
-
-        private static bool IsValueTypeWithReferenceFieldsImpl(Type type)
-        {
-			if (!type.IsValueType) return false;
-			return type.GetProperties(GetBindingFlags(CacheBehaviour.IncludePrivate)).Any(x => x.PropertyType.IsClass);
-        }
-
-        internal static bool IsListType(Type type)
-		{
-			return IsListCache.GetOrAdd(type, IsListTypeImpl);
-		}
-
-		private static bool IsListTypeImpl(Type type)
-		{
-			var equals = type == typeof(IEnumerable);
-			var inherits = type.GetInterface("IEnumerable") == typeof(IEnumerable);
-
-			return equals || inherits;
-		}
-
-		internal static bool IsSetType(Type type)
-		{
-			return IsSetCache.GetOrAdd(type, IsSetTypeImpl);
-		}
-
-		private static bool IsSetTypeImpl(Type type)
-		{
-			bool isSet(Type t) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ISet<>);
-
-			var equals = isSet(type);
-			var inherits = type.GetInterfaces().Any(isSet);
-
-			return equals || inherits;
-		}
-
-		internal static bool IsDictionaryType(Type type)
-		{
-			return IsDictionaryCache.GetOrAdd(type, IsDictionaryTypeImpl);
-		}
-
-		private static bool IsDictionaryTypeImpl(Type type)
-		{
-			var equals = type == typeof(IDictionary);
-			var inherits = type.GetInterface("IDictionary") == typeof(IDictionary);
-
-			return equals || inherits;
-		}
-
-		internal static bool IsValueType(Type type)
-		{
-			return type.IsValueType ||
-			       type == typeof (string);
-		}
-
-		public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)
-		{
-			PropertyReader[] GetAllProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.IncludePrivate);
-
-			foreach (var type in types)
-			{
-				PropertyCache.AddOrUpdate(type, GetAllProperties, (t, value) => GetAllProperties(t));
-			}
-		}
-
-		public static PropertyReader[] GetProperties(object obj)
-		{
-			// Dont cache dynamic properties
-			if (obj is IDynamicMetaObjectProvider dyn)
-			{
-				return GetDynamicProperties(dyn);
-			}
-
-			var type = obj.GetType();
-
-			PropertyReader[] getPublicProperties(Type t) => GetPropertiesAndFields(t, CacheBehaviour.PublicOnly);
-
-			return PropertyCache.GetOrAdd(type, getPublicProperties);
-		}
-
-		private static PropertyReader[] GetDynamicProperties(IDynamicMetaObjectProvider provider)
-		{
-			var metaObject = provider.GetMetaObject(Expression.Constant(provider));
-
-			// may return property names as well as method names, etc.
-			var memberNames = metaObject.GetDynamicMemberNames();
-
-			var result = new List<PropertyReader>();
-
-			foreach (var name in memberNames)
-			{
-				try
-				{
-					var argumentInfo = new[]
-						{
-							CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
-						};
-
-					var binder = Binder.GetMember(
-						CSharpBinderFlags.None,
-						name,
-						provider.GetType(),
-						argumentInfo);
-
-					var site = CallSite<Func<CallSite, object, object>>.Create(binder);
-
-					// will throw if no valid property getter
-					var value = site.Target(site, provider);
-
-					result.Add(new PropertyReader
+				var argumentInfo = new[]
 					{
-						Name = name,
-						DeclaringType = provider.GetType(),
-						Read = o => value
-					});
-				}
-				catch (RuntimeBinderException)
+						CSharpArgumentInfo.Create(CSharpArgumentInfoFlags.None, null)
+					};
+
+				var binder = Binder.GetMember(
+					CSharpBinderFlags.None,
+					name,
+					provider.GetType(),
+					argumentInfo);
+
+				var site = CallSite<Func<CallSite, object, object>>.Create(binder);
+
+				// will throw if no valid property getter
+				var value = site.Target(site, provider);
+
+				result.Add(new PropertyReader
 				{
-				}
+					Name = name,
+					DeclaringType = provider.GetType(),
+					Read = o => value
+				});
 			}
-
-			return result.ToArray();
-		}
-
-		private static PropertyReader[] GetPropertiesAndFields(Type type, CacheBehaviour behaviour)
-		{
-			return GetProperties(type, behaviour)
-				.Concat(GetFields(type, behaviour))
-				.ToArray();
-		}
-
-		private static IEnumerable<PropertyReader> GetProperties(Type type, CacheBehaviour behaviour)
-		{
-			var bindingFlags = GetBindingFlags(behaviour);
-			var properties = type.GetProperties(bindingFlags).AsEnumerable();
-
-			properties = RemoveHiddenProperties(properties);
-			properties = ExcludeIndexProperties(properties);
-			properties = ExcludeSetOnlyProperties(properties);
-
-			return properties
-				.Select(
-					x => new PropertyReader
-						{
-							Name = x.Name,
-							DeclaringType = type,
-							Read = o => x.GetValue(o, null)
-						});
-		}
-
-		private static IEnumerable<PropertyInfo> RemoveHiddenProperties(IEnumerable<PropertyInfo> properties)
-		{
-			return properties
-				.ToLookup(x => x.Name)
-				.Select(x => x.First());
-		}
-
-		private static IEnumerable<PropertyInfo> ExcludeIndexProperties(IEnumerable<PropertyInfo> properties)
-		{
-			return properties
-				.Where(x => !x.GetIndexParameters().Any());
-		}
-
-		private static IEnumerable<PropertyInfo> ExcludeSetOnlyProperties(IEnumerable<PropertyInfo> properties)
-		{
-			return properties
-				.Where(x => x.GetMethod != null);
-		}
-
-		private static IEnumerable<PropertyReader> GetFields(Type type, CacheBehaviour behaviour)
-		{
-			var bindingFlags = GetBindingFlags(behaviour);
-			var fields = type.GetFields(bindingFlags).AsEnumerable();
-
-			fields = RemoveHiddenFields(fields);
-
-			return fields
-				.Select(
-					x => new PropertyReader
-						{
-							Name = x.Name,
-							DeclaringType = type,
-							Read = o => x.GetValue(o)
-						});
-		}
-
-		private static IEnumerable<FieldInfo> RemoveHiddenFields(IEnumerable<FieldInfo> properties)
-		{
-			return properties
-				.ToLookup(x => x.Name)
-				.Select(x => x.First());
-		}
-
-		private static BindingFlags GetBindingFlags(CacheBehaviour behaviour)
-		{
-			var result = BindingFlags.Instance | BindingFlags.Public;
-
-			if (behaviour == CacheBehaviour.IncludePrivate)
+			catch (RuntimeBinderException)
 			{
-				result |= BindingFlags.NonPublic;
 			}
-
-			return result;
 		}
+
+		return result.ToArray();
 	}
 
-	internal enum CacheBehaviour
+	private static PropertyReader[] GetPropertiesAndFields(Type type, CacheBehaviour behaviour)
 	{
-		PublicOnly,
-		IncludePrivate
+		return GetProperties(type, behaviour)
+			.Concat(GetFields(type, behaviour))
+			.ToArray();
 	}
+
+	private static IEnumerable<PropertyReader> GetProperties(Type type, CacheBehaviour behaviour)
+	{
+		var bindingFlags = GetBindingFlags(behaviour);
+		var properties = type.GetProperties(bindingFlags).AsEnumerable();
+
+		properties = RemoveHiddenProperties(properties);
+		properties = ExcludeIndexProperties(properties);
+		properties = ExcludeSetOnlyProperties(properties);
+
+		return properties
+			.Select(
+				x => new PropertyReader
+					{
+						Name = x.Name,
+						DeclaringType = type,
+						Read = o => x.GetValue(o, null)
+					});
+	}
+
+	private static IEnumerable<PropertyInfo> RemoveHiddenProperties(IEnumerable<PropertyInfo> properties)
+	{
+		return properties
+			.ToLookup(x => x.Name)
+			.Select(x => x.First());
+	}
+
+	private static IEnumerable<PropertyInfo> ExcludeIndexProperties(IEnumerable<PropertyInfo> properties)
+	{
+		return properties
+			.Where(x => !x.GetIndexParameters().Any());
+	}
+
+	private static IEnumerable<PropertyInfo> ExcludeSetOnlyProperties(IEnumerable<PropertyInfo> properties)
+	{
+		return properties
+			.Where(x => x.GetMethod != null);
+	}
+
+	private static IEnumerable<PropertyReader> GetFields(Type type, CacheBehaviour behaviour)
+	{
+		var bindingFlags = GetBindingFlags(behaviour);
+		var fields = type.GetFields(bindingFlags).AsEnumerable();
+
+		fields = RemoveHiddenFields(fields);
+
+		return fields
+			.Select(
+				x => new PropertyReader
+					{
+						Name = x.Name,
+						DeclaringType = type,
+						Read = o => x.GetValue(o)
+					});
+	}
+
+	private static IEnumerable<FieldInfo> RemoveHiddenFields(IEnumerable<FieldInfo> properties)
+	{
+		return properties
+			.ToLookup(x => x.Name)
+			.Select(x => x.First());
+	}
+
+	private static BindingFlags GetBindingFlags(CacheBehaviour behaviour)
+	{
+		var result = BindingFlags.Instance | BindingFlags.Public;
+
+		if (behaviour == CacheBehaviour.IncludePrivate)
+		{
+			result |= BindingFlags.NonPublic;
+		}
+
+		return result;
+	}
+}
+
+internal enum CacheBehaviour
+{
+	PublicOnly,
+	IncludePrivate
 }

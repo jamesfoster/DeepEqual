@@ -14,7 +14,8 @@ namespace DeepEqual.Formatting
 			return string.Format(format,
 				difference.Breadcrumb,
 				Prettify(difference.Key),
-				Prettify(difference.Value));
+				Prettify(difference.Value)
+			);
 		}
 	}
 }

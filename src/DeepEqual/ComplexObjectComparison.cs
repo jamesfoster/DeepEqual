@@ -1,62 +1,57 @@
-﻿namespace DeepEqual
+﻿namespace DeepEqual;
+
+public class ComplexObjectComparison : IComparison
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Linq.Expressions;
+	public IComparison Inner { get; set; }
 
-	public class ComplexObjectComparison : IComparison
+	public bool IgnoreUnmatchedProperties { get; set; }
+
+	public List<Func<PropertyReader, bool>> IgnoredProperties { get; set; }
+
+	public ComplexObjectComparison(IComparison inner)
 	{
-		public IComparison Inner { get; set; }
+		Inner = inner;
+		IgnoredProperties = new List<Func<PropertyReader, bool>>();
+	}
 
-		public bool IgnoreUnmatchedProperties { get; set; }
+	public bool CanCompare(Type type1, Type type2)
+	{
+		return (type1.IsClass && type2.IsClass) 
+			|| ReflectionCache.IsValueTypeWithReferenceFields(type1) 
+			|| ReflectionCache.IsValueTypeWithReferenceFields(type2);
+	}
 
-		public List<Func<PropertyReader, bool>> IgnoredProperties { get; set; }
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	{
+		var comparer = new ComplexObjectComparer(Inner, IgnoreUnmatchedProperties, IgnoredProperties);
 
-		public ComplexObjectComparison(IComparison inner)
+		return comparer.CompareObjects(context, value1, value2);
+	}
+
+	public void IgnoreProperty<T>(Expression<Func<T, object>> property)
+	{
+		var exp = property.Body;
+
+		if (exp is UnaryExpression cast)
 		{
-			Inner = inner;
-			IgnoredProperties = new List<Func<PropertyReader, bool>>();
+			exp = cast.Operand; // implicit cast to object
 		}
 
-		public bool CanCompare(Type type1, Type type2)
+		if (exp is MemberExpression member)
 		{
-			return (type1.IsClass && type2.IsClass) 
-				|| ReflectionCache.IsValueTypeWithReferenceFields(type1) 
-				|| ReflectionCache.IsValueTypeWithReferenceFields(type2);
+			var propertyName = member.Member.Name;
+
+			IgnoreProperty(typeof(T), propertyName);
 		}
+	}
 
-		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
-		{
-			var comparer = new ComplexObjectComparer(Inner, IgnoreUnmatchedProperties, IgnoredProperties);
+	private void IgnoreProperty(Type type, string propertyName)
+	{
+		IgnoreProperty(property => type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName);
+	}
 
-			return comparer.CompareObjects(context, value1, value2);
-		}
-
-		public void IgnoreProperty<T>(Expression<Func<T, object>> property)
-		{
-			var exp = property.Body;
-
-			if (exp is UnaryExpression cast)
-			{
-				exp = cast.Operand; // implicit cast to object
-			}
-
-			if (exp is MemberExpression member)
-			{
-				var propertyName = member.Member.Name;
-
-				IgnoreProperty(typeof(T), propertyName);
-			}
-		}
-
-		private void IgnoreProperty(Type type, string propertyName)
-		{
-			IgnoreProperty(property => type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName);
-		}
-
-		public void IgnoreProperty(Func<PropertyReader, bool> item)
-		{
-			IgnoredProperties.Add(item);
-		}
+	public void IgnoreProperty(Func<PropertyReader, bool> item)
+	{
+		IgnoredProperties.Add(item);
 	}
 }
