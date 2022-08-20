@@ -16,6 +16,7 @@ public static class ReflectionCache
 	private static readonly ConcurrentDictionary<Type, bool> IsSetCache = new();
 	private static readonly ConcurrentDictionary<Type, bool> IsDictionaryCache = new();
 	private static readonly ConcurrentDictionary<Type, PropertyReader[]> PropertyCache = new();
+	private static readonly ConcurrentDictionary<Type, bool> ValueTypeWithReferenceFieldsCache = new();
 
 	public static void ClearCache()
 	{
@@ -100,6 +101,17 @@ public static class ReflectionCache
 	{
 		return type.IsValueType ||
 		       type == typeof (string);
+	}
+
+	internal static bool IsValueTypeWithReferenceFields(Type type)
+	{
+		return ValueTypeWithReferenceFieldsCache.GetOrAdd(type, IsValueTypeWithReferenceFieldsImpl);
+	}
+
+	private static bool IsValueTypeWithReferenceFieldsImpl(Type type)
+	{
+		if (!type.IsValueType) return false;
+		return type.GetProperties(GetBindingFlags(CacheBehaviour.IncludePrivate)).Any(x => x.PropertyType.IsClass);
 	}
 
 	public static void CachePrivatePropertiesOfTypes(IEnumerable<Type> types)

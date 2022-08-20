@@ -11,7 +11,9 @@ public class DefaultComparison : IComparison
 
 	public bool CanCompare(Type type1, Type type2)
 	{
-		return !IsSkipped(type1) && !IsSkipped(type2);
+		return !IsSkipped(type1) && !IsSkipped(type2)
+			&& !ReflectionCache.IsValueTypeWithReferenceFields(type1)
+			&& !ReflectionCache.IsValueTypeWithReferenceFields(type2);
 	}
 
 	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
