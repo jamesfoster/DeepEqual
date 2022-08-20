@@ -9,7 +9,7 @@
     <Version>3.0.0</Version>
     <Description>An extensible deep comparison library for .NET</Description>
     <Authors>James Foster</Authors>
-    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
     <Copyright>James Foster 2020</Copyright>
     <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
