@@ -30,10 +30,10 @@ public class FloatComparison : IComparison
 		var num1 = Convert.ToSingle(value1);
 		var num2 = Convert.ToSingle(value2);
 
-		if (num1 == num2)
+		if ((float.IsNaN(num1) && float.IsNaN(num2)) || (num1 == num2))
 			return (ComparisonResult.Pass, context);
 
-		if(singleTolerance == 0.0f)
+		if (singleTolerance == 0.0f)
 			return (ComparisonResult.Fail, context.AddDifference(value1, value2));
 
 		var epsilon = Math.Max(Math.Abs(num1), Math.Abs(num2)) * singleTolerance;
@@ -49,7 +49,7 @@ public class FloatComparison : IComparison
 		var num1 = Convert.ToDouble(value1);
 		var num2 = Convert.ToDouble(value2);
 
-		if (num1 == num2)
+		if ((double.IsNaN(num1) && double.IsNaN(num2)) || (num1 == num2))
 			return (ComparisonResult.Pass, context);
 
 		if (doubleTolerance == 0.0f)
