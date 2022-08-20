@@ -31,6 +31,7 @@ public class DictionaryComparison : IComparison
 			return (ComparisonResult.Pass, context);
 		}
 
+		var newContext = context;
 		var results = new List<ComparisonResult>();
 
 		foreach (DictionaryEntry entry in dict1)
@@ -57,11 +58,11 @@ public class DictionaryComparison : IComparison
 			var (result, innerContext) = ValueComparer.Compare(context.VisitingIndex(key), entry.Value, value);
 
 			results.Add(result);
-			context = context.MergeDifferencesFrom(innerContext);
+			newContext = newContext.MergeDifferencesFrom(innerContext);
 		}
 
 		if(dict2.Count == 0)
-			return (results.ToResult(), context);
+			return (results.ToResult(), newContext);
 
 		foreach (var entry in dict2)
 		{
@@ -72,10 +73,10 @@ public class DictionaryComparison : IComparison
 				entry.Value
 			);
 
-			context = context.AddDifference(difference);
+			newContext = newContext.AddDifference(difference);
 		}
 
-		return (ComparisonResult.Fail, context);
+		return (ComparisonResult.Fail, newContext);
 	}
 
 	private static IEnumerable<DictionaryEntry> CastToDictionaryEntries(IDictionary source)
