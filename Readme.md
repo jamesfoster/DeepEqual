@@ -6,7 +6,7 @@ DeepEqual is an extensible deep equality comparison library.
 Installing
 -
 
-Install via NuGet
+Install via NuGet (https://www.nuget.org/packages/DeepEqual/)
 
 `Install-Package DeepEqual`
 
