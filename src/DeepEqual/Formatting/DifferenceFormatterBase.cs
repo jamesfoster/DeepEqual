@@ -1,18 +1,17 @@
-namespace DeepEqual.Formatting
+namespace DeepEqual.Formatting;
+
+public abstract class DifferenceFormatterBase : IDifferenceFormatter
 {
-	public abstract class DifferenceFormatterBase : IDifferenceFormatter
+	public abstract string Format(Difference difference);
+
+	protected static string Prettify(object value)
 	{
-		public abstract string Format(Difference difference);
+		if (value == null)
+			return "(null)";
 
-		protected static string Prettify(object value)
-		{
-			if (value == null)
-				return "(null)";
+		if (value is string)
+			return $"\"{value}\"";
 
-			if (value is string)
-				return $"\"{value}\"";
-
-			return value.ToString();
-		}
+		return value.ToString();
 	}
 }

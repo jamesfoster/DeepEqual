@@ -1,10 +1,9 @@
-﻿namespace DeepEqual.Formatting
+﻿namespace DeepEqual.Formatting;
+
+public class BreadcrumbDifferenceFormatter : DifferenceFormatterBase
 {
-	public class BreadcrumbDifferenceFormatter : DifferenceFormatterBase
+	public override string Format(Difference difference)
 	{
-		public override string Format(Difference difference)
-		{
-			return $"Actual{difference.Breadcrumb} != Expected{difference.Breadcrumb}";
-		}
+		return $"Actual{difference.Breadcrumb} != Expected{difference.Breadcrumb}";
 	}
 }
