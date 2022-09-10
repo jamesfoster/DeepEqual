@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6</TargetFramework>
-    <LangVersion>10</LangVersion>
+    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6</TargetFrameworks>
+    <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <!--Nullable>enable</Nullable-->
 
@@ -12,7 +12,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://github.com/jamesfoster/DeepEqual</PackageProjectUrl>
     <PackageReadmeFile>Readme.md</PackageReadmeFile>
-    <Copyright>James Foster 2020</Copyright>
+    <Copyright>James Foster 2022</Copyright>
     <PackageTags>deepequal deep equal equality comparison compare</PackageTags>
 
     <SignAssembly>true</SignAssembly>
@@ -21,6 +21,11 @@
 
   <ItemGroup>
     <None Include="..\..\Readme.md" Pack="true" PackagePath="\"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' or '$(TargetFramework)' == 'netstandard2.0' ">
+    <PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

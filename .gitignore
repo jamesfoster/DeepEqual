@@ -21,6 +21,11 @@ _NCrunch_*/
 *.received.*
 
 
+# Secrets
+
+nuget.apikey
+
+
 # OS trash
 
 .DS_Store

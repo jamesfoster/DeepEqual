@@ -1,7 +1,6 @@
-namespace DeepEqual.Formatting
+namespace DeepEqual.Formatting;
+
+public interface IDifferenceFormatter
 {
-	public interface IDifferenceFormatter
-	{
-		string Format(Difference difference);
-	}
+	string Format(Difference difference);
 }

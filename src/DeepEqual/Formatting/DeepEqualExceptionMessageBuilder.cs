@@ -1,58 +1,61 @@
-namespace DeepEqual.Formatting
+namespace DeepEqual.Formatting;
+
+using System;
+using System.Text;
+
+public class DeepEqualExceptionMessageBuilder
 {
-	using System;
-	using System.Text;
+	private readonly IComparisonContext context;
+	private readonly IDifferenceFormatterFactory formatterFactory;
 
-	public class DeepEqualExceptionMessageBuilder
+	public DeepEqualExceptionMessageBuilder(
+		IComparisonContext context,
+		IDifferenceFormatterFactory formatterFactory
+	)
 	{
-		private readonly IComparisonContext context;
-		private readonly IDifferenceFormatterFactory formatterFactory;
+		this.context = context;
+		this.formatterFactory = formatterFactory;
+	}
 
-		public DeepEqualExceptionMessageBuilder(
-			IComparisonContext context,
-			IDifferenceFormatterFactory formatterFactory
-		)
+	public string GetMessage()
+	{
+		var sb = new StringBuilder();
+
+		sb.Append("Comparison Failed");
+
+		var count = context.Differences.Count;
+		if (count > 0)
 		{
-			this.context = context;
-			this.formatterFactory = formatterFactory;
+			sb.Append($": The following {count} differences were found.");
 		}
 
-		public string GetMessage()
+		foreach (var difference in context.Differences)
 		{
-			var sb = new StringBuilder();
+			sb.Append("\n\t");
 
-			sb.Append("Comparison Failed");
-
-			var count = context.Differences.Count;
-			if (count > 0)
-			{
-				sb.Append($": The following {count} differences were found.");
-			}
-
-			foreach (var difference in context.Differences)
-			{
-				sb.Append("\n\t");
-
-				var text = IndentLines(FormatDifference(difference));
-				sb.Append(text);
-			}
-
-			return sb.ToString();
+			var text = IndentLines(FormatDifference(difference));
+			sb.Append(text);
 		}
 
-		private static string IndentLines(string differenceString)
-		{
-			var lines = differenceString
-				.Replace(Environment.NewLine, "\n")
-				.Split('\n', StringSplitOptions.None);
-			return string.Join("\n\t\t", lines);
-		}
+		return sb.ToString();
+	}
 
-		private string FormatDifference(Difference difference)
-		{
-			var formatter = formatterFactory.GetFormatter(difference);
+	private static string IndentLines(string differenceString)
+	{
+		var lines = differenceString
+			.Replace(Environment.NewLine, "\n")
+#if NETSTANDARD2_0
+			.Split(new[] { '\n' }, StringSplitOptions.None);
+#else
+			.Split('\n', StringSplitOptions.None);
+#endif
+		return string.Join("\n\t\t", lines);
+	}
 
-			return formatter.Format(difference);
-		}
+	private string FormatDifference(Difference difference)
+	{
+		var formatter = formatterFactory.GetFormatter(difference);
+
+		return formatter.Format(difference);
 	}
 }
