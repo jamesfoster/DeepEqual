@@ -18,49 +18,42 @@ public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSynta
 		Builder = ComparisonBuilder.Get();
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> IgnoreSourceProperty(Expression<Func<TActual, object>> property)
 	{
 		Builder.IgnoreProperty(property);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> IgnoreDestinationProperty(Expression<Func<TExpected, object>> property)
 	{
 		Builder.IgnoreProperty(property);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> IgnoreProperty<T>(Expression<Func<T, object>> property)
 	{
 		Builder.IgnoreProperty(property);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> IgnoreProperty(Func<PropertyReader, bool> func)
 	{
 		Builder.IgnoreProperty(func);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> SkipDefault<T>()
 	{
 		Builder.SkipDefault<T>();
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> WithCustomComparison(IComparison comparison)
 	{
 		Builder.WithCustomComparison(comparison);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
 		where TDifference : Difference
 	{
@@ -68,28 +61,24 @@ public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSynta
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> IgnoreUnmatchedProperties()
 	{
 		Builder.IgnoreUnmatchedProperties();
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> ExposeInternalsOf<T>()
 	{
 		Builder.ExposeInternalsOf<T>();
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> ExposeInternalsOf(params Type[] types)
 	{
 		Builder.ExposeInternalsOf(types);
 		return this;
 	}
 
-	[Pure]
 	public CompareSyntax<TActual, TExpected> WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f)
 	{
 		Builder.WithFloatingPointTolerance(doubleTolerance, singleTolerance);
