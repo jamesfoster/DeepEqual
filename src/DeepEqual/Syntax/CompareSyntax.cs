@@ -97,6 +97,13 @@ public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSynta
 	}
 
 	[Pure]
+	public CompareSyntax<TActual, TExpected> IgnoreCircularReferences()
+	{
+		Builder.IgnoreCircularReferences();
+		return this;
+	}
+
+	[Pure]
 	public bool Compare()
 	{
 		return Actual.IsDeepEqual(Expected, Builder.Create());
@@ -108,7 +115,7 @@ public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSynta
 	}
 
 	//ncrunch: no coverage start
-	CompositeComparison IComparisonBuilder<CompareSyntax<TActual, TExpected>>.Create()
+	IComparison IComparisonBuilder<CompareSyntax<TActual, TExpected>>.Create()
 	{
 		throw new NotImplementedException();
 	}

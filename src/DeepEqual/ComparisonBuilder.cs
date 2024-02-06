@@ -1,11 +1,12 @@
 ﻿namespace DeepEqual;
 
-public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
+public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 {
 	public IList<IComparison> CustomComparisons { get; set; }
 	public IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
 
-	protected CompositeComparison Root { get; set; }
+	private CycleGuard CycleGuard { get; set; }
+	private CompositeComparison AllComparisons { get; set; }
 
 	public ComplexObjectComparison ComplexObjectComparison { get; set; }
 	public DefaultComparison DefaultComparison { get; set; }
@@ -23,27 +24,28 @@ public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 		CustomComparisons = new List<IComparison>();
 		CustomFormatters = new Dictionary<Type, IDifferenceFormatter>();
 
-		Root = new CompositeComparison();
+		AllComparisons = new CompositeComparison();
+		CycleGuard = new CycleGuard(AllComparisons);
 
-		ComplexObjectComparison = new ComplexObjectComparison(Root);
+		ComplexObjectComparison = new ComplexObjectComparison(CycleGuard);
 		DefaultComparison = new DefaultComparison();
 	}
 
-	public CompositeComparison Create()
+	public IComparison Create()
 	{
-		Root.AddRange(CustomComparisons.ToArray());
+		AllComparisons.AddRange(CustomComparisons.ToArray());
 
-		Root.AddRange(
+		AllComparisons.AddRange([
 			new FloatComparison(DoubleTolerance, SingleTolerance),
 			new EnumComparison(),
 			DefaultComparison,
-			new DictionaryComparison(new DefaultComparison(), Root),
-			new SetComparison(Root),
-			new ListComparison(Root),
+			new DictionaryComparison(new DefaultComparison(), CycleGuard),
+			new SetComparison(CycleGuard),
+			new ListComparison(CycleGuard),
 			ComplexObjectComparison
-		);
+		]);
 
-		return Root;
+		return CycleGuard;
 	}
 
 	public IDifferenceFormatterFactory GetFormatterFactory()
@@ -108,6 +110,12 @@ public class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 	{
 		DoubleTolerance = doubleTolerance;
 		SingleTolerance = singleTolerance;
+		return this;
+	}
+
+	public ComparisonBuilder IgnoreCircularReferences()
+	{
+		CycleGuard.IgnoreCircularReferences();
 		return this;
 	}
 }

@@ -16,8 +16,8 @@ public class ComplexObjectComparison : IComparison
 
 	public bool CanCompare(Type type1, Type type2)
 	{
-		return (type1.IsClass && type2.IsClass) 
-			|| ReflectionCache.IsValueTypeWithReferenceFields(type1) 
+		return (type1.IsClass && type2.IsClass)
+			|| ReflectionCache.IsValueTypeWithReferenceFields(type1)
 			|| ReflectionCache.IsValueTypeWithReferenceFields(type2);
 	}
 
