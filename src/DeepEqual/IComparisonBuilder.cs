@@ -6,7 +6,7 @@
 public interface IComparisonBuilder<out TBuilder>
 	where TBuilder : IComparisonBuilder<TBuilder>
 {
-	CompositeComparison Create();
+	IComparison Create();
 	IDifferenceFormatterFactory GetFormatterFactory();
 
 	TBuilder IgnoreUnmatchedProperties();
@@ -18,4 +18,5 @@ public interface IComparisonBuilder<out TBuilder>
 	TBuilder ExposeInternalsOf<T>();
 	TBuilder ExposeInternalsOf(params Type[] types);
 	TBuilder WithFloatingPointTolerance(double doubleTolerance = 1e-15d, float singleTolerance = 1e-6f);
+	TBuilder IgnoreCircularReferences();
 }

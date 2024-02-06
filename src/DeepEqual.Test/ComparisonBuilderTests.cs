@@ -259,6 +259,7 @@
 		[Scenario]
 		public void Creating_a_default_Comparison()
 		{
+			var root = default (IComparison);
 			var result = default (CompositeComparison);
 
 			"Given a builder".x(() =>
@@ -266,8 +267,10 @@
 			);
 
 			"When calling Create".x(() =>
-				result = SUT.Create()
-			);
+			{
+				root = SUT.Create();
+				result = ((CycleGuard)root).Inner as CompositeComparison;
+			});
 
 			"Then it not return null".x(() =>
 				result.ShouldNotBe(null)
@@ -294,7 +297,7 @@
 			);
 
 			"... and the value comparer is the result".x(() =>
-				((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(result)
+				((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(root)
 			);
 
 			"And the 5th comparer is the DictionaryComparison".x(() =>
@@ -302,7 +305,7 @@
 			);
 
 			"... and the inner comparer is the result".x(() =>
-				((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(result)
+				((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(root)
 			);
 
 			"And the 6th comparer is the DictionaryComparison".x(() =>
@@ -310,7 +313,7 @@
 			);
 
 			"... and the inner comparer is the result".x(() =>
-				((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(result)
+				((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(root)
 			);
 
 			"And the 7th comparer is the ComplexObjectComparison".x(() =>
@@ -318,7 +321,7 @@
 			);
 
 			"... and the inner comparer is the result".x(() =>
-				((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(result)
+				((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(root)
 			);
 
 			"... and IgnoreUnmatchedProperties should be false".x(() =>
@@ -344,7 +347,7 @@
 			});
 
 			"When calling Create".x(() =>
-				result = SUT.Create()
+				result = ((CycleGuard)SUT.Create()).Inner as CompositeComparison
 			);
 
 			"Then the 1st comparer is the custom comparison".x(() =>
@@ -366,7 +369,7 @@
 			);
 
 			"When calling Create".x(() =>
-				result = SUT.Create()
+				result = ((CycleGuard)SUT.Create()).Inner as CompositeComparison
 			);
 
 			"Then the 6th comparer is the ComplexObjectComparison".x(() =>
