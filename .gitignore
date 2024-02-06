@@ -14,7 +14,7 @@ _ReSharper*/
 
 *.ncrunch*
 _NCrunch_*/
-
+nCrunchTemp_*
 
 # ApprovalTests
 
