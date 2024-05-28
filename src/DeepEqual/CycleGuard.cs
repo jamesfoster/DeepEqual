@@ -22,10 +22,15 @@ public class CycleGuard(IComparison inner) : IComparison
 
 	public (ComparisonResult result, IComparisonContext context) Compare(
 		IComparisonContext context,
-		object value1,
-		object value2
+		object? value1,
+		object? value2
 	)
 	{
+		if (value1 == null || value2 == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		var previousComparisons = PreviousComparisonsForCurrentThread();
 		if (previousComparisons.Count > 0)
 		{
@@ -52,7 +57,6 @@ public class CycleGuard(IComparison inner) : IComparison
 		{
 			previousComparisons.Pop();
 		}
-
 	}
 
 	private (ComparisonResult result, IComparisonContext context) HandleCycle(
@@ -106,7 +110,7 @@ public class CycleGuard(IComparison inner) : IComparison
 
 	private Stack<ComparisonFrame> PreviousComparisonsForCurrentThread()
 	{
-		return framesByThread.Value;
+		return framesByThread.Value!;
 	}
 
 	private readonly record struct ComparisonFrame(string Breadcrumb, object Value1, object Value2);

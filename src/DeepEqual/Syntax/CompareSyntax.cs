@@ -5,6 +5,8 @@ using System.Diagnostics.Contracts;
 using DeepEqual.Formatting;
 
 public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSyntax<TActual, TExpected>>
+	where TActual : notnull
+	where TExpected : notnull
 {
 	public TActual Actual { get; set; }
 	public TExpected Expected { get; set; }

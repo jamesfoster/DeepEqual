@@ -36,7 +36,7 @@ public static class ReflectionCache
 	{
 		if (type.IsArray)
 		{
-			return type.GetElementType();
+			return type.GetElementType()!;
 		}
 
 		var implements = type
@@ -168,12 +168,7 @@ public static class ReflectionCache
 				// will throw if no valid property getter
 				var value = site.Target(site, provider);
 
-				result.Add(new PropertyReader
-				{
-					Name = name,
-					DeclaringType = provider.GetType(),
-					Read = o => value
-				});
+				result.Add(new PropertyReader(name, o => value, provider.GetType()));
 			}
 			catch (RuntimeBinderException)
 			{
@@ -201,12 +196,7 @@ public static class ReflectionCache
 
 		return properties
 			.Select(
-				x => new PropertyReader
-					{
-						Name = x.Name,
-						DeclaringType = type,
-						Read = o => x.GetValue(o, null)
-					}
+				x => new PropertyReader(x.Name, o => x.GetValue(o, null), type)
 			);
 	}
 
@@ -238,12 +228,7 @@ public static class ReflectionCache
 
 		return fields
 			.Select(
-				x => new PropertyReader
-					{
-						Name = x.Name,
-						DeclaringType = type,
-						Read = o => x.GetValue(o)
-					}
+				x => new PropertyReader(x.Name, o => x.GetValue(o), type)
 			);
 	}
 

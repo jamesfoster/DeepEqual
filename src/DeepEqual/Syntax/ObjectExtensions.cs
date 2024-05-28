@@ -13,7 +13,7 @@ public static class ObjectExtensions
 	}
 
 	[Pure]
-	public static bool IsDeepEqual(this object actual, object expected, IComparison comparison)
+	public static bool IsDeepEqual(this object actual, object expected, IComparison? comparison)
 	{
 		comparison ??= new ComparisonBuilder().Create();
 
@@ -29,7 +29,7 @@ public static class ObjectExtensions
 		ShouldDeepEqual(actual, expected, null, null);
 	}
 
-	public static void ShouldDeepEqual(this object actual, object expected, IComparison comparison)
+	public static void ShouldDeepEqual(this object actual, object expected, IComparison? comparison)
 	{
 		ShouldDeepEqual(actual, expected, comparison, null);
 	}
@@ -37,8 +37,8 @@ public static class ObjectExtensions
 	public static void ShouldDeepEqual(
 		this object actual,
 		object expected,
-		IComparison comparison,
-		IDifferenceFormatterFactory formatterFactory
+		IComparison? comparison,
+		IDifferenceFormatterFactory? formatterFactory
 	)
 	{
 		var builder = new ComparisonBuilder();
@@ -65,7 +65,9 @@ public static class ObjectExtensions
 		this TActual actual,
 		TExpected expected
 	)
-	{
+		where TActual : notnull
+		where TExpected : notnull
+    {
 		return new CompareSyntax<TActual, TExpected>(actual, expected);
 	}
 }

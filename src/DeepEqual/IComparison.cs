@@ -6,7 +6,7 @@ public interface IComparison
 
 	(ComparisonResult result, IComparisonContext context) Compare(
 		IComparisonContext context,
-		object value1,
-		object value2
+		object? value1,
+		object? value2
 	);
 }

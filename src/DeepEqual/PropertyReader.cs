@@ -1,8 +1,3 @@
 namespace DeepEqual;
 
-public class PropertyReader
-{
-	public string Name { get; set; }
-	public Func<object, object> Read { get; set; }
-	public Type DeclaringType { get; set; }
-}
+public record PropertyReader(string Name, Func<object, object?> Read, Type DeclaringType);

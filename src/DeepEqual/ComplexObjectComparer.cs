@@ -7,8 +7,7 @@ public class ComplexObjectComparer
 	private readonly List<Func<PropertyReader, bool>> ignoredProperties;
 
 	private readonly List<ComparisonResult> results;
-	private List<PropertyPair> propertyMap;
-	private PropertyPair currentPair;
+	private List<PropertyPair> propertyMap = [];
 
 	public ComplexObjectComparer(
 		IComparison inner,
@@ -19,15 +18,20 @@ public class ComplexObjectComparer
 		this.inner = inner;
 		this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
 		this.ignoredProperties = ignoredProperties;
-		results = new List<ComparisonResult>();
+		results = [];
 	}
 
 	public (ComparisonResult, IComparisonContext) CompareObjects(
 		IComparisonContext context,
-		object source,
-		object destination
+		object? source,
+		object? destination
 	)
 	{
+		if (source == null || destination == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		PreparePropertyInfo(source, destination);
 
 		if (propertyMap.Count == 0) return (ComparisonResult.Pass, context);
@@ -36,19 +40,18 @@ public class ComplexObjectComparer
 
 		foreach (var pair in propertyMap)
 		{
-			currentPair = pair;
-			var sourceValue = new Lazy<object>(() => currentPair.Source.Read(source));
-			var destinationValue = new Lazy<object>(() => currentPair.Destination.Read(destination));
+			var sourceValue = new Lazy<object?>(() => pair.Source!.Read(source));
+			var destinationValue = new Lazy<object?>(() => pair.Destination!.Read(destination));
 
-			if (IsPropertyIgnored())
+			if (IsPropertyIgnored(pair))
 			{
 				continue;
 			}
 
-			if (SourceAndDestinationPresent())
+			if (SourceAndDestinationPresent(pair))
 			{
 				var (result, innerContext) = inner.Compare(
-					context.VisitingProperty(currentPair.Name),
+					context.VisitingProperty(pair.Name),
 					sourceValue.Value,
 					destinationValue.Value
 				);
@@ -58,15 +61,15 @@ public class ComplexObjectComparer
 			}
 			else if (!ignoreUnmatchedProperties)
 			{
-				if (currentPair.Source == null)
+				if (pair.Source == null)
 				{
-					currentContext = currentContext.AddDifference("(missing)", destinationValue.Value, currentPair.Name);
+					currentContext = currentContext.AddDifference("(missing)", destinationValue.Value, pair.Name);
 					results.Add(ComparisonResult.Fail);
 				}
 
-				if (currentPair.Destination == null)
+				if (pair.Destination == null)
 				{
-					currentContext = currentContext.AddDifference(sourceValue.Value, "(missing)", currentPair.Name);
+					currentContext = currentContext.AddDifference(sourceValue.Value, "(missing)", pair.Name);
 					results.Add(ComparisonResult.Fail);
 				}
 			}
@@ -76,9 +79,9 @@ public class ComplexObjectComparer
 		return (results.ToResult(), currentContext);
 	}
 
-	private bool SourceAndDestinationPresent()
+	private bool SourceAndDestinationPresent(PropertyPair pair)
 	{
-		return currentPair.Source != null && currentPair.Destination != null;
+		return pair.Source != null && pair.Destination != null;
 	}
 
 	private void PreparePropertyInfo(object source, object destination)
@@ -113,16 +116,16 @@ public class ComplexObjectComparer
 		}
 	}
 
-	private bool IsPropertyIgnored()
+	private bool IsPropertyIgnored(PropertyPair pair)
 	{
 		foreach (var ignoredProperty in ignoredProperties)
 		{
-			if (currentPair.Source != null && ignoredProperty(currentPair.Source))
+			if (pair.Source != null && ignoredProperty(pair.Source))
 			{
 				return true;
 			}
 
-			if (currentPair.Destination != null && ignoredProperty(currentPair.Destination))
+			if (pair.Destination != null && ignoredProperty(pair.Destination))
 			{
 				return true;
 			}
@@ -133,15 +136,15 @@ public class ComplexObjectComparer
 
 	private class PropertyPair
 	{
-		public PropertyPair(PropertyReader source, PropertyReader destination, string name)
+		public PropertyPair(PropertyReader? source, PropertyReader? destination, string name)
 		{
 			Source = source;
 			Destination = destination;
 			Name = name;
 		}
 
-		public PropertyReader Source { get; }
-		public PropertyReader Destination { get; }
+		public PropertyReader? Source { get; }
+		public PropertyReader? Destination { get; }
 		public string Name { get; }
 	}
 }

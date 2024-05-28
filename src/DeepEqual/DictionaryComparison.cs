@@ -16,15 +16,23 @@ public class DictionaryComparison : IComparison
 		return ReflectionCache.IsDictionaryType(type1) && ReflectionCache.IsDictionaryType(type2);
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
-		var dict1 = (IDictionary) value1;
-		var dict2 = CastToDictionaryEntries((IDictionary) value2).ToDictionary(e => e.Key, e => e.Value);
+		if (value1 is not IDictionary dict1)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+		if (value2 is not IDictionary dict2)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
 
 		if (dict1.Count != dict2.Count)
 		{
 			return (ComparisonResult.Fail, context.AddDifference(dict1.Count, dict2.Count, "Count"));
 		}
+
+		var dict2entries = CastToDictionaryEntries(dict2).ToDictionary(e => e.Key, e => (object?)e.Value);
 
 		if (dict1.Count == 0)
 		{
@@ -36,7 +44,7 @@ public class DictionaryComparison : IComparison
 
 		foreach (DictionaryEntry entry in dict1)
 		{
-			var key = FindKey(dict2, entry.Key);
+			var key = FindKey(dict2entries, entry.Key);
 
 			if (key == null)
 			{
@@ -52,8 +60,8 @@ public class DictionaryComparison : IComparison
 				continue;
 			}
 
-			var value = dict2[key];
-			dict2.Remove(key);
+			var value = dict2entries[key];
+			dict2entries.Remove(key);
 
 			var (result, innerContext) = ValueComparer.Compare(context.VisitingIndex(key), entry.Value, value);
 
@@ -61,10 +69,10 @@ public class DictionaryComparison : IComparison
 			newContext = newContext.MergeDifferencesFrom(innerContext);
 		}
 
-		if(dict2.Count == 0)
+		if(dict2entries.Count == 0)
 			return (results.ToResult(), newContext);
 
-		foreach (var entry in dict2)
+		foreach (var entry in dict2entries)
 		{
 			var difference = new MissingEntryDifference(
 				context.Breadcrumb,
@@ -85,7 +93,7 @@ public class DictionaryComparison : IComparison
 			yield return entry;
 	}
 
-	private object FindKey(IDictionary<object, object> dictionary, object key)
+	private object? FindKey(IDictionary<object, object?> dictionary, object key)
 	{
 		var tempContext = new ComparisonContext();
 

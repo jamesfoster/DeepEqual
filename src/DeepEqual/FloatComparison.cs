@@ -17,8 +17,13 @@ public class FloatComparison : IComparison
 			|| IsFloat(type2) && IsNumber(type1);
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
+		if (value1 == null || value2 == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		if (IsDoublePrecision(value1.GetType()) || IsDoublePrecision(value2.GetType()))
 			return CompareDoublePrecision(context, value1, value2);
 

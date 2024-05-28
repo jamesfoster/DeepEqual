@@ -2,12 +2,12 @@
 
 public static class ComparisonContextExtensions
 {
-	public static IComparisonContext AddDifference(this IComparisonContext context, object value1, object value2)
+	public static IComparisonContext AddDifference(this IComparisonContext context, object? value1, object? value2)
 	{
 		return AddDifference(context, value1, value2, null);
 	}
 
-	public static IComparisonContext AddDifference(this IComparisonContext context, object value1, object value2, string childProperty)
+	public static IComparisonContext AddDifference(this IComparisonContext context, object? value1, object? value2, string? childProperty)
 	{
 		return context.AddDifference(new BasicDifference(
 			context.Breadcrumb,

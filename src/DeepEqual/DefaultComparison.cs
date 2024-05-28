@@ -16,8 +16,13 @@ public class DefaultComparison : IComparison
 			&& !ReflectionCache.IsValueTypeWithReferenceFields(type2);
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
+		if (value1 == null || value2 == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		var type1 = value1.GetType();
 		var type2 = value2.GetType();
 
@@ -106,7 +111,7 @@ public class DefaultComparison : IComparison
 		if (conversionMethod == null)
 			return false;
 
-		value = conversionMethod.Invoke(null, new[] {value});
+		value = conversionMethod.Invoke(null, new[] {value})!;
 		return true;
 	}
 }

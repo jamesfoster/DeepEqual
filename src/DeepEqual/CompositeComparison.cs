@@ -26,7 +26,7 @@ public class CompositeComparison : IComparison
 		return true;
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
 		if (value1 == null && value2 == null)
 		{

@@ -9,7 +9,7 @@ public class ComparisonContext : IComparisonContext
 
 	public ComparisonContext(string breadcrumb) : this(null, breadcrumb) {}
 
-	public ComparisonContext(ImmutableList<Difference> differences, string breadcrumb)
+	public ComparisonContext(ImmutableList<Difference>? differences, string breadcrumb)
 	{
 		Differences = differences ?? ImmutableList<Difference>.Empty;
 		Breadcrumb = breadcrumb;

@@ -25,8 +25,13 @@ public class ListComparison : IComparison
 		}
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
+		if (value1 == null || value2 == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		var list1 = ((IEnumerable) value1).Cast<object>().ToArray();
 		var list2 = ((IEnumerable) value2).Cast<object>().ToArray();
 

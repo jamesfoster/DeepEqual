@@ -4,7 +4,7 @@ public abstract class DifferenceFormatterBase : IDifferenceFormatter
 {
 	public abstract string Format(Difference difference);
 
-	protected static string Prettify(object value)
+	protected static string Prettify(object? value)
 	{
 		if (value == null)
 			return "(null)";
@@ -12,6 +12,6 @@ public abstract class DifferenceFormatterBase : IDifferenceFormatter
 		if (value is string)
 			return $"\"{value}\"";
 
-		return value.ToString();
+		return value.ToString() ?? string.Empty;
 	}
 }

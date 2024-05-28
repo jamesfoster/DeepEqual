@@ -12,8 +12,13 @@ public class EnumComparison : IComparison
 			(type2.IsEnum || type2 == typeof(string) || type2 == typeof(int));
 	}
 
-	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object? value1, object? value2)
 	{
+		if (value1 == null || value2 == null)
+		{
+			return (ComparisonResult.Inconclusive, context);
+		}
+
 		var value1IsEnum = value1.GetType().IsEnum;
 		var value2IsEnum = value2.GetType().IsEnum;
 

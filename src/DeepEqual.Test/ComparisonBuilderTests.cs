@@ -99,11 +99,7 @@
 			);
 
 			"And it should return true for the Major property of the Version type".x(() =>
-				SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
-					{
-						DeclaringType = typeof(Version),
-						Name = "Major"
-					}).ShouldBe(true)
+				SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
 			);
 
 			"And it should return the builder".x(() =>
@@ -129,10 +125,7 @@
 			);
 
 			"And it should return true for the Major property of the Version type".x(() =>
-				SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader
-					{
-						Name = "Major"
-					}).ShouldBe(true)
+				SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
 			);
 
 			"And it should return the builder".x(() =>
