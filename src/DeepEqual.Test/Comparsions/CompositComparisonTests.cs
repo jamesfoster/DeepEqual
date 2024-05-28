@@ -22,7 +22,7 @@ public class CompositComparisonTests
 
 	protected CompositeComparison SUT { get; set; }
 	protected List<Mock<IComparison>> Inner { get; set; }
-	protected Mock<IComparisonContext> Context { get; set; }
+	protected IComparisonContext Context { get; set; }
 
 	protected ComparisonResult Result { get; set; }
 
@@ -33,6 +33,7 @@ public class CompositComparisonTests
 		{
 			Fixture = new Fixture();
 			Fixture.Customize(new AutoMoqCustomization());
+			Fixture.Register(() => BreadcrumbPair.Empty);
 		});
 
 		"And some inner comparers".x(() =>
@@ -101,13 +102,13 @@ public class CompositComparisonTests
 	[Scenario]
 	public void When_testing_equality_if_a_comparer_returns_Inconclusive(object value1, object value2)
 	{
-		"Given the first comparer can compare the values".x(() => 
+		"Given the first comparer can compare the values".x(() =>
 			Inner[0]
 				.Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
 				.Returns(true)
 		);
 
-		"... and returns Inconclusive".x(() => 
+		"... and returns Inconclusive".x(() =>
 			Inner[0]
 				.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
 				.Returns<IComparisonContext, object, object>((c, v1, v2) => (ComparisonResult.Inconclusive, c))
@@ -120,11 +121,11 @@ public class CompositComparisonTests
 		});
 
 		"And a Comparison context object".x(() =>
-			Context = Fixture.Create<Mock<IComparisonContext>>()
+			Context = new ComparisonContext()
 		);
 
 		"When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context.Object, value1, value2)
+			(Result, _) = SUT.Compare(Context, value1, value2)
 		);
 
 		"Then it should call CanCompare on all inner comparisons".x(() =>
@@ -132,7 +133,7 @@ public class CompositComparisonTests
 		);
 
 		"and it should call Compare on the first inner comparison".x(() =>
-			Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once())
+			Inner[0].Verify(c => c.Compare(Context, value1, value2), Times.Once())
 		);
 
 		"but it shouldn't call the other comparisons Compare".x(() =>
@@ -147,13 +148,13 @@ public class CompositComparisonTests
 	[Scenario]
 	public void When_testing_equality_if_a_comparer_returns_Pass(object value1, object value2)
 	{
-		"Given the first comparer can compare the values".x(() => 
+		"Given the first comparer can compare the values".x(() =>
 			Inner[0]
 				.Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
 				.Returns(true)
 		);
 
-		"... and returns Pass".x(() => 
+		"... and returns Pass".x(() =>
 			Inner[0]
 				.Setup(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()))
 				.Returns<IComparisonContext, object, object>((c, v1, v2) => (ComparisonResult.Pass, c))
@@ -166,11 +167,11 @@ public class CompositComparisonTests
 		});
 
 		"And a Comparison context object".x(() =>
-			Context = Fixture.Create<Mock<IComparisonContext>>()
+			Context = new ComparisonContext()
 		);
 
 		"When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context.Object, value1, value2)
+			(Result, _) = SUT.Compare(Context, value1, value2)
 		);
 
 		"Then it should call CanCompare on the first inner comparisons".x(() =>
@@ -178,7 +179,7 @@ public class CompositComparisonTests
 		);
 
 		"and it should call Compare on the first inner comparison".x(() =>
-			Inner[0].Verify(c => c.Compare(Context.Object, value1, value2), Times.Once())
+			Inner[0].Verify(c => c.Compare(Context, value1, value2), Times.Once())
 		);
 
 		"but it shouldn't call the other comparisons CanCompare".x(() =>
@@ -204,11 +205,11 @@ public class CompositComparisonTests
 		});
 
 		"And a Comparison context object".x(() =>
-			Context = Fixture.Create<Mock<IComparisonContext>>()
-		);
+			Context = new ComparisonContext()
+        );
 
 		"When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context.Object, value1, value2)
+			(Result, _) = SUT.Compare(Context, value1, value2)
 		);
 
 		"it should call the inner comparers CanCompare".x(() =>
@@ -216,7 +217,7 @@ public class CompositComparisonTests
 		);
 
 		"it should not call the inner comparers Compare".x(() =>
-			Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never())
+			Inner.VerifyAll(c => c.Compare(Context, value1, value2), Times.Never())
 		);
 
 		"and it should return false".x(() =>
@@ -231,11 +232,11 @@ public class CompositComparisonTests
 	public void When_testing_nulls(object value1, object value2, ComparisonResult expected)
 	{
 		"Given a Comparison context object".x(() =>
-			Context = Fixture.Create<Mock<IComparisonContext>>()
+			Context = new ComparisonContext()
 		);
 
 		"When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context.Object, value1, value2)
+			(Result, _) = SUT.Compare(Context, value1, value2)
 		);
 
 		"Then it should return {2}".x(() =>
@@ -247,7 +248,7 @@ public class CompositComparisonTests
 		);
 
 		"And it should not call the inner comparers Compare".x(() =>
-			Inner.VerifyAll(c => c.Compare(Context.Object, value1, value2), Times.Never())
+			Inner.VerifyAll(c => c.Compare(Context, value1, value2), Times.Never())
 		);
 	}
 }

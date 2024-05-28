@@ -104,7 +104,7 @@ public class SetComparisonTests
 		);
 
 		"And a Comparison context object".x(() =>
-			Context = new ComparisonContext("Set")
+			Context = new ComparisonContext(new BreadcrumbPair("Set"))
 		);
 
 		"When comparing enumerables".x(() =>
@@ -140,7 +140,7 @@ public class SetComparisonTests
 		else
 		{
 			var expectedDifference = new BasicDifference(
-				Breadcrumb: "Set",
+				Breadcrumb: new BreadcrumbPair("Set"),
 				Value1: list1.Length,
 				Value2: list2.Length,
 				ChildProperty: "Count"

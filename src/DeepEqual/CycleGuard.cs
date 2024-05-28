@@ -118,5 +118,9 @@ public class CycleGuard(IComparison inner) : IComparison
         return framesByThread.Value!;
     }
 
-    private readonly record struct ComparisonFrame(string Breadcrumb, object Value1, object Value2);
+    private readonly record struct ComparisonFrame(
+        BreadcrumbPair Breadcrumb,
+        object Value1,
+        object Value2
+    );
 }

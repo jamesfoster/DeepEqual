@@ -40,7 +40,7 @@ public class DictionaryComparisonTests
 		);
 
 		"And a ComparisonContext".x(() =>
-			Context = new ComparisonContext("Set")
+			Context = new ComparisonContext(new BreadcrumbPair("Set"))
 		);
 	}
 

@@ -5,13 +5,13 @@ namespace DeepEqual;
 [Serializable]
 public class ObjectGraphCircularReferenceException : Exception
 {
-    public string Breadcrumb { get; set; }
+    public BreadcrumbPair Breadcrumb { get; set; }
     public object Value1 { get; set; }
     public object Value2 { get; set; }
 
     public ObjectGraphCircularReferenceException(
         string message,
-        string breadcrumb,
+        BreadcrumbPair breadcrumb,
         object value1,
         object value2
     )

@@ -174,7 +174,7 @@ public class RegexComparison : IComparison
 	}
 }
 
-public record RegexDifference(string Breadcrumb, string Value, Regex Regex) : Difference(Breadcrumb);
+public record RegexDifference(BreadcrumbPair Breadcrumb, string Value, Regex Regex) : Difference(Breadcrumb);
 
 public class RegexDifferenceFormatter : IDifferenceFormatter
 {
@@ -182,6 +182,6 @@ public class RegexDifferenceFormatter : IDifferenceFormatter
 	{
 		var regexDiff = (RegexDifference) difference;
 
-		return $"Actual{regexDiff.Breadcrumb} doesn't match regex {regexDiff.Regex}\n{regexDiff.Value}";
+		return $"Actual{regexDiff.Breadcrumb.Left} doesn't match regex {regexDiff.Regex}\n{regexDiff.Value}";
 	}
 }

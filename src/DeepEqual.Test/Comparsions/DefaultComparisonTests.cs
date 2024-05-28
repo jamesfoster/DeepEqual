@@ -192,7 +192,7 @@ public class DefaultComparisonTests
 		);
 
 		"And a Comparison context object".x(() =>
-			Context = new ComparisonContext("Root")
+			Context = new ComparisonContext(new BreadcrumbPair("Root"))
 		);
 
 		"When calling Compare".x(() =>
@@ -206,7 +206,7 @@ public class DefaultComparisonTests
 		if (expectedResult == ComparisonResult.Fail)
 		{
 			var expectedDifference = new BasicDifference(
-				Breadcrumb: "Root",
+				Breadcrumb: new BreadcrumbPair("Root"),
 				Value1: value1,
 				Value2: value2,
 				ChildProperty: null

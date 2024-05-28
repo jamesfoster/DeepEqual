@@ -70,7 +70,7 @@ public class EnumComparisonTests
 
 		"And a Comparison context object".x(() =>
 		{
-			Context = new ComparisonContext("Property");
+			Context = new ComparisonContext(new BreadcrumbPair("Property"));
 		});
 
 		"When calling Compare({0}, {1})".x(() =>
@@ -93,7 +93,7 @@ public class EnumComparisonTests
 		else
 		{
 			var expectedDifference = new BasicDifference(
-				Breadcrumb: "Property",
+				Breadcrumb: new BreadcrumbPair("Property"),
 				Value1: value1,
 				Value2: value2,
 				ChildProperty: null

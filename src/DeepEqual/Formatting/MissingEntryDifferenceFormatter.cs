@@ -8,12 +8,13 @@ public class MissingEntryDifferenceFormatter : DifferenceFormatterBase
 
         var format =
             difference.Side == MissingSide.Expected
-                ? "Expected{0}[{1}] not found (Actual{0}[{1}] = {2})"
-                : "Actual{0}[{1}] not found (Expected{0}[{1}] = {2})";
+                ? "Expected{1}[{2}] not found (Actual{0}[{2}] = {3})"
+                : "Actual{0}[{2}] not found (Expected{1}[{2}] = {3})";
 
         return string.Format(
             format,
-            difference.Breadcrumb,
+            difference.Breadcrumb.Left,
+            difference.Breadcrumb.Right,
             Prettify(difference.Key),
             Prettify(difference.Value)
         );

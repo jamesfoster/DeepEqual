@@ -3,15 +3,15 @@
 public class ComparisonContext : IComparisonContext
 {
     public ImmutableList<Difference> Differences { get; }
-    public string Breadcrumb { get; }
+    public BreadcrumbPair Breadcrumb { get; }
 
     public ComparisonContext()
-        : this(string.Empty) { }
+        : this(BreadcrumbPair.Empty) { }
 
-    public ComparisonContext(string breadcrumb)
+    public ComparisonContext(BreadcrumbPair breadcrumb)
         : this(null, breadcrumb) { }
 
-    public ComparisonContext(ImmutableList<Difference>? differences, string breadcrumb)
+    public ComparisonContext(ImmutableList<Difference>? differences, BreadcrumbPair breadcrumb)
     {
         Differences = differences ?? ImmutableList<Difference>.Empty;
         Breadcrumb = breadcrumb;
@@ -24,7 +24,7 @@ public class ComparisonContext : IComparisonContext
         return new ComparisonContext(newDifferences, Breadcrumb);
     }
 
-    public IComparisonContext SetBreadcrumb(string breadcrumb)
+    public IComparisonContext SetBreadcrumb(BreadcrumbPair breadcrumb)
     {
         return new ComparisonContext(Differences, breadcrumb);
     }

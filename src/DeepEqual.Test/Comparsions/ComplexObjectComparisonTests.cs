@@ -58,7 +58,7 @@ public class ComplexObjectComparisonTests
 		);
 
 		"And a Comparison context object".x(() =>
-			Context = new ComparisonContext("Property")
+			Context = new ComparisonContext(new BreadcrumbPair("Property"))
 		);
 	}
 
@@ -112,7 +112,8 @@ public class ComplexObjectComparisonTests
 				var v2 = p2.GetValue(value2);
 
 				Inner.CompareCalls.ShouldContain(call =>
-					call.context.Breadcrumb == "Property." + p1.Name &&
+					call.context.Breadcrumb.Left == "Property." + p1.Name &&
+					call.context.Breadcrumb.Right == "Property." + p1.Name &&
 					call.value1.Equals(v1) &&
 					call.value2.Equals(v2)
 				);

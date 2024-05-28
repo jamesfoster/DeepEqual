@@ -42,11 +42,11 @@ public class ListComparisonTests
 			Fixture.Customize(new AutoMoqCustomization());
 		});
 
-		"When creating an ListComparison".x(() => 
+		"When creating an ListComparison".x(() =>
 			SUT = Fixture.Create<ListComparison>()
 		);
 
-		"Then it should implement IComparison".x(() => 
+		"Then it should implement IComparison".x(() =>
 			SUT.ShouldBeAssignableTo<IComparison>()
 		);
 	}
@@ -68,12 +68,12 @@ public class ListComparisonTests
 			Fixture.Inject<IComparison>(Inner);
 		});
 
-		"And a ListComparison".x(() => 
+		"And a ListComparison".x(() =>
 			SUT = Fixture.Create<ListComparison>()
 		);
 
-		"And a Comparison context object".x(() => 
-			Context = new ComparisonContext("List")
+		"And a Comparison context object".x(() =>
+			Context = new ComparisonContext(new BreadcrumbPair("List"))
 		);
 
 		"When comparing enumerables".x(() =>
@@ -83,7 +83,7 @@ public class ListComparisonTests
 			Context = context;
 		});
 
-		"Then it should return {2}".x(() => 
+		"Then it should return {2}".x(() =>
 			Result.ShouldBe(expected)
 		);
 
@@ -98,7 +98,8 @@ public class ListComparisonTests
 					var index = i;
 
 					Inner.CompareCalls.ShouldContain(call =>
-						call.context.Breadcrumb == $"List[{index}]" &&
+						call.context.Breadcrumb.Left == $"List[{index}]" &&
+						call.context.Breadcrumb.Right == $"List[{index}]" &&
 						call.value1.Equals(p.Item1) &&
 						call.value2.Equals(p.Item2)
 					);
@@ -109,13 +110,13 @@ public class ListComparisonTests
 		{
 			var expectedDifference = new
 				{
-					Breadcrumb = "List",
+					Breadcrumb = new BreadcrumbPair("List"),
 					ChildProperty = "Count",
 					Value1 = list1.Length,
 					Value2 = list2.Length
 				};
 
-			"And it should add a Difference".x(() => 
+			"And it should add a Difference".x(() =>
 				Context.Differences[0].ShouldDeepEqual(expectedDifference)
 			);
 		}
@@ -136,21 +137,21 @@ public class ListComparisonTests
 			Fixture.Inject<IComparison>(Inner);
 		});
 
-		"And an ListComparison".x(() => 
+		"And an ListComparison".x(() =>
 			SUT = Fixture.Create<ListComparison>()
 		);
 
-		"When calling CanCompare({0}, {1})".x(() => 
+		"When calling CanCompare({0}, {1})".x(() =>
 			CanCompareResult = SUT.CanCompare(type1, type2)
 		);
 
-		"It should return {2}".x(() => 
+		"It should return {2}".x(() =>
 			CanCompareResult.ShouldBe(expected)
 		);
 
 		if (expected)
 		{
-			"and it should call CanCompare on the inner comparer".x(() => 
+			"and it should call CanCompare on the inner comparer".x(() =>
 				Inner.CanCompareCalls.ShouldContain(call => call.type1 == elementType1 && call.type2 == elementType2)
 			);
 		}

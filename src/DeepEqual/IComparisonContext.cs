@@ -3,8 +3,8 @@
 public interface IComparisonContext
 {
     ImmutableList<Difference> Differences { get; }
-    string Breadcrumb { get; }
+    BreadcrumbPair Breadcrumb { get; }
 
     IComparisonContext AddDifference(Difference difference);
-    IComparisonContext SetBreadcrumb(string breadcrumb);
+    IComparisonContext SetBreadcrumb(BreadcrumbPair breadcrumb);
 }

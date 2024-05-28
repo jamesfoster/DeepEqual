@@ -14,10 +14,10 @@ public class BasicDifferenceFormatter : DifferenceFormatterBase
             difference as BasicDifference
             ?? throw new ArgumentException("Invalid difference type", nameof(difference));
 
-        var format = "Actual{0}.{1} != Expected{0}.{1} ({2} != {3})";
+        var format = "Actual{0}.{2} != Expected{1}.{2} ({3} != {4})";
 
         if (basicDifference.ChildProperty == null)
-            format = "Actual{0} != Expected{0} ({2} != {3})";
+            format = "Actual{0} != Expected{1} ({3} != {4})";
 
         var value1 = basicDifference.Value1;
         var value2 = basicDifference.Value2;
@@ -27,7 +27,8 @@ public class BasicDifferenceFormatter : DifferenceFormatterBase
 
         return string.Format(
             format,
-            basicDifference.Breadcrumb,
+            basicDifference.Breadcrumb.Left,
+            basicDifference.Breadcrumb.Right,
             basicDifference.ChildProperty,
             Prettify(value1),
             Prettify(value2)

@@ -178,7 +178,7 @@ Comparison Failed: The following 1 differences were found.
 	{
 		var context = new ComparisonContext()
 			.AddDifference(new MissingEntryDifference(
-				Breadcrumb: "",
+				Breadcrumb: BreadcrumbPair.Empty,
 				Side: MissingSide.Expected,
 				Key: "Index",
 				Value: "Value"
@@ -197,7 +197,7 @@ Comparison Failed: The following 1 differences were found.
 	{
 		var context = new ComparisonContext()
 			.AddDifference(new MissingEntryDifference(
-				Breadcrumb: "",
+				Breadcrumb: BreadcrumbPair.Empty,
 				Side: MissingSide.Actual,
 				Key: "Index",
 				Value: "Value"
@@ -216,7 +216,7 @@ Comparison Failed: The following 1 differences were found.
 	{
 		var context = new ComparisonContext()
 			.AddDifference(new SetDifference(
-				breadcrumb: ".Set",
+				breadcrumb: new BreadcrumbPair(".Set"),
 				expected: new List<object> { 1, 2, 3 },
 				extra: new List<object>()
 			));
@@ -238,7 +238,7 @@ Comparison Failed: The following 1 differences were found.
 	{
 		var context = new ComparisonContext()
 			.AddDifference(new SetDifference(
-				breadcrumb: ".Set",
+				breadcrumb: new BreadcrumbPair(".Set"),
 				expected: new List<object>(),
 				extra: new List<object> {1, 2, 3}
 			));
@@ -259,7 +259,7 @@ Comparison Failed: The following 1 differences were found.
 	public void Custom_difference_type()
 	{
 		var context = new ComparisonContext()
-			.AddDifference(new CustomDifference(".Custom", 123));
+			.AddDifference(new CustomDifference(new BreadcrumbPair(".Custom"), 123));
 
 		AssertExceptionMessage(
 			context,
@@ -273,7 +273,7 @@ Comparison Failed: The following 1 differences were found.
 	public void Custom_difference_type_formatter()
 	{
 		var context = new ComparisonContext()
-			.AddDifference(new CustomDifference(".Custom", 123));
+			.AddDifference(new CustomDifference(new BreadcrumbPair(".Custom"), 123));
 
 		var customFormatters = new Dictionary<Type, IDifferenceFormatter>
 		{
@@ -289,7 +289,7 @@ Comparison Failed: The following 1 differences were found.
 """);
 	}
 
-	public record CustomDifference(string Breadcrumb, int Foo) : Difference(Breadcrumb);
+	public record CustomDifference(BreadcrumbPair Breadcrumb, int Foo) : Difference(Breadcrumb);
 
 	public class CustomDifferenceFormatter : IDifferenceFormatter
 	{
@@ -297,7 +297,7 @@ Comparison Failed: The following 1 differences were found.
 		{
 			var customDifference = (CustomDifference) difference;
 
-			return $"{difference.Breadcrumb} >>>{customDifference.Foo}<<<";
+			return $"{difference.Breadcrumb.Left} >>>{customDifference.Foo}<<<";
 		}
 	}
 

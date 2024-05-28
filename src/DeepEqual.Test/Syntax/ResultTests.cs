@@ -48,8 +48,9 @@ public class ResultTests
 			.ShouldHaveSingleItem()
 			.ShouldBeAssignableTo<BasicDifference>();
 
-		difference.Breadcrumb.ShouldBe(".A");
-		difference.Value1.ShouldBe(1);
+		difference.Breadcrumb.Left.ShouldBe(".A");
+		difference.Breadcrumb.Right.ShouldBe(".A");
+        difference.Value1.ShouldBe(1);
 		difference.Value2.ShouldBe(2);
 	}
 }

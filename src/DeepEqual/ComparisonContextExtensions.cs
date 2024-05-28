@@ -28,12 +28,12 @@ public static class ComparisonContextExtensions
         string propertyName
     )
     {
-        return context.SetBreadcrumb($"{context.Breadcrumb}.{propertyName}");
+        return context.SetBreadcrumb(context.Breadcrumb.Dot(propertyName));
     }
 
     public static IComparisonContext VisitingIndex(this IComparisonContext context, object index)
     {
-        return context.SetBreadcrumb($"{context.Breadcrumb}[{index}]");
+        return context.SetBreadcrumb(context.Breadcrumb.Index($"{index}"));
     }
 
     public static IComparisonContext MergeDifferencesFrom(
