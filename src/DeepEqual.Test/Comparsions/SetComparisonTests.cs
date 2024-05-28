@@ -143,7 +143,8 @@ public class SetComparisonTests
 				Breadcrumb: new BreadcrumbPair("Set"),
 				Value1: list1.Length,
 				Value2: list2.Length,
-				ChildProperty: "Count"
+				LeftChildProperty: "Count",
+				RightChildProperty: "Count"
 			);
 
 			"And it should add a Difference".x(() =>

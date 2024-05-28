@@ -1,4 +1,6 @@
-﻿namespace DeepEqual;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace DeepEqual;
 
 public class ComplexObjectComparison : IComparison
 {
@@ -7,11 +9,13 @@ public class ComplexObjectComparison : IComparison
     public bool IgnoreUnmatchedProperties { get; set; }
 
     public List<Func<PropertyReader, bool>> IgnoredProperties { get; set; }
+    public List<Func<Type, Type, string, string?>> MappedProperties { get; set; }
 
     public ComplexObjectComparison(IComparison inner)
     {
         Inner = inner;
-        IgnoredProperties = new List<Func<PropertyReader, bool>>();
+        IgnoredProperties = [];
+        MappedProperties = [];
     }
 
     public bool CanCompare(Type type1, Type type2)
@@ -30,13 +34,42 @@ public class ComplexObjectComparison : IComparison
         var comparer = new ComplexObjectComparer(
             Inner,
             IgnoreUnmatchedProperties,
-            IgnoredProperties
+            IgnoredProperties,
+            MappedProperties
         );
 
         return comparer.CompareObjects(context, value1, value2);
     }
 
-    public void IgnoreProperty<T>(Expression<Func<T, object>> property)
+    public void MapProperty<A, B>(
+        Expression<Func<A, object?>> left,
+        Expression<Func<B, object?>> right
+    )
+    {
+        if (GetMemberName(left, out var leftName) && GetMemberName(right, out var rightName))
+        {
+            MappedProperties.Add(
+                (leftType, rightType, propName) =>
+                {
+                    if (leftType == typeof(A) && rightType == typeof(B) && propName == leftName)
+                    {
+                        return rightName;
+                    }
+                    return null;
+                }
+            );
+        }
+    }
+
+    public void IgnoreProperty<T>(Expression<Func<T, object?>> property)
+    {
+        if (GetMemberName(property, out var name))
+        {
+            IgnoreProperty(typeof(T), name);
+        }
+    }
+
+    private static bool GetMemberName<T>(Expression<Func<T, object?>> property, out string? name)
     {
         var exp = property.Body;
 
@@ -47,14 +80,19 @@ public class ComplexObjectComparison : IComparison
 
         if (exp is MemberExpression member)
         {
-            var propertyName = member.Member.Name;
-
-            IgnoreProperty(typeof(T), propertyName);
+            name = member.Member.Name;
+            return true;
         }
+
+        name = null;
+        return false;
     }
 
-    private void IgnoreProperty(Type type, string propertyName)
+    private void IgnoreProperty(Type type, string? propertyName)
     {
+        if (propertyName is null)
+            return;
+
         IgnoreProperty(property =>
             type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName
         );

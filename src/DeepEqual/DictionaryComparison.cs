@@ -35,7 +35,7 @@ public class DictionaryComparison : IComparison
         {
             return (
                 ComparisonResult.Fail,
-                context.AddDifference(dict1.Count, dict2.Count, "Count")
+                context.AddDifference(dict1.Count, dict2.Count, "Count", "Count")
             );
         }
 

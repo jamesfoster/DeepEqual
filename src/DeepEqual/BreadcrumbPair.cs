@@ -12,8 +12,24 @@ public record BreadcrumbPair(string Left, string Right)
         return new BreadcrumbPair($"{Left}.{property}", $"{Right}.{property}");
     }
 
+    public BreadcrumbPair Dot(string? left, string? right)
+    {
+        return new BreadcrumbPair(
+            left == null ? Left : $"{Left}.{left}",
+            right == null ? Right : $"{Right}.{right}"
+        );
+    }
+
     public BreadcrumbPair Index(string index)
     {
         return new BreadcrumbPair($"{Left}[{index}]", $"{Right}[{index}]");
+    }
+
+    public BreadcrumbPair Index(string? left, string? right)
+    {
+        return new BreadcrumbPair(
+            left == null ? Left : $"{Left}[{left}]",
+            right == null ? Right : $"{Right}[{right}]"
+        );
     }
 }

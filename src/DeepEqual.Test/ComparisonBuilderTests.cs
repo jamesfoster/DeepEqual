@@ -47,15 +47,11 @@ public class ComparisonBuilderTests
 		);
 
 		"Then there should be a custom comparison".x(() =>
-			SUT.CustomComparisons.Count.ShouldBe(1)
+			result.CustomComparisons.Count.ShouldBe(1)
 		);
 
 		"And it should be the correct comparison".x(() =>
-			SUT.CustomComparisons[0].ShouldBeSameAs(custom)
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
+			result.CustomComparisons[0].ShouldBeSameAs(custom)
 		);
 	}
 
@@ -73,11 +69,7 @@ public class ComparisonBuilderTests
 		);
 
 		"Then UnmatchedPropertiesIgnored should be true".x(() =>
-			SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true)
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
+			result.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true)
 		);
 	}
 
@@ -95,15 +87,11 @@ public class ComparisonBuilderTests
 		);
 
 		"Then it should add an IgnoredProperty".x(() =>
-			SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+			result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
 		);
 
 		"And it should return true for the Major property of the Version type".x(() =>
-			SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
+			result.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
 		);
 	}
 
@@ -121,15 +109,11 @@ public class ComparisonBuilderTests
 		);
 
 		"Then it should add an IgnoredProperty".x(() =>
-			SUT.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+			result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
 		);
 
 		"And it should return true for the Major property of the Version type".x(() =>
-			SUT.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
+			result.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
 		);
 	}
 
@@ -147,11 +131,7 @@ public class ComparisonBuilderTests
 		);
 
 		"Then SkippedTypes should contain Version".x(() =>
-			SUT.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version))
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
+			result.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version))
 		);
 	}
 
@@ -170,13 +150,9 @@ public class ComparisonBuilderTests
 
 		"Then the tolerance should be set".x(() =>
 		{
-			SUT.DoubleTolerance.ShouldBe(0.001d);
-			SUT.SingleTolerance.ShouldBe(0.2f);
+			result.DoubleTolerance.ShouldBe(0.001d);
+			result.SingleTolerance.ShouldBe(0.2f);
 		});
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
-		);
 	}
 
 	[Scenario]
@@ -194,7 +170,7 @@ public class ComparisonBuilderTests
 	}
 
 	[Scenario]
-	public void Expoising_internals_of_a_given_type()
+	public void Exposing_internals_of_a_given_type()
 	{
 		var result = default (ComparisonBuilder);
 		var properties = default (PropertyReader[]);
@@ -212,10 +188,6 @@ public class ComparisonBuilderTests
 		"Then ReflectionCache should contain the private properties of Version".x(() =>
 			properties.ShouldContain(x => x.Name == "_Major")
 		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
-		);
 	}
 
 	[Scenario]
@@ -229,7 +201,7 @@ public class ComparisonBuilderTests
 			SUT = new ComparisonBuilder()
 		);
 
-		"When exposing the internals of Version".x(() =>
+		"When exposing the internals of Version and Uri".x(() =>
 		{
 			result = SUT.ExposeInternalsOf(typeof(Version), typeof(Uri));
 			versionProperties = ReflectionCache.GetProperties(new Version(1, 2, 3, 4));
@@ -242,10 +214,6 @@ public class ComparisonBuilderTests
 
 		"And ReflectionCache should contain the private properties of Uri".x(() =>
 			uriProperties.ShouldContain(x => x.Name == "_syntax")
-		);
-
-		"And it should return the builder".x(() =>
-			result.ShouldBeSameAs(SUT)
 		);
 	}
 

@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using AutoFixture;
+using AutoFixture.AutoMoq;
 
-using DeepEqual;
 using DeepEqual.Syntax;
 using DeepEqual.Test.Helper;
 
 using Moq;
 
-using AutoFixture;
-using AutoFixture.AutoMoq;
+using Shouldly;
+
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 using Xbehave;
 
-using Shouldly;
 using Xunit;
 
 namespace DeepEqual.Test.Comparsions;
@@ -111,7 +111,8 @@ public class ListComparisonTests
 			var expectedDifference = new
 				{
 					Breadcrumb = new BreadcrumbPair("List"),
-					ChildProperty = "Count",
+					LeftChildProperty = "Count",
+					RightChildProperty = "Count",
 					Value1 = list1.Length,
 					Value2 = list2.Length
 				};

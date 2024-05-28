@@ -43,7 +43,10 @@ public class ListComparison : IComparison
 
         if (length != list2.Length)
         {
-            return (ComparisonResult.Fail, context.AddDifference(length, list2.Length, "Count"));
+            return (
+                ComparisonResult.Fail,
+                context.AddDifference(length, list2.Length, "Count", "Count")
+            );
         }
 
         if (length == 0)

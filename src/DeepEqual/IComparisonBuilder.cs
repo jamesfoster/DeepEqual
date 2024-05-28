@@ -9,13 +9,17 @@ public interface IComparisonBuilder<out TBuilder>
     IComparison Create();
     IDifferenceFormatterFactory GetFormatterFactory();
 
-    TBuilder IgnoreUnmatchedProperties();
     TBuilder WithCustomComparison(IComparison comparison);
     TBuilder WithCustomComparison(Func<IComparison, IComparison> comparison);
     TBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
         where TDifference : Difference;
-    TBuilder IgnoreProperty<T>(Expression<Func<T, object>> property);
+    TBuilder MapProperty<A, B>(
+        Expression<Func<A, object?>> left,
+        Expression<Func<B, object?>> right
+    );
+    TBuilder IgnoreProperty<T>(Expression<Func<T, object?>> property);
     TBuilder IgnoreProperty(Func<PropertyReader, bool> func);
+    TBuilder IgnoreUnmatchedProperties();
     TBuilder SkipDefault<T>();
     TBuilder ExposeInternalsOf<T>();
     TBuilder ExposeInternalsOf(params Type[] types);

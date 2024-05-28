@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using DeepEqual;
-using DeepEqual.Test.Helper;
-
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.AutoMoq;
+
+using DeepEqual.Test.Helper;
 
 using Moq;
 
 using Shouldly;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Xbehave;
 

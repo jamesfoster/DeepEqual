@@ -40,7 +40,7 @@ public class ObjectsWithCyclicalReferences
 
 
 	[Fact]
-	public void Should_consider_public_fields_when_comparing_complex_objects()
+	public void Can_change_behaviour_to_ignore_detected_cycles()
 	{
 		var builder = actual
 			.WithDeepEqual(expected)

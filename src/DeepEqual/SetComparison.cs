@@ -47,7 +47,7 @@ public class SetComparison : IComparison
         {
             return (
                 ComparisonResult.Fail,
-                context.AddDifference(set1.Length, set2.Length, "Count")
+                context.AddDifference(set1.Length, set2.Length, "Count", "Count")
             );
         }
 

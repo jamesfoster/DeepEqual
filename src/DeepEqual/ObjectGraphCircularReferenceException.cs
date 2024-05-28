@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace DeepEqual;
+﻿namespace DeepEqual;
 
 [Serializable]
 public class ObjectGraphCircularReferenceException : Exception

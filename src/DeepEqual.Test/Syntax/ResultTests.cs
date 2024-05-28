@@ -50,7 +50,7 @@ public class ResultTests
 
 		difference.Breadcrumb.Left.ShouldBe(".A");
 		difference.Breadcrumb.Right.ShouldBe(".A");
-        difference.Value1.ShouldBe(1);
+		difference.Value1.ShouldBe(1);
 		difference.Value2.ShouldBe(2);
 	}
 }

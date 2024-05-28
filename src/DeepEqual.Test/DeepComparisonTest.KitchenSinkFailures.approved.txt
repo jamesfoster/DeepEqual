@@ -1,4 +1,4 @@
-﻿Comparison Failed: The following 10 differences were found.
+﻿Comparison Failed: The following 11 differences were found.
 	Actual.A != Expected.A (1 != 2)
 	Actual.B != Expected.B (Absolute != "Not Quite Absolute")
 	Actual.C[0] != Expected.C[0] (1 != 3)
@@ -14,3 +14,4 @@
 			5
 	Actual.Dictionary[123] != Expected.Dictionary[123] (234 != 2345)
 	Actual.Dictionary[34] not found (Expected.Dictionary[34] = 456)
+	Actual.X.Size != Expected.X.Width (123 != 234)

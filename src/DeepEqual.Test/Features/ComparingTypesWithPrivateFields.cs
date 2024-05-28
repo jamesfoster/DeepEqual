@@ -13,15 +13,13 @@ public class ComparingTypesWithPrivateFields
 		var expected = new ClassWithPrivates(123)
 		{
 			Id = 234,
-			Name = "Joe",
-			Internal = "???"
+			Name = "Joe"
 		};
 
 		var actual = new ClassWithPrivates(321)
 		{
 			Id = 234,
-			Name = "Joe",
-			Internal = "!!!"
+			Name = "Joe"
 		};
 
 		var comparison = new ComparisonBuilder()
@@ -37,15 +35,13 @@ public class ComparingTypesWithPrivateFields
 		var expected = new ClassWithPrivates(123)
 		{
 			Id = 234,
-			Name = "Joe",
-			Internal = "???"
+			Name = "Joe"
 		};
 
 		var actual = new ClassWithPrivates(123)
 		{
 			Id = 234,
-			Name = "Joe",
-			Internal = "???"
+			Name = "Joe"
 		};
 
 		var comparison = new ComparisonBuilder()
@@ -66,7 +62,6 @@ public class ComparingTypesWithPrivateFields
 		}
 
 		public string Name { get; set; }
-		public string Internal { get; set; }
 
 	}
 }

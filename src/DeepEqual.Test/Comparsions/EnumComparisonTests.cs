@@ -96,7 +96,8 @@ public class EnumComparisonTests
 				Breadcrumb: new BreadcrumbPair("Property"),
 				Value1: value1,
 				Value2: value2,
-				ChildProperty: null
+				LeftChildProperty: null,
+				RightChildProperty: null
 			);
 
 			"And it should add a differences".x(() =>

@@ -85,7 +85,17 @@ public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
         return this;
     }
 
-    public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object>> property)
+    public ComparisonBuilder MapProperty<A, B>(
+        Expression<Func<A, object?>> left,
+        Expression<Func<B, object?>> right
+    )
+    {
+        ComplexObjectComparison.MapProperty(left, right);
+
+        return this;
+    }
+
+    public ComparisonBuilder IgnoreProperty<T>(Expression<Func<T, object?>> property)
     {
         ComplexObjectComparison.IgnoreProperty(property);
 

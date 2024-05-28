@@ -21,8 +21,18 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
+    public CompareSyntax<TActual, TExpected> MapProperty<A, B>(
+        Expression<Func<A, object?>> left,
+        Expression<Func<B, object?>> right
+    )
+    {
+        Builder.MapProperty(left, right);
+        return this;
+    }
+
+    [Pure]
     public CompareSyntax<TActual, TExpected> IgnoreSourceProperty(
-        Expression<Func<TActual, object>> property
+        Expression<Func<TActual, object?>> property
     )
     {
         Builder.IgnoreProperty(property);
@@ -31,7 +41,7 @@ public class CompareSyntax<TActual, TExpected>
 
     [Pure]
     public CompareSyntax<TActual, TExpected> IgnoreDestinationProperty(
-        Expression<Func<TExpected, object>> property
+        Expression<Func<TExpected, object?>> property
     )
     {
         Builder.IgnoreProperty(property);
@@ -39,7 +49,9 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreProperty<T>(Expression<Func<T, object>> property)
+    public CompareSyntax<TActual, TExpected> IgnoreProperty<T>(
+        Expression<Func<T, object?>> property
+    )
     {
         Builder.IgnoreProperty(property);
         return this;

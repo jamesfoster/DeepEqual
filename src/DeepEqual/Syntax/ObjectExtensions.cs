@@ -14,7 +14,7 @@ public static class ObjectExtensions
     [Pure]
     public static bool IsDeepEqual(this object actual, object expected, IComparison? comparison)
     {
-        comparison ??= new ComparisonBuilder().Create();
+        comparison ??= ComparisonBuilder.Get().Create();
 
         var context = new ComparisonContext();
 
@@ -25,12 +25,12 @@ public static class ObjectExtensions
 
     public static void ShouldDeepEqual(this object actual, object expected)
     {
-        ShouldDeepEqual(actual, expected, null, null);
+        ShouldDeepEqual(actual, expected, comparison: null, formatterFactory: null);
     }
 
     public static void ShouldDeepEqual(this object actual, object expected, IComparison? comparison)
     {
-        ShouldDeepEqual(actual, expected, comparison, null);
+        ShouldDeepEqual(actual, expected, comparison, formatterFactory: null);
     }
 
     public static void ShouldDeepEqual(
@@ -40,7 +40,7 @@ public static class ObjectExtensions
         IDifferenceFormatterFactory? formatterFactory
     )
     {
-        var builder = new ComparisonBuilder();
+        var builder = ComparisonBuilder.Get();
 
         comparison ??= builder.Create();
         formatterFactory ??= builder.GetFormatterFactory();

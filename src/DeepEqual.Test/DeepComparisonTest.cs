@@ -37,7 +37,8 @@ public class DeepComparisonTest
 						{2, 3},
 						{123, 234},
 						{345, 456}
-					}
+					},
+				X = new Left(123)
 			};
 
 		var object2 = new
@@ -59,11 +60,13 @@ public class DeepComparisonTest
 						{123, 234},
 						{345, 456},
 						{2, 3}
-					}
+					},
+				X = new Right(123)
 			};
 
 		var comparison = new ComparisonBuilder()
 			.IgnoreProperty<TestType>(x => x.Y)
+			.MapProperty<Left, Right>(x => x.Size, x => x.Width)
 			.Create();
 
 		DeepAssert.AreEqual(object1, object2, comparison);
@@ -93,7 +96,8 @@ public class DeepComparisonTest
 				{2, 3},
 				{123, 234},
 				{345, 456}
-			}
+			},
+			X = new Left(123)
 		};
 
 		var object2 = new
@@ -116,11 +120,13 @@ public class DeepComparisonTest
 				{123, 2345},
 				{34, 456},
 				{2, 3}
-			}
+			},
+			X = new Right(234)
 		};
 
 		var syntax = object1
 			.WithDeepEqual(object2)
+			.MapProperty<Left, Right>(x => x.Size, x => x.Width)
 			.WithCustomComparison(new RegexComparison())
 			.WithCustomFormatter<RegexDifference>(new RegexDifferenceFormatter());
 
@@ -154,6 +160,9 @@ public class TestType
 	public int Y { get; set; }
 	public int Z { get; set; }
 }
+
+public record Left(int Size);
+public record Right(long Width);
 
 public class RegexComparison : IComparison
 {

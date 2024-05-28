@@ -29,7 +29,12 @@ public class JsonElementComparison : IComparison
         {
             return (
                 ComparisonResult.Fail,
-                context.AddDifference(element1.Value.ValueKind, element2.Value.ValueKind, "Kind")
+                context.AddDifference(
+                    element1.Value.ValueKind,
+                    element2.Value.ValueKind,
+                    "Kind",
+                    "Kind"
+                )
             );
         }
 
@@ -124,7 +129,10 @@ public class JsonElementComparison : IComparison
 
         if (length != list2.Length)
         {
-            return (ComparisonResult.Fail, context.AddDifference(length, list2.Length, "Count"));
+            return (
+                ComparisonResult.Fail,
+                context.AddDifference(length, list2.Length, "Count", "Count")
+            );
         }
 
         if (length == 0)

@@ -5,19 +5,21 @@ public class ComplexObjectComparer
     private readonly IComparison inner;
     private readonly bool ignoreUnmatchedProperties;
     private readonly List<Func<PropertyReader, bool>> ignoredProperties;
+    private readonly List<Func<Type, Type, string, string?>> mappedProperties;
 
     private readonly List<ComparisonResult> results;
-    private List<PropertyPair> propertyMap = [];
 
     public ComplexObjectComparer(
         IComparison inner,
         bool ignoreUnmatchedProperties,
-        List<Func<PropertyReader, bool>> ignoredProperties
+        List<Func<PropertyReader, bool>> ignoredProperties,
+        List<Func<Type, Type, string, string?>> mappedProperties
     )
     {
         this.inner = inner;
         this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
         this.ignoredProperties = ignoredProperties;
+        this.mappedProperties = mappedProperties;
         results = [];
     }
 
@@ -32,7 +34,7 @@ public class ComplexObjectComparer
             return (ComparisonResult.Inconclusive, context);
         }
 
-        PreparePropertyInfo(source, destination);
+        var propertyMap = PreparePropertyInfo(source, destination);
 
         if (propertyMap.Count == 0)
             return (ComparisonResult.Pass, context);
@@ -52,7 +54,7 @@ public class ComplexObjectComparer
             if (SourceAndDestinationPresent(pair))
             {
                 var (result, innerContext) = inner.Compare(
-                    context.VisitingProperty(pair.Name),
+                    context.VisitingProperty(pair.SourceName, pair.DestinationName),
                     sourceValue.Value,
                     destinationValue.Value
                 );
@@ -67,7 +69,8 @@ public class ComplexObjectComparer
                     currentContext = currentContext.AddDifference(
                         "(missing)",
                         destinationValue.Value,
-                        pair.Name
+                        pair.SourceName,
+                        pair.DestinationName
                     );
                     results.Add(ComparisonResult.Fail);
                 }
@@ -77,7 +80,8 @@ public class ComplexObjectComparer
                     currentContext = currentContext.AddDifference(
                         sourceValue.Value,
                         "(missing)",
-                        pair.Name
+                        pair.SourceName,
+                        pair.DestinationName
                     );
                     results.Add(ComparisonResult.Fail);
                 }
@@ -92,35 +96,59 @@ public class ComplexObjectComparer
         return pair.Source != null && pair.Destination != null;
     }
 
-    private void PreparePropertyInfo(object source, object destination)
+    private List<PropertyPair> PreparePropertyInfo(object source, object destination)
     {
+        var sourceType = source.GetType();
+        var destinationType = destination.GetType();
+
         var sourceProperties = ReflectionCache.GetProperties(source);
 
         var destinationProperties = ReflectionCache
             .GetProperties(destination)
             .ToDictionary(x => x.Name);
 
-        propertyMap = new List<PropertyPair>();
+        var propertyMap = new List<PropertyPair>();
 
         foreach (var property in sourceProperties)
         {
-            var name = property.Name;
+            var sourceName = property.Name;
+            var destinationName = GetMappedPropertyName(sourceType, destinationType, sourceName);
 
-            if (destinationProperties.ContainsKey(name))
+            if (destinationProperties.ContainsKey(destinationName))
             {
-                propertyMap.Add(new PropertyPair(property, destinationProperties[name], name));
-                destinationProperties.Remove(name);
+                propertyMap.Add(
+                    new PropertyPair(
+                        property,
+                        destinationProperties[destinationName],
+                        sourceName,
+                        destinationName
+                    )
+                );
+                destinationProperties.Remove(destinationName);
             }
             else
             {
-                propertyMap.Add(new PropertyPair(property, null, name));
+                propertyMap.Add(new PropertyPair(property, null, sourceName, destinationName));
             }
         }
 
         foreach (var property in destinationProperties.Values)
         {
-            propertyMap.Add(new PropertyPair(null, property, property.Name));
+            propertyMap.Add(new PropertyPair(null, property, property.Name, property.Name));
         }
+
+        return propertyMap;
+    }
+
+    private string GetMappedPropertyName(Type sourceType, Type destinationType, string sourceName)
+    {
+        foreach (var map in mappedProperties)
+        {
+            var result = map(sourceType, destinationType, sourceName);
+            if (result != null)
+                return result;
+        }
+        return sourceName;
     }
 
     private bool IsPropertyIgnored(PropertyPair pair)
@@ -143,15 +171,22 @@ public class ComplexObjectComparer
 
     private class PropertyPair
     {
-        public PropertyPair(PropertyReader? source, PropertyReader? destination, string name)
+        public PropertyPair(
+            PropertyReader? source,
+            PropertyReader? destination,
+            string sourceName,
+            string destinationName
+        )
         {
             Source = source;
             Destination = destination;
-            Name = name;
+            SourceName = sourceName;
+            DestinationName = destinationName;
         }
 
         public PropertyReader? Source { get; }
         public PropertyReader? Destination { get; }
-        public string Name { get; }
+        public string SourceName { get; }
+        public string DestinationName { get; }
     }
 }
