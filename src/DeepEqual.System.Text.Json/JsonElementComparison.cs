@@ -10,8 +10,7 @@ public class JsonElementComparison : IComparison
     public bool CanCompare(Type type1, Type type2)
     {
         return type1 == jsonElementType && allowableTypes.Contains(type2)
-            || type2 == jsonElementType && allowableTypes.Contains(type1)
-            ;
+            || type2 == jsonElementType && allowableTypes.Contains(type1);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
@@ -23,7 +22,8 @@ public class JsonElementComparison : IComparison
         var element1 = AsJsonElement(value1);
         var element2 = AsJsonElement(value2);
 
-        if (element1 is null || element2 is null) return (ComparisonResult.Inconclusive, context);
+        if (element1 is null || element2 is null)
+            return (ComparisonResult.Inconclusive, context);
 
         if (element1.Value.ValueKind != element2.Value.ValueKind)
         {
@@ -139,8 +139,15 @@ public class JsonElementComparison : IComparison
                 (result: ComparisonResult.Inconclusive, context: context),
                 (acc, x) =>
                 {
-                    var (newResult, newContext) = Compare(context.VisitingIndex(x.index), x.value1, x.value2);
-                    return (acc.result.Plus(newResult), acc.context.MergeDifferencesFrom(newContext));
+                    var (newResult, newContext) = Compare(
+                        context.VisitingIndex(x.index),
+                        x.value1,
+                        x.value2
+                    );
+                    return (
+                        acc.result.Plus(newResult),
+                        acc.context.MergeDifferencesFrom(newContext)
+                    );
                 }
             );
     }
@@ -154,7 +161,8 @@ public class JsonElementComparison : IComparison
         var str1 = value1.GetString();
         var str2 = value2.GetString();
 
-        if (str1 != str2) return (ComparisonResult.Fail, context.AddDifference(str1, str2));
+        if (str1 != str2)
+            return (ComparisonResult.Fail, context.AddDifference(str1, str2));
 
         return (ComparisonResult.Pass, context);
     }
@@ -168,14 +176,16 @@ public class JsonElementComparison : IComparison
         var num1 = value1.GetDouble();
         var num2 = value2.GetDouble();
 
-        if (num1 != num2) return (ComparisonResult.Fail, context.AddDifference(num1, num2));
+        if (num1 != num2)
+            return (ComparisonResult.Fail, context.AddDifference(num1, num2));
 
         return (ComparisonResult.Pass, context);
     }
 
     private static JsonElement? AsJsonElement(object value)
     {
-        if (value is JsonElement e) return e;
+        if (value is JsonElement e)
+            return e;
 
         if (value is string json)
         {

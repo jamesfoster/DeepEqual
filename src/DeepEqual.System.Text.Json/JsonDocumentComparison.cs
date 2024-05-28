@@ -11,8 +11,7 @@ public class JsonDocumentComparison : IComparison
     public bool CanCompare(Type type1, Type type2)
     {
         return type1 == jsonDocumentType && allowableTypes.Contains(type2)
-            || type2 == jsonDocumentType && allowableTypes.Contains(type1)
-            ;
+            || type2 == jsonDocumentType && allowableTypes.Contains(type1);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
@@ -24,16 +23,19 @@ public class JsonDocumentComparison : IComparison
         var doc1 = AsJsonDocument(value1);
         var doc2 = AsJsonDocument(value2);
 
-        if (doc1 is null || doc2 is null) return (ComparisonResult.Inconclusive, context);
+        if (doc1 is null || doc2 is null)
+            return (ComparisonResult.Inconclusive, context);
 
         return jsonElementComparison.Compare(context, doc1.RootElement, doc2.RootElement);
     }
 
     private static JsonDocument? AsJsonDocument(object value)
     {
-        if (value is JsonDocument doc) return doc;
+        if (value is JsonDocument doc)
+            return doc;
 
-        if (value is string json) return JsonDocument.Parse(json);
+        if (value is string json)
+            return JsonDocument.Parse(json);
 
         return null;
     }
