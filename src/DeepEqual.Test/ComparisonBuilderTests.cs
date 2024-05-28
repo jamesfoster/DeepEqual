@@ -356,6 +356,37 @@
 		}
 
 		[Scenario]
+		public void Creating_a_Comparison_with_custom_comparisons_lambda()
+		{
+			var result = default (CompositeComparison);
+			var custom = default (IComparison);
+			var capture = default (IComparison);
+
+			"Given a builder".x(() =>
+				SUT = new ComparisonBuilder()
+			);
+
+			"And a custom comparison".x(() =>
+			{
+				custom = new Mock<IComparison>().Object;
+
+				SUT.WithCustomComparison(x => { capture = x; return custom; });
+			});
+
+			"When calling Create".x(() =>
+				result = ((CycleGuard)SUT.Create()).Inner as CompositeComparison
+			);
+
+			"Then the 1st comparer is the custom comparison".x(() =>
+				result.Comparisons[0].ShouldBeSameAs(custom)
+			);
+
+			"And the lambda is given a reference to the root comparer".x(() =>
+				capture.ShouldBe(result)
+			);
+		}
+
+		[Scenario]
 		public void Creating_a_Comparison_and_ignoring_unmatched_properties()
 		{
 			var result = default (CompositeComparison);

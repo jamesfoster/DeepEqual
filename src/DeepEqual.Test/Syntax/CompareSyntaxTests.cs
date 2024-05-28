@@ -101,6 +101,16 @@ namespace DeepEqual.Test.Syntax
 		}
 
 		[Fact]
+		public void Delegates_WithCustomComparison_Lambda()
+		{
+			var c = (IComparison root) => new DefaultComparison();
+
+			syntax.WithCustomComparison(c);
+
+			builder.Verify(x => x.WithCustomComparison(c), Times.Once());
+		}
+
+		[Fact]
 		public void Delegates_ExposeInternalsOf_T()
 		{
 			syntax.ExposeInternalsOf<Version>();

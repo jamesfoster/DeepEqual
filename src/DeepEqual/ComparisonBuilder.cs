@@ -67,6 +67,13 @@ public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 		return this;
 	}
 
+	public ComparisonBuilder WithCustomComparison(Func<IComparison, IComparison> ctor)
+	{
+		CustomComparisons.Add(ctor(AllComparisons));
+
+		return this;
+	}
+
 	public ComparisonBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
 		where TDifference : Difference
 	{

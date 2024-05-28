@@ -61,6 +61,13 @@ public class CompareSyntax<TActual, TExpected> : IComparisonBuilder<CompareSynta
 	}
 
 	[Pure]
+	public CompareSyntax<TActual, TExpected> WithCustomComparison(Func<IComparison, IComparison> comparison)
+	{
+		Builder.WithCustomComparison(comparison);
+		return this;
+	}
+
+	[Pure]
 	public CompareSyntax<TActual, TExpected> WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
 		where TDifference : Difference
 	{
