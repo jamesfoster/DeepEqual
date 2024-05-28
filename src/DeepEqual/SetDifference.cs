@@ -1,13 +1,8 @@
 ﻿namespace DeepEqual;
 
-public class SetDifference : Difference
+public record SetDifference(string Breadcrumb, ImmutableList<object> Expected, ImmutableList<object> Extra) : Difference(Breadcrumb)
 {
-	public ImmutableList<object> Expected { get; }
-	public ImmutableList<object> Extra { get; }
-
-	public SetDifference(string breadcrumb, IEnumerable<object> expected, IEnumerable<object> extra) : base(breadcrumb)
-	{
-		Expected = expected.ToImmutableList();
-		Extra = extra.ToImmutableList();
-	}
+	public SetDifference(string breadcrumb, IEnumerable<object> expected, IEnumerable<object> extra)
+		: this (breadcrumb, expected.ToImmutableList(), extra.ToImmutableList())
+	{ }
 }

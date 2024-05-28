@@ -1,24 +1,23 @@
-namespace DeepEqual.Test.Helper
+using System;
+
+namespace DeepEqual.Test.Helper;
+
+public class EchoComparison : IComparison
 {
-	using System;
+	private readonly ComparisonResult result;
 
-	public class EchoComparison : IComparison
+	public EchoComparison(ComparisonResult result)
 	{
-		private readonly ComparisonResult result;
+		this.result = result;
+	}
 
-		public EchoComparison(ComparisonResult result)
-		{
-			this.result = result;
-		}
+	public bool CanCompare(Type type1, Type type2)
+	{
+		return true;
+	}
 
-		public bool CanCompare(Type type1, Type type2)
-		{
-			return true;
-		}
-
-		public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
-		{
-			return (result, context);
-		}
+	public (ComparisonResult result, IComparisonContext context) Compare(IComparisonContext context, object value1, object value2)
+	{
+		return (result, context);
 	}
 }

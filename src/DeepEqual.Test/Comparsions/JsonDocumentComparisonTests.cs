@@ -1,5 +1,4 @@
-﻿using DeepEqual.Formatting;
-using DeepEqual.SystemTextJson;
+﻿using DeepEqual.SystemTextJson;
 
 using Shouldly;
 

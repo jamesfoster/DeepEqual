@@ -1,18 +1,19 @@
-﻿namespace DeepEqual.Test.Features
+﻿
+using DeepEqual.Test.Helper;
+using DeepEqual.Test.VB;
+
+using Xunit;
+
+namespace DeepEqual.Test.Features;
+
+public class ComparingObjectsPropertiesWithArguments
 {
-	using DeepEqual.Test.Helper;
-	using DeepEqual.Test.VB;
-	using Xunit;
-
-	public class ComparingObjectsPropertiesWithArguments
+	[Fact]
+	public void ShouldBeAbleToHandleComparingObjectsWithPropertiesWithArguments()
 	{
-		[Fact]
-		public void ShouldBeAbleToHandleComparingObjectsWithPropertiesWithArguments()
-		{
-			var x = new HasPropertiesWithArguments();
-			var y = new HasPropertiesWithArguments();
+		var x = new HasPropertiesWithArguments();
+		var y = new HasPropertiesWithArguments();
 
-			DeepAssert.AreEqual(x, y);
-		}
+		DeepAssert.AreEqual(x, y);
 	}
 }

@@ -1,508 +1,507 @@
-﻿namespace DeepEqual.Test.Comparsions
+﻿using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
+
+using DeepEqual.Test.Helper;
+
+using AutoFixture;
+using AutoFixture.AutoMoq;
+
+using Shouldly;
+
+using Xbehave;
+
+using Xunit;
+
+namespace DeepEqual.Test.Comparsions;
+
+public class ComplexObjectComparisonTests
 {
-	using System.Collections.Generic;
-	using System.Dynamic;
-	using System.Linq;
+	protected Fixture Fixture { get; set; }
 
-	using DeepEqual.Test.Helper;
+	protected ComplexObjectComparison SUT { get; set; }
+	protected MockComparison Inner { get; set; }
+	protected IComparisonContext Context { get; set; }
 
-	using AutoFixture;
-	using AutoFixture.AutoMoq;
+	protected ComparisonResult Result { get; set; }
 
-	using Shouldly;
-
-	using Xbehave;
-
-	using Xunit;
-
-	public class ComplexObjectComparisonTests
+	[Scenario]
+	public void Creating_a_ComplexObjectComparer()
 	{
-		protected Fixture Fixture { get; set; }
+		"When creating a ComplexObjectComparison".x(() =>
+			SUT = new ComplexObjectComparison(null)
+		);
 
-		protected ComplexObjectComparison SUT { get; set; }
-		protected MockComparison Inner { get; set; }
-		protected IComparisonContext Context { get; set; }
+		"It should be an IComparison".x(() =>
+			SUT.ShouldBeAssignableTo<IComparison>()
+		);
+	}
 
-		protected ComparisonResult Result { get; set; }
-
-		[Scenario]
-		public void Creating_a_ComplexObjectComparer()
+	private void SetUp()
+	{
+		"Given a fixture".x(() =>
 		{
-			"When creating a ComplexObjectComparison".x(() =>
-				SUT = new ComplexObjectComparison(null)
-			);
+			Fixture = new Fixture();
+			Fixture.Customize(new AutoMoqCustomization());
+		});
 
-			"It should be an IComparison".x(() =>
-				SUT.ShouldBeAssignableTo<IComparison>()
+		"And an inner comparison".x(() =>
+		{
+			Inner = new MockComparison();
+			Fixture.Inject<IComparison>(Inner);
+		});
+
+		"And a ComplexObjectComparison".x(() =>
+			SUT = Fixture.Build<ComplexObjectComparison>()
+				.OmitAutoProperties()
+				.Create()
+		);
+
+		"And a Comparison context object".x(() =>
+			Context = new ComparisonContext("Property")
+		);
+	}
+
+	[Scenario]
+	[MemberData(nameof(SimilarObjectsTestData))]
+	public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
+	{
+		SetUp();
+
+		"And IgnoreUnmatchedProperties is set to {0}".x(() =>
+			SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties
+		);
+
+		"When calling Compare".x(() =>
+		{
+			var (result, context) = SUT.Compare(Context, value1, value2);
+			Result = result;
+			Context = context;
+		});
+
+		"It should return {3}".x(() =>
+			Result.ShouldBe(expected)
+		);
+
+		if (expected == ComparisonResult.Fail)
+		{
+			"And it should add a difference to the context".x(() =>
+				Context.Differences.Count.ShouldBe(1)
+			);
+		}
+		else
+		{
+			"And there should be no differences in the context".x(() =>
+				Context.Differences.Count.ShouldBe(0)
 			);
 		}
 
-		private void SetUp()
+		"And it should call Compare on the inner comparison for each property".x(() =>
 		{
-			"Given a fixture".x(() =>
+			var properties1 = value1.GetType().GetProperties();
+			var properties2 = value2.GetType().GetProperties().ToDictionary(x => x.Name);
+
+			foreach (var p1 in properties1)
 			{
-				Fixture = new Fixture();
-				Fixture.Customize(new AutoMoqCustomization());
-			});
+				if (!properties2.ContainsKey(p1.Name))
+					continue;
 
-			"And an inner comparison".x(() =>
-			{
-				Inner = new MockComparison();
-				Fixture.Inject<IComparison>(Inner);
-			});
+				var p2 = properties2[p1.Name];
 
-			"And a ComplexObjectComparison".x(() =>
-				SUT = Fixture.Build<ComplexObjectComparison>()
-					.OmitAutoProperties()
-					.Create()
-			);
+				var v1 = p1.GetValue(value1);
+				var v2 = p2.GetValue(value2);
 
-			"And a Comparison context object".x(() =>
-				Context = new ComparisonContext("Property")
-			);
-		}
-
-		[Scenario]
-		[MemberData(nameof(SimilarObjectsTestData))]
-		public void When_comparing_objects_of_the_same_type(bool ignoreUnmatchedProperties, object value1, object value2, ComparisonResult expected)
-		{
-			SetUp();
-
-			"And IgnoreUnmatchedProperties is set to {0}".x(() =>
-				SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties
-			);
-
-			"When calling Compare".x(() =>
-			{
-				var (result, context) = SUT.Compare(Context, value1, value2);
-				Result = result;
-				Context = context;
-			});
-
-			"It should return {3}".x(() =>
-				Result.ShouldBe(expected)
-			);
-
-			if (expected == ComparisonResult.Fail)
-			{
-				"And it should add a difference to the context".x(() =>
-					Context.Differences.Count.ShouldBe(1)
+				Inner.CompareCalls.ShouldContain(call =>
+					call.context.Breadcrumb == "Property." + p1.Name &&
+					call.value1.Equals(v1) &&
+					call.value2.Equals(v2)
 				);
 			}
-			else
+		});
+	}
+
+	[Scenario]
+	public void Ignoring_properties_on_the_source_type_when_missing()
+	{
+		A value1 = null;
+		object value2 = null;
+
+		SetUp();
+
+		"And the IgnoreMe property is ignored".x(() =>
+			SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+		);
+
+		"And value1 is provided".x(() =>
+			value1 = new A
 			{
-				"And there should be no differences in the context".x(() =>
-					Context.Differences.Count.ShouldBe(0)
-				);
+				X = Fixture.Create<string>(),
+				Y = Fixture.Create<string>(),
+				IgnoreMe = Fixture.Create<string>()
 			}
+		);
 
-			"And it should call Compare on the inner comparison for each property".x(() =>
+		"And value2 is equivalent to value1".x(() =>
+			value2 = new
 			{
-				var properties1 = value1.GetType().GetProperties();
-				var properties2 = value2.GetType().GetProperties().ToDictionary(x => x.Name);
+				value1.X,
+				value1.Y
+			}
+		);
 
-				foreach (var p1 in properties1)
-				{
-					if (!properties2.ContainsKey(p1.Name))
-						continue;
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
 
-					var p2 = properties2[p1.Name];
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
 
-					var v1 = p1.GetValue(value1);
-					var v2 = p2.GetValue(value2);
+	[Scenario]
+	public void Ignoring_properties_on_the_source_type_when_different()
+	{
+		A value1 = null;
+		object value2 = null;
 
-					Inner.CompareCalls.ShouldContain(call => 
-						call.context.Breadcrumb == "Property." + p1.Name &&
-						call.value1.Equals(v1) &&
-						call.value2.Equals(v2)
-					);
-				}
+		SetUp();
+
+		"And the IgnoreMe property is ignored".x(() =>
+			SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+		);
+
+		"And value1 is a MyClass instance".x(() =>
+			value1 = new A
+			{
+				X = Fixture.Create<string>(),
+				Y = Fixture.Create<string>(),
+				IgnoreMe = Fixture.Create<string>()
+			}
+		);
+
+		"And value2 is equivalent to value1".x(() =>
+			value2 = new
+			{
+				value1.X,
+				value1.Y,
+				IgnoreMe = Fixture.Create<string>()
+			}
+		);
+
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
+
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
+
+	[Scenario]
+	public void Ignoring_properties_on_the_destination_type_when_missing()
+	{
+		object value1 = null;
+		A value2 = null;
+
+		SetUp();
+
+		"And the IgnoreMe property is ignored".x(() =>
+			SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+		);
+
+		"And value2".x(() =>
+			value2 = new
+		A
+			{
+				X = Fixture.Create<string>(),
+				Y = Fixture.Create<string>(),
+				IgnoreMe = Fixture.Create<string>()
 			});
-		}
 
-		[Scenario]
-		public void Ignoring_properties_on_the_source_type_when_missing()
-		{
-			A value1 = null;
-			object value2 = null;
+		"And value1 is equivalent to value2".x(() =>
+			value1 = new
+			{
+				value2.X,
+				value2.Y
+			}
+		);
 
-			SetUp();
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
 
-			"And the IgnoreMe property is ignored".x(() =>
-				SUT.IgnoreProperty<A>(x => x.IgnoreMe)
-			);
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
 
-			"And value1 is provided".x(() =>
-				value1 = new A
+	[Scenario]
+	public void Ignoring_properties_on_the_destination_type_when_different()
+	{
+		object value1 = null;
+		A value2 = null;
+
+		SetUp();
+
+		"And the IgnoreMe property is ignored".x(() =>
+			SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+		);
+
+		"And value2".x(() =>
+			value2 = new A
+			{
+				X = Fixture.Create<string>(),
+				Y = Fixture.Create<string>(),
+				IgnoreMe = Fixture.Create<string>()
+			}
+		);
+
+		"And value1 is equivalent to value2".x(() =>
+			value1 = new
 				{
-					X = Fixture.Create<string>(),
-					Y = Fixture.Create<string>(),
+					value2.X,
+					value2.Y,
 					IgnoreMe = Fixture.Create<string>()
 				}
-			);
+		);
 
-			"And value2 is equivalent to value1".x(() =>
-				value2 = new
-				{
-					value1.X,
-					value1.Y
-				}
-			);
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
 
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
 
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
+	[Scenario]
+	public void Ignoring_properties_on_a_base_class_also_ignores_them_on_derived_types()
+	{
+		B value1 = null;
+		object value2 = null;
 
-		[Scenario]
-		public void Ignoring_properties_on_the_source_type_when_different()
-		{
-			A value1 = null;
-			object value2 = null;
+		SetUp();
 
-			SetUp();
+		"And the IgnoreMe property is ignored".x(() =>
+			SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+		);
 
-			"And the IgnoreMe property is ignored".x(() =>
-				SUT.IgnoreProperty<A>(x => x.IgnoreMe)
-			);
+		"And value1".x(() =>
+			value1 = new B
+			{
+				X = Fixture.Create<string>(),
+				Y = Fixture.Create<string>(),
+				IgnoreMe = Fixture.Create<string>()
+			}
+		);
 
-			"And value1 is a MyClass instance".x(() =>
-				value1 = new A
-				{
-					X = Fixture.Create<string>(),
-					Y = Fixture.Create<string>(),
-					IgnoreMe = Fixture.Create<string>()
-				}
-			);
-
-			"And value2 is equivalent to value1".x(() =>
-				value2 = new
+		"And value2 is equivalent to value1".x(() =>
+			value2 = new
 				{
 					value1.X,
 					value1.Y,
 					IgnoreMe = Fixture.Create<string>()
 				}
-			);
+		);
 
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
 
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Ignoring_properties_on_the_destination_type_when_missing()
-		{
-			object value1 = null;
-			A value2 = null;
-
-			SetUp();
-
-			"And the IgnoreMe property is ignored".x(() =>
-				SUT.IgnoreProperty<A>(x => x.IgnoreMe)
-			);
-
-			"And value2".x(() =>
-				value2 = new
-			A
-				{
-					X = Fixture.Create<string>(),
-					Y = Fixture.Create<string>(),
-					IgnoreMe = Fixture.Create<string>()
-				});
-
-			"And value1 is equivalent to value2".x(() =>
-				value1 = new
-				{
-					value2.X,
-					value2.Y
-				}
-			);
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Ignoring_properties_on_the_destination_type_when_different()
-		{
-			object value1 = null;
-			A value2 = null;
-
-			SetUp();
-
-			"And the IgnoreMe property is ignored".x(() =>
-				SUT.IgnoreProperty<A>(x => x.IgnoreMe)
-			);
-
-			"And value2".x(() =>
-				value2 = new A
-				{
-					X = Fixture.Create<string>(),
-					Y = Fixture.Create<string>(),
-					IgnoreMe = Fixture.Create<string>()
-				}
-			);
-
-			"And value1 is equivalent to value2".x(() =>
-				value1 = new
-					{
-						value2.X,
-						value2.Y,
-						IgnoreMe = Fixture.Create<string>()
-					}
-			);
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Ignoring_properties_on_a_base_class_also_ignores_them_on_derived_types()
-		{
-			B value1 = null;
-			object value2 = null;
-
-			SetUp();
-
-			"And the IgnoreMe property is ignored".x(() =>
-				SUT.IgnoreProperty<A>(x => x.IgnoreMe)
-			);
-
-			"And value1".x(() =>
-				value1 = new B
-				{
-					X = Fixture.Create<string>(),
-					Y = Fixture.Create<string>(),
-					IgnoreMe = Fixture.Create<string>()
-				}
-			);
-
-			"And value2 is equivalent to value1".x(() =>
-				value2 = new
-					{
-						value1.X,
-						value1.Y,
-						IgnoreMe = Fixture.Create<string>()
-					}
-			);
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Comparing_object_with_new_property_uses_value_in_derived_type()
-		{
-			Derived value1 = null;
-			object value2 = null;
-
-			SetUp();
-
-			"And two values".x(() =>
-			{
-				value1 = new Derived();
-				value2 = new { Property = "abc" };
-			});
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Properties_with_no_getter_are_ignored()
-		{
-			C value1 = null;
-			object value2 = null;
-
-			SetUp();
-
-			"And value1 is provided".x(() =>
-				value1 = new C
-				{
-					X = Fixture.Create<string>(),
-					SetOnly = Fixture.Create<string>()
-				}
-			);
-
-			"And value2 is equivalent to value1".x(() =>
-				value2 = new
-				{
-					value1.X,
-					value1.Y
-				}
-			);
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		[Scenario]
-		public void Comparing_dynamic_object_with_static_object_succeeds()
-		{
-			dynamic value1 = null;
-			object value2 = null;
-
-			SetUp();
-
-			"And a dynamic object".x(() =>
-			{
-				value1 = new ExpandoObject();
-				value1.Foo = "abc";
-				value1.Bar = 123;
-			});
-
-			"And a static object".x(() =>
-			{
-				value2 = new
-				{
-					Foo = "abc",
-					Bar = 123
-				};
-			});
-
-			"When comparing the 2 values".x(() =>
-				(Result, _) = ((ComparisonResult, IComparisonContext)) SUT.Compare(Context, value1, value2)
-			);
-
-			"Then it should return a Pass".x(() =>
-				Result.ShouldBe(ComparisonResult.Pass)
-			);
-		}
-
-		private class A
-		{
-			public string X { get; set; }
-			public string Y { get; set; }
-			public string IgnoreMe { get; set; }
-		}
-
-		private class B : A { }
-
-		private class C
-		{
-			public string X { get; set; }
-
-			public string Y { get; set; }
-
-			public string SetOnly
-			{
-				set => Y = value;
-			}
-		}
-
-		public interface IFoo
-		{
-			int Prop { get; set; }
-		}
-
-		public class Base
-		{
-			public int Property => 123;
-		}
-
-		public class Derived : Base
-		{
-			public new string Property => "abc";
-		}
-
-		public static IEnumerable<object[]> SimilarObjectsTestData => new[]
-		{
-			new object[]
-			{
-				false,
-				new {A = 1, B = 2, C = 3},
-				new {A = 1, B = 2, C = 3},
-				ComparisonResult.Pass
-			},
-			new object[]
-			{
-				false,
-				new {},
-				new {},
-				ComparisonResult.Pass
-			},
-			new object[]
-			{
-				false,
-				new {A = 1, B = 2, C = 3},
-				new {A = 1, B = 2},
-				ComparisonResult.Fail
-			},
-			new object[]
-			{
-				false,
-				new {A = 1, B = 2},
-				new {A = 1, B = 2, C = 3},
-				ComparisonResult.Fail
-			},
-			new object[]
-			{
-				false,
-				new {A = 1, B = 2, C = 3},
-				new {A = 123, B = 2, C = 3},
-				ComparisonResult.Fail
-			},
-			new object[]
-			{
-				true,
-				new {A = 1, B = 2, C = 3},
-				new {A = 1, B = 2, C = 3},
-				ComparisonResult.Pass
-			},
-			new object[]
-			{
-				true,
-				new {A = 1, B = 2, C = 3},
-				new {A = 1, B = 2},
-				ComparisonResult.Pass
-			},
-			new object[]
-			{
-				true,
-				new {A = 1, B = 2},
-				new {A = 1, B = 2, C = 3},
-				ComparisonResult.Pass
-			},
-			new object[]
-			{
-				true,
-				new {A = 1, B = 2, C = 3},
-				new {A = 123, B = 2, C = 3},
-				ComparisonResult.Fail
-			}
-		};
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
 	}
+
+	[Scenario]
+	public void Comparing_object_with_new_property_uses_value_in_derived_type()
+	{
+		Derived value1 = null;
+		object value2 = null;
+
+		SetUp();
+
+		"And two values".x(() =>
+		{
+			value1 = new Derived();
+			value2 = new { Property = "abc" };
+		});
+
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
+
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
+
+	[Scenario]
+	public void Properties_with_no_getter_are_ignored()
+	{
+		C value1 = null;
+		object value2 = null;
+
+		SetUp();
+
+		"And value1 is provided".x(() =>
+			value1 = new C
+			{
+				X = Fixture.Create<string>(),
+				SetOnly = Fixture.Create<string>()
+			}
+		);
+
+		"And value2 is equivalent to value1".x(() =>
+			value2 = new
+			{
+				value1.X,
+				value1.Y
+			}
+		);
+
+		"When comparing the 2 values".x(() =>
+			(Result, _) = SUT.Compare(Context, value1, value2)
+		);
+
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
+
+	[Scenario]
+	public void Comparing_dynamic_object_with_static_object_succeeds()
+	{
+		dynamic value1 = null;
+		object value2 = null;
+
+		SetUp();
+
+		"And a dynamic object".x(() =>
+		{
+			value1 = new ExpandoObject();
+			value1.Foo = "abc";
+			value1.Bar = 123;
+		});
+
+		"And a static object".x(() =>
+		{
+			value2 = new
+			{
+				Foo = "abc",
+				Bar = 123
+			};
+		});
+
+		"When comparing the 2 values".x(() =>
+			(Result, _) = ((ComparisonResult, IComparisonContext)) SUT.Compare(Context, value1, value2)
+		);
+
+		"Then it should return a Pass".x(() =>
+			Result.ShouldBe(ComparisonResult.Pass)
+		);
+	}
+
+	private class A
+	{
+		public string X { get; set; }
+		public string Y { get; set; }
+		public string IgnoreMe { get; set; }
+	}
+
+	private class B : A { }
+
+	private class C
+	{
+		public string X { get; set; }
+
+		public string Y { get; set; }
+
+		public string SetOnly
+		{
+			set => Y = value;
+		}
+	}
+
+	public interface IFoo
+	{
+		int Prop { get; set; }
+	}
+
+	public class Base
+	{
+		public int Property => 123;
+	}
+
+	public class Derived : Base
+	{
+		public new string Property => "abc";
+	}
+
+	public static IEnumerable<object[]> SimilarObjectsTestData => new[]
+	{
+		new object[]
+		{
+			false,
+			new {A = 1, B = 2, C = 3},
+			new {A = 1, B = 2, C = 3},
+			ComparisonResult.Pass
+		},
+		new object[]
+		{
+			false,
+			new {},
+			new {},
+			ComparisonResult.Pass
+		},
+		new object[]
+		{
+			false,
+			new {A = 1, B = 2, C = 3},
+			new {A = 1, B = 2},
+			ComparisonResult.Fail
+		},
+		new object[]
+		{
+			false,
+			new {A = 1, B = 2},
+			new {A = 1, B = 2, C = 3},
+			ComparisonResult.Fail
+		},
+		new object[]
+		{
+			false,
+			new {A = 1, B = 2, C = 3},
+			new {A = 123, B = 2, C = 3},
+			ComparisonResult.Fail
+		},
+		new object[]
+		{
+			true,
+			new {A = 1, B = 2, C = 3},
+			new {A = 1, B = 2, C = 3},
+			ComparisonResult.Pass
+		},
+		new object[]
+		{
+			true,
+			new {A = 1, B = 2, C = 3},
+			new {A = 1, B = 2},
+			ComparisonResult.Pass
+		},
+		new object[]
+		{
+			true,
+			new {A = 1, B = 2},
+			new {A = 1, B = 2, C = 3},
+			ComparisonResult.Pass
+		},
+		new object[]
+		{
+			true,
+			new {A = 1, B = 2, C = 3},
+			new {A = 123, B = 2, C = 3},
+			ComparisonResult.Fail
+		}
+	};
 }

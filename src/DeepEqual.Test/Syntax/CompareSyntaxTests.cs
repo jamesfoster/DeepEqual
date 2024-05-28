@@ -1,163 +1,160 @@
-﻿// ReSharper disable ReturnValueOfPureMethodIsNotUsed
+﻿using System;
 
-namespace DeepEqual.Test.Syntax
+using DeepEqual.Syntax;
+
+using Moq;
+
+using Xunit;
+
+namespace DeepEqual.Test.Syntax;
+
+public class CompareSyntaxTests : IDisposable
 {
-	using System;
+	private readonly A a = new A();
 
-	using DeepEqual.Syntax;
+	private readonly B b = new B();
 
-	using Moq;
+	private readonly CompareSyntax<A, B> syntax;
 
-	using Xunit;
+	private readonly Mock<IComparisonBuilder<ComparisonBuilder>> builder;
 
-	public class CompareSyntaxTests : IDisposable
+	public CompareSyntaxTests()
 	{
-		private readonly A a = new A();
+		var comparison = new CompositeComparison();
 
-		private readonly B b = new B();
+		builder = new Mock<IComparisonBuilder<ComparisonBuilder>>();
 
-		private readonly CompareSyntax<A, B> syntax;
+		builder
+			.Setup(x => x.Create())
+			.Returns(() => comparison);
 
-		private readonly Mock<IComparisonBuilder<ComparisonBuilder>> builder;
+		ComparisonBuilder.Get = () => builder.Object;
 
-		public CompareSyntaxTests()
-		{
-			var comparison = new CompositeComparison();
+		syntax = a.WithDeepEqual(b);
+	}
 
-			builder = new Mock<IComparisonBuilder<ComparisonBuilder>>();
+	public void Dispose()
+	{
+		ComparisonBuilder.Reset();
+	}
 
-			builder
-				.Setup(x => x.Create())
-				.Returns(() => comparison);
+	[Fact]
+	public void Delegates_IgnoreUnmatchedProperties()
+	{
+		syntax.IgnoreUnmatchedProperties();
 
-			ComparisonBuilder.Get = () => builder.Object;
+		builder.Verify(x => x.IgnoreUnmatchedProperties(), Times.Once());
+	}
 
-			syntax = a.WithDeepEqual(b);
-		}
+	[Fact]
+	public void When_calling_IgnoreSourceProperty_ignores_the_property_on_the_source_type()
+	{
+		syntax.IgnoreSourceProperty(x => x.Prop);
 
-		public void Dispose()
-		{
-			ComparisonBuilder.Reset();
-		}
+		builder.Verify(x => x.IgnoreProperty<A>(y => y.Prop), Times.Once());
+	}
 
-		[Fact]
-		public void Delegates_IgnoreUnmatchedProperties()
-		{
-			syntax.IgnoreUnmatchedProperties();
+	[Fact]
+	public void When_calling_IgnoreDestinationProperty_ignores_the_property_on_the_source_type()
+	{
+		syntax.IgnoreDestinationProperty(x => x.Prop2);
 
-			builder.Verify(x => x.IgnoreUnmatchedProperties(), Times.Once());
-		}
+		builder.Verify(x => x.IgnoreProperty<B>(y => y.Prop2), Times.Once());
+	}
 
-		[Fact]
-		public void When_calling_IgnoreSourceProperty_ignores_the_property_on_the_source_type()
-		{
-			syntax.IgnoreSourceProperty(x => x.Prop);
+	[Fact]
+	public void Delegates_IgnoreProperty()
+	{
+		syntax.IgnoreProperty<Version>(x => x.Major);
 
-			builder.Verify(x => x.IgnoreProperty<A>(y => y.Prop), Times.Once());
-		}
+		builder.Verify(x => x.IgnoreProperty<Version>(y => y.Major), Times.Once());
+	}
 
-		[Fact]
-		public void When_calling_IgnoreDestinationProperty_ignores_the_property_on_the_source_type()
-		{
-			syntax.IgnoreDestinationProperty(x => x.Prop2);
+	[Fact]
+	public void Delegates_IgnoreProperty_2()
+	{
+		Func<PropertyReader, bool> func = x => x.Name == "Abc";
 
-			builder.Verify(x => x.IgnoreProperty<B>(y => y.Prop2), Times.Once());
-		}
+		syntax.IgnoreProperty(func);
 
-		[Fact]
-		public void Delegates_IgnoreProperty()
-		{
-			syntax.IgnoreProperty<Version>(x => x.Major);
+		builder.Verify(x => x.IgnoreProperty(func), Times.Once());
+	}
 
-			builder.Verify(x => x.IgnoreProperty<Version>(y => y.Major), Times.Once());
-		}
+	[Fact]
+	public void Delegates_SkipDefault()
+	{
+		syntax.SkipDefault<Version>();
 
-		[Fact]
-		public void Delegates_IgnoreProperty_2()
-		{
-			Func<PropertyReader, bool> func = x => x.Name == "Abc";
+		builder.Verify(x => x.SkipDefault<Version>(), Times.Once());
+	}
 
-			syntax.IgnoreProperty(func);
+	[Fact]
+	public void Delegates_WithCustomComparison()
+	{
+		var c = new DefaultComparison();
 
-			builder.Verify(x => x.IgnoreProperty(func), Times.Once());
-		}
+		syntax.WithCustomComparison(c);
 
-		[Fact]
-		public void Delegates_SkipDefault()
-		{
-			syntax.SkipDefault<Version>();
+		builder.Verify(x => x.WithCustomComparison(c), Times.Once());
+	}
 
-			builder.Verify(x => x.SkipDefault<Version>(), Times.Once());
-		}
+	[Fact]
+	public void Delegates_WithCustomComparison_Lambda()
+	{
+		var c = (IComparison root) => new DefaultComparison();
 
-		[Fact]
-		public void Delegates_WithCustomComparison()
-		{
-			var c = new DefaultComparison();
+		syntax.WithCustomComparison(c);
 
-			syntax.WithCustomComparison(c);
+		builder.Verify(x => x.WithCustomComparison(c), Times.Once());
+	}
 
-			builder.Verify(x => x.WithCustomComparison(c), Times.Once());
-		}
+	[Fact]
+	public void Delegates_ExposeInternalsOf_T()
+	{
+		syntax.ExposeInternalsOf<Version>();
 
-		[Fact]
-		public void Delegates_WithCustomComparison_Lambda()
-		{
-			var c = (IComparison root) => new DefaultComparison();
+		builder.Verify(x => x.ExposeInternalsOf<Version>(), Times.Once());
+	}
 
-			syntax.WithCustomComparison(c);
+	[Fact]
+	public void Delegates_ExposeInternalsOf()
+	{
+		syntax.ExposeInternalsOf(typeof(Version), typeof(Uri));
 
-			builder.Verify(x => x.WithCustomComparison(c), Times.Once());
-		}
+		builder.Verify(x => x.ExposeInternalsOf(typeof(Version), typeof(Uri)), Times.Once());
+	}
 
-		[Fact]
-		public void Delegates_ExposeInternalsOf_T()
-		{
-			syntax.ExposeInternalsOf<Version>();
+	[Fact]
+	public void Delegates_WithFloatingPointTolerance()
+	{
+		syntax.WithFloatingPointTolerance(1, 2);
 
-			builder.Verify(x => x.ExposeInternalsOf<Version>(), Times.Once());
-		}
+		builder.Verify(x => x.WithFloatingPointTolerance(1, 2), Times.Once());
+	}
 
-		[Fact]
-		public void Delegates_ExposeInternalsOf()
-		{
-			syntax.ExposeInternalsOf(typeof(Version), typeof(Uri));
+	[Fact]
+	public void Calling_Compare_creates_the_comparison()
+	{
+		syntax.Compare();
 
-			builder.Verify(x => x.ExposeInternalsOf(typeof(Version), typeof(Uri)), Times.Once());
-		}
+		builder.Verify(x => x.Create(), Times.Once());
+	}
 
-		[Fact]
-		public void Delegates_WithFloatingPointTolerance()
-		{
-			syntax.WithFloatingPointTolerance(1, 2);
+	[Fact]
+	public void Calling_Assert_creates_the_comparison()
+	{
+		try { syntax.Assert(); } catch { }
 
-			builder.Verify(x => x.WithFloatingPointTolerance(1, 2), Times.Once());
-		}
+		builder.Verify(x => x.Create(), Times.Once());
+	}
 
-		[Fact]
-		public void Calling_Compare_creates_the_comparison()
-		{
-			syntax.Compare();
+	private class B
+	{
+		public object Prop2 { get; set; }
+	}
 
-			builder.Verify(x => x.Create(), Times.Once());
-		}
-
-		[Fact]
-		public void Calling_Assert_creates_the_comparison()
-		{
-			try { syntax.Assert(); } catch { }
-
-			builder.Verify(x => x.Create(), Times.Once());
-		}
-
-		private class B
-		{
-			public object Prop2 { get; set; }
-		}
-
-		private class A
-		{
-			public object Prop { get; set; }
-		}
+	private class A
+	{
+		public object Prop { get; set; }
 	}
 }
