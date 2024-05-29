@@ -10,8 +10,8 @@ public static class DeepAssert
 {
     public static void AreEqual(object actual, object expected, IComparison comparison = null)
     {
-        actual.IsDeepEqual(expected, comparison).ShouldBe(true);
         actual.ShouldDeepEqual(expected, comparison);
+        actual.IsDeepEqual(expected, comparison).ShouldBe(true);
     }
 
     public static void AreNotEqual(object actual, object expected, IComparison comparison = null)

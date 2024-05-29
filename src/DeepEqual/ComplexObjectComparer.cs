@@ -4,7 +4,7 @@ public class ComplexObjectComparer
 {
     private readonly IComparison inner;
     private readonly bool ignoreUnmatchedProperties;
-    private readonly List<Func<PropertyReader, bool>> ignoredProperties;
+    private readonly List<Func<PropertyPair, bool>> ignoredProperties;
     private readonly List<Func<Type, Type, string, string?>> mappedProperties;
 
     private readonly List<ComparisonResult> results;
@@ -12,7 +12,7 @@ public class ComplexObjectComparer
     public ComplexObjectComparer(
         IComparison inner,
         bool ignoreUnmatchedProperties,
-        List<Func<PropertyReader, bool>> ignoredProperties,
+        List<Func<PropertyPair, bool>> ignoredProperties,
         List<Func<Type, Type, string, string?>> mappedProperties
     )
     {
@@ -147,12 +147,7 @@ public class ComplexObjectComparer
     {
         foreach (var ignoredProperty in ignoredProperties)
         {
-            if (pair.Left != null && ignoredProperty(pair.Left))
-            {
-                return true;
-            }
-
-            if (pair.Right != null && ignoredProperty(pair.Right))
+            if (ignoredProperty(pair))
             {
                 return true;
             }
@@ -160,25 +155,25 @@ public class ComplexObjectComparer
 
         return false;
     }
+}
 
-    private class PropertyPair
+public class PropertyPair
+{
+    public PropertyPair(
+        PropertyReader? left,
+        PropertyReader? right,
+        string leftName,
+        string rightName
+    )
     {
-        public PropertyPair(
-            PropertyReader? left,
-            PropertyReader? right,
-            string leftName,
-            string rightName
-        )
-        {
-            Left = left;
-            Right = right;
-            LeftName = leftName;
-            RightName = rightName;
-        }
-
-        public PropertyReader? Left { get; }
-        public PropertyReader? Right { get; }
-        public string LeftName { get; }
-        public string RightName { get; }
+        Left = left;
+        Right = right;
+        LeftName = leftName;
+        RightName = rightName;
     }
+
+    public PropertyReader? Left { get; }
+    public PropertyReader? Right { get; }
+    public string LeftName { get; }
+    public string RightName { get; }
 }

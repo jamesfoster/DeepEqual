@@ -55,7 +55,7 @@ public class CompareSyntax<TLeft, TRight> : IComparisonBuilder<CompareSyntax<TLe
     }
 
     [Pure]
-    public CompareSyntax<TLeft, TRight> IgnoreProperty(Func<PropertyReader, bool> func)
+    public CompareSyntax<TLeft, TRight> IgnoreProperty(Func<PropertyPair, bool> func)
     {
         Builder.IgnoreProperty(func);
         return this;

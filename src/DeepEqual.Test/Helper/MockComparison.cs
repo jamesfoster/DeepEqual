@@ -14,7 +14,8 @@ public class MockComparison : IComparison
             : (ComparisonResult.Fail, c.AddDifference(v1, v2));
 
     public List<(Type leftType, Type rightType)> CanCompareCalls { get; } = new List<(Type, Type)>();
-    public List<(IComparisonContext context, object leftValue, object rightValue)> CompareCalls { get; } = new List<(IComparisonContext, object, object)>();
+    public List<(IComparisonContext context, object leftValue, object rightValue)> CompareCalls { get; }
+        = new List<(IComparisonContext, object, object)>();
 
     public bool CanCompare(Type leftType, Type rightType)
     {
@@ -32,6 +33,15 @@ public class MockComparison : IComparison
         return compare(context, leftValue, rightValue);
     }
 
-    public void SetCanCompare(Func<Type, Type, bool> func) => canCompare = func;
-    public void SetCompare(Func<IComparisonContext, object, object, (ComparisonResult, IComparisonContext)> func) => compare = func;
+    public void SetCanCompare(Func<Type, Type, bool> func)
+    {
+        canCompare = func;
+    }
+
+    public void SetCompare(
+        Func<IComparisonContext, object, object, (ComparisonResult, IComparisonContext)> func
+    )
+    {
+        compare = func;
+    }
 }

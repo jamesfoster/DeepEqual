@@ -81,7 +81,7 @@ public class CompareSyntaxTests : IDisposable
     [Fact]
     public void Delegates_IgnoreProperty_2()
     {
-        Func<PropertyReader, bool> func = x => x.Name == "Abc";
+        Func<PropertyPair, bool> func = x => x.Left.Name == "Abc";
 
         syntax.IgnoreProperty(func);
 

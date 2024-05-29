@@ -18,7 +18,7 @@ public interface IComparisonBuilder<out TBuilder>
         Expression<Func<B, object?>> right
     );
     TBuilder IgnoreProperty<T>(Expression<Func<T, object?>> property);
-    TBuilder IgnoreProperty(Func<PropertyReader, bool> func);
+    TBuilder IgnoreProperty(Func<PropertyPair, bool> func);
     TBuilder IgnoreUnmatchedProperties();
     TBuilder SkipDefault<T>();
     TBuilder ExposeInternalsOf<T>();

@@ -8,7 +8,7 @@ public class ComplexObjectComparison : IComparison
 
     public bool IgnoreUnmatchedProperties { get; set; }
 
-    public List<Func<PropertyReader, bool>> IgnoredProperties { get; set; }
+    public List<Func<PropertyPair, bool>> IgnoredProperties { get; set; }
     public List<Func<Type, Type, string, string?>> MappedProperties { get; set; }
 
     public ComplexObjectComparison(IComparison inner)
@@ -63,10 +63,11 @@ public class ComplexObjectComparison : IComparison
 
     public void IgnoreProperty<T>(Expression<Func<T, object?>> property)
     {
-        if (GetMemberName(property, out var name))
+        if (!GetMemberName(property, out var name))
         {
-            IgnoreProperty(typeof(T), name);
+            throw new ArgumentException($"Expression must be a simple member access: {property}");
         }
+        IgnoreProperty(typeof(T), name);
     }
 
     private static bool GetMemberName<T>(Expression<Func<T, object?>> property, out string? name)
@@ -94,11 +95,19 @@ public class ComplexObjectComparison : IComparison
             return;
 
         IgnoreProperty(property =>
-            type.IsAssignableFrom(property.DeclaringType) && property.Name == propertyName
-        );
+        {
+            static bool Matches(PropertyReader? reader, Type type, string name)
+            {
+                return reader is not null
+                    && type.IsAssignableFrom(reader.DeclaringType)
+                    && reader.Name == name;
+            }
+            return Matches(property.Left, type, propertyName)
+                || Matches(property.Right, type, propertyName);
+        });
     }
 
-    public void IgnoreProperty(Func<PropertyReader, bool> item)
+    public void IgnoreProperty(Func<PropertyPair, bool> item)
     {
         IgnoredProperties.Add(item);
     }

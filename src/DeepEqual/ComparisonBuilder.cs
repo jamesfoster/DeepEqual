@@ -102,7 +102,7 @@ public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
         return this;
     }
 
-    public ComparisonBuilder IgnoreProperty(Func<PropertyReader, bool> func)
+    public ComparisonBuilder IgnoreProperty(Func<PropertyPair, bool> func)
     {
         ComplexObjectComparison.IgnoreProperty(func);
 

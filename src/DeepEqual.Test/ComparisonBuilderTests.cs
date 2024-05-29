@@ -91,7 +91,11 @@ public class ComparisonBuilderTests
         );
 
         "And it should return true for the Major property of the Version type".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
+            SUT.Create().Compare(
+                new ComparisonContext(),
+                new Version(9, 9, 9, 9),
+                new Version(1, 9, 9, 9)
+            ).result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -105,7 +109,7 @@ public class ComparisonBuilderTests
         );
 
         "When ignoring the Major property of Version".x(() =>
-            result = SUT.IgnoreProperty(x => x.Name == "Major")
+            result = SUT.IgnoreProperty(x => x.Left.Name == "Major")
         );
 
         "Then it should add an IgnoredProperty".x(() =>
@@ -113,7 +117,11 @@ public class ComparisonBuilderTests
         );
 
         "And it should return true for the Major property of the Version type".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties[0](new PropertyReader("Major", x => "1", typeof(Version))).ShouldBe(true)
+            SUT.Create().Compare(
+                new ComparisonContext(),
+                new Version(9, 9, 9, 9),
+                new Version(1, 9, 9, 9)
+            ).result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
