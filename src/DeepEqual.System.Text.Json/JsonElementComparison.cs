@@ -15,8 +15,8 @@ public class JsonElementComparison : IComparison
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object value1,
-        object value2
+        object? value1,
+        object? value2
     )
     {
         var element1 = AsJsonElement(value1);
@@ -190,8 +190,11 @@ public class JsonElementComparison : IComparison
         return (ComparisonResult.Pass, context);
     }
 
-    private static JsonElement? AsJsonElement(object value)
+    private static JsonElement? AsJsonElement(object? value)
     {
+        if (value == null)
+            return null;
+
         if (value is JsonElement e)
             return e;
 

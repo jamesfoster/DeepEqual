@@ -5,6 +5,7 @@
     <LangVersion>10.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 
     <Version>5.1.0</Version>
     <Description>An extension to DeepEqual for comparing System.Test.Json types</Description>

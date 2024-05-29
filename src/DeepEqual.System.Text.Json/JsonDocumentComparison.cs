@@ -16,8 +16,8 @@ public class JsonDocumentComparison : IComparison
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object value1,
-        object value2
+        object? value1,
+        object? value2
     )
     {
         var doc1 = AsJsonDocument(value1);
@@ -29,8 +29,11 @@ public class JsonDocumentComparison : IComparison
         return jsonElementComparison.Compare(context, doc1.RootElement, doc2.RootElement);
     }
 
-    private static JsonDocument? AsJsonDocument(object value)
+    private static JsonDocument? AsJsonDocument(object? value)
     {
+        if (value is null)
+            return null;
+
         if (value is JsonDocument doc)
             return doc;
 
