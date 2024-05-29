@@ -25,16 +25,16 @@ public class ComplexObjectComparer
 
     public (ComparisonResult, IComparisonContext) CompareObjects(
         IComparisonContext context,
-        object? source,
-        object? destination
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (source == null || destination == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        var propertyMap = PreparePropertyInfo(source, destination);
+        var propertyMap = PreparePropertyInfo(leftValue, rightValue);
 
         if (propertyMap.Count == 0)
             return (ComparisonResult.Pass, context);
@@ -43,20 +43,20 @@ public class ComplexObjectComparer
 
         foreach (var pair in propertyMap)
         {
-            var sourceValue = new Lazy<object?>(() => pair.Source!.Read(source));
-            var destinationValue = new Lazy<object?>(() => pair.Destination!.Read(destination));
+            var leftPropValue = new Lazy<object?>(() => pair.Left!.Read(leftValue));
+            var rightPropValue = new Lazy<object?>(() => pair.Right!.Read(rightValue));
 
             if (IsPropertyIgnored(pair))
             {
                 continue;
             }
 
-            if (SourceAndDestinationPresent(pair))
+            if (LeftAndRightPresent(pair))
             {
                 var (result, innerContext) = inner.Compare(
-                    context.VisitingProperty(pair.SourceName, pair.DestinationName),
-                    sourceValue.Value,
-                    destinationValue.Value
+                    context.VisitingProperty(pair.LeftName, pair.RightName),
+                    leftPropValue.Value,
+                    rightPropValue.Value
                 );
 
                 results.Add(result);
@@ -64,24 +64,24 @@ public class ComplexObjectComparer
             }
             else if (!ignoreUnmatchedProperties)
             {
-                if (pair.Source == null)
+                if (pair.Left == null)
                 {
                     currentContext = currentContext.AddDifference(
                         "(missing)",
-                        destinationValue.Value,
-                        pair.SourceName,
-                        pair.DestinationName
+                        rightPropValue.Value,
+                        pair.LeftName,
+                        pair.RightName
                     );
                     results.Add(ComparisonResult.Fail);
                 }
 
-                if (pair.Destination == null)
+                if (pair.Right == null)
                 {
                     currentContext = currentContext.AddDifference(
-                        sourceValue.Value,
+                        leftPropValue.Value,
                         "(missing)",
-                        pair.SourceName,
-                        pair.DestinationName
+                        pair.LeftName,
+                        pair.RightName
                     );
                     results.Add(ComparisonResult.Fail);
                 }
@@ -91,48 +91,40 @@ public class ComplexObjectComparer
         return (results.ToResult(), currentContext);
     }
 
-    private bool SourceAndDestinationPresent(PropertyPair pair)
+    private bool LeftAndRightPresent(PropertyPair pair)
     {
-        return pair.Source != null && pair.Destination != null;
+        return pair.Left != null && pair.Right != null;
     }
 
-    private List<PropertyPair> PreparePropertyInfo(object source, object destination)
+    private List<PropertyPair> PreparePropertyInfo(object leftValue, object rightValue)
     {
-        var sourceType = source.GetType();
-        var destinationType = destination.GetType();
+        var leftType = leftValue.GetType();
+        var rightType = rightValue.GetType();
 
-        var sourceProperties = ReflectionCache.GetProperties(source);
+        var leftProperties = ReflectionCache.GetProperties(leftValue);
 
-        var destinationProperties = ReflectionCache
-            .GetProperties(destination)
-            .ToDictionary(x => x.Name);
+        var rightProperties = ReflectionCache.GetProperties(rightValue).ToDictionary(x => x.Name);
 
         var propertyMap = new List<PropertyPair>();
 
-        foreach (var property in sourceProperties)
+        foreach (var leftProp in leftProperties)
         {
-            var sourceName = property.Name;
-            var destinationName = GetMappedPropertyName(sourceType, destinationType, sourceName);
+            var leftPropName = leftProp.Name;
+            var rightPropName = GetMappedPropertyName(leftType, rightType, leftPropName);
 
-            if (destinationProperties.ContainsKey(destinationName))
+            if (rightProperties.ContainsKey(rightPropName))
             {
-                propertyMap.Add(
-                    new PropertyPair(
-                        property,
-                        destinationProperties[destinationName],
-                        sourceName,
-                        destinationName
-                    )
-                );
-                destinationProperties.Remove(destinationName);
+                var rightProp = rightProperties[rightPropName];
+                propertyMap.Add(new PropertyPair(leftProp, rightProp, leftPropName, rightPropName));
+                rightProperties.Remove(rightPropName);
             }
             else
             {
-                propertyMap.Add(new PropertyPair(property, null, sourceName, destinationName));
+                propertyMap.Add(new PropertyPair(leftProp, null, leftPropName, rightPropName));
             }
         }
 
-        foreach (var property in destinationProperties.Values)
+        foreach (var property in rightProperties.Values)
         {
             propertyMap.Add(new PropertyPair(null, property, property.Name, property.Name));
         }
@@ -140,27 +132,27 @@ public class ComplexObjectComparer
         return propertyMap;
     }
 
-    private string GetMappedPropertyName(Type sourceType, Type destinationType, string sourceName)
+    private string GetMappedPropertyName(Type leftType, Type rightType, string leftPropName)
     {
         foreach (var map in mappedProperties)
         {
-            var result = map(sourceType, destinationType, sourceName);
+            var result = map(leftType, rightType, leftPropName);
             if (result != null)
                 return result;
         }
-        return sourceName;
+        return leftPropName;
     }
 
     private bool IsPropertyIgnored(PropertyPair pair)
     {
         foreach (var ignoredProperty in ignoredProperties)
         {
-            if (pair.Source != null && ignoredProperty(pair.Source))
+            if (pair.Left != null && ignoredProperty(pair.Left))
             {
                 return true;
             }
 
-            if (pair.Destination != null && ignoredProperty(pair.Destination))
+            if (pair.Right != null && ignoredProperty(pair.Right))
             {
                 return true;
             }
@@ -172,21 +164,21 @@ public class ComplexObjectComparer
     private class PropertyPair
     {
         public PropertyPair(
-            PropertyReader? source,
-            PropertyReader? destination,
-            string sourceName,
-            string destinationName
+            PropertyReader? left,
+            PropertyReader? right,
+            string leftName,
+            string rightName
         )
         {
-            Source = source;
-            Destination = destination;
-            SourceName = sourceName;
-            DestinationName = destinationName;
+            Left = left;
+            Right = right;
+            LeftName = leftName;
+            RightName = rightName;
         }
 
-        public PropertyReader? Source { get; }
-        public PropertyReader? Destination { get; }
-        public string SourceName { get; }
-        public string DestinationName { get; }
+        public PropertyReader? Left { get; }
+        public PropertyReader? Right { get; }
+        public string LeftName { get; }
+        public string RightName { get; }
     }
 }

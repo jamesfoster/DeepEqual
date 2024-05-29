@@ -11,7 +11,7 @@ public class SetDifferenceFormatter : DifferenceFormatterBase
         var sb = new StringBuilder();
 
         sb.AppendFormat(
-            "Actual{0} != Expected{1}",
+            "{0} != {1}",
             setDifference.Breadcrumb.Left,
             setDifference.Breadcrumb.Right
         );
@@ -20,7 +20,7 @@ public class SetDifferenceFormatter : DifferenceFormatterBase
         {
             sb.AppendLine();
             sb.AppendFormat(
-                "Actual{0} contains the following unmatched elements:",
+                "{0} contains the following unmatched elements:",
                 setDifference.Breadcrumb.Left
             );
             foreach (var o in setDifference.Extra)
@@ -34,7 +34,7 @@ public class SetDifferenceFormatter : DifferenceFormatterBase
         {
             sb.AppendLine();
             sb.AppendFormat(
-                "Expected{0} contains the following unmatched elements:",
+                "{0} contains the following unmatched elements:",
                 setDifference.Breadcrumb.Right
             );
             foreach (var o in setDifference.Expected)

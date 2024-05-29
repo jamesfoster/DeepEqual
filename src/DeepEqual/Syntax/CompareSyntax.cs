@@ -3,25 +3,24 @@
 using System.Diagnostics.Contracts;
 using DeepEqual.Formatting;
 
-public class CompareSyntax<TActual, TExpected>
-    : IComparisonBuilder<CompareSyntax<TActual, TExpected>>
-    where TActual : notnull
-    where TExpected : notnull
+public class CompareSyntax<TLeft, TRight> : IComparisonBuilder<CompareSyntax<TLeft, TRight>>
+    where TLeft : notnull
+    where TRight : notnull
 {
-    public TActual Actual { get; set; }
-    public TExpected Expected { get; set; }
+    public TLeft Left { get; set; }
+    public TRight Right { get; set; }
 
     internal IComparisonBuilder<ComparisonBuilder> Builder { get; set; }
 
-    public CompareSyntax(TActual actual, TExpected expected)
+    public CompareSyntax(TLeft left, TRight right)
     {
-        Actual = actual;
-        Expected = expected;
+        Left = left;
+        Right = right;
         Builder = ComparisonBuilder.Get();
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> MapProperty<A, B>(
+    public CompareSyntax<TLeft, TRight> MapProperty<A, B>(
         Expression<Func<A, object?>> left,
         Expression<Func<B, object?>> right
     )
@@ -31,8 +30,8 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreSourceProperty(
-        Expression<Func<TActual, object?>> property
+    public CompareSyntax<TLeft, TRight> IgnoreLeftProperty(
+        Expression<Func<TLeft, object?>> property
     )
     {
         Builder.IgnoreProperty(property);
@@ -40,8 +39,8 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreDestinationProperty(
-        Expression<Func<TExpected, object?>> property
+    public CompareSyntax<TLeft, TRight> IgnoreRightProperty(
+        Expression<Func<TRight, object?>> property
     )
     {
         Builder.IgnoreProperty(property);
@@ -49,37 +48,35 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreProperty<T>(
-        Expression<Func<T, object?>> property
-    )
+    public CompareSyntax<TLeft, TRight> IgnoreProperty<T>(Expression<Func<T, object?>> property)
     {
         Builder.IgnoreProperty(property);
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreProperty(Func<PropertyReader, bool> func)
+    public CompareSyntax<TLeft, TRight> IgnoreProperty(Func<PropertyReader, bool> func)
     {
         Builder.IgnoreProperty(func);
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> SkipDefault<T>()
+    public CompareSyntax<TLeft, TRight> SkipDefault<T>()
     {
         Builder.SkipDefault<T>();
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> WithCustomComparison(IComparison comparison)
+    public CompareSyntax<TLeft, TRight> WithCustomComparison(IComparison comparison)
     {
         Builder.WithCustomComparison(comparison);
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> WithCustomComparison(
+    public CompareSyntax<TLeft, TRight> WithCustomComparison(
         Func<IComparison, IComparison> comparison
     )
     {
@@ -88,7 +85,7 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> WithCustomFormatter<TDifference>(
+    public CompareSyntax<TLeft, TRight> WithCustomFormatter<TDifference>(
         IDifferenceFormatter formatter
     )
         where TDifference : Difference
@@ -98,28 +95,28 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreUnmatchedProperties()
+    public CompareSyntax<TLeft, TRight> IgnoreUnmatchedProperties()
     {
         Builder.IgnoreUnmatchedProperties();
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> ExposeInternalsOf<T>()
+    public CompareSyntax<TLeft, TRight> ExposeInternalsOf<T>()
     {
         Builder.ExposeInternalsOf<T>();
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> ExposeInternalsOf(params Type[] types)
+    public CompareSyntax<TLeft, TRight> ExposeInternalsOf(params Type[] types)
     {
         Builder.ExposeInternalsOf(types);
         return this;
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> WithFloatingPointTolerance(
+    public CompareSyntax<TLeft, TRight> WithFloatingPointTolerance(
         double doubleTolerance = 1e-15d,
         float singleTolerance = 1e-6f
     )
@@ -129,7 +126,7 @@ public class CompareSyntax<TActual, TExpected>
     }
 
     [Pure]
-    public CompareSyntax<TActual, TExpected> IgnoreCircularReferences()
+    public CompareSyntax<TLeft, TRight> IgnoreCircularReferences()
     {
         Builder.IgnoreCircularReferences();
         return this;
@@ -138,22 +135,22 @@ public class CompareSyntax<TActual, TExpected>
     [Pure]
     public bool Compare()
     {
-        return Actual.IsDeepEqual(Expected, Builder.Create());
+        return Left.IsDeepEqual(Right, Builder.Create());
     }
 
     public void Assert()
     {
-        Actual.ShouldDeepEqual(Expected, Builder.Create(), Builder.GetFormatterFactory());
+        Left.ShouldDeepEqual(Right, Builder.Create(), Builder.GetFormatterFactory());
     }
 
     //ncrunch: no coverage start
-    IComparison IComparisonBuilder<CompareSyntax<TActual, TExpected>>.Create()
+    IComparison IComparisonBuilder<CompareSyntax<TLeft, TRight>>.Create()
     {
         throw new NotImplementedException();
     }
 
     IDifferenceFormatterFactory IComparisonBuilder<
-        CompareSyntax<TActual, TExpected>
+        CompareSyntax<TLeft, TRight>
     >.GetFormatterFactory()
     {
         throw new NotImplementedException();

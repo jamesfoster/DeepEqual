@@ -7,9 +7,9 @@ public class MissingEntryDifferenceFormatter : DifferenceFormatterBase
         var difference = (MissingEntryDifference)diff;
 
         var format =
-            difference.Side == MissingSide.Expected
-                ? "Expected{1}[{2}] not found (Actual{0}[{2}] = {3})"
-                : "Actual{0}[{2}] not found (Expected{1}[{2}] = {3})";
+            difference.Side == MissingSide.Right
+                ? "{1}[{2}] not found ({0}[{2}] = {3})"
+                : "{0}[{2}] not found ({1}[{2}] = {3})";
 
         return string.Format(
             format,

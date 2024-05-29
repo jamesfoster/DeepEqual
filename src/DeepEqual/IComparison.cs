@@ -2,11 +2,11 @@
 
 public interface IComparison
 {
-    bool CanCompare(Type type1, Type type2);
+    bool CanCompare(Type leftType, Type rightType);
 
     (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     );
 }

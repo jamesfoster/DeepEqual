@@ -6,7 +6,7 @@ public class ComparisonContext : IComparisonContext
     public BreadcrumbPair Breadcrumb { get; }
 
     public ComparisonContext()
-        : this(BreadcrumbPair.Empty) { }
+        : this(new BreadcrumbPair("Left", "Right")) { }
 
     public ComparisonContext(BreadcrumbPair breadcrumb)
         : this(null, breadcrumb) { }

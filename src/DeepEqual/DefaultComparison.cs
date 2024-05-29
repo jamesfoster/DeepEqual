@@ -9,55 +9,55 @@ public class DefaultComparison : IComparison
         SkippedTypes = new List<Type>();
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        return !IsSkipped(type1)
-            && !IsSkipped(type2)
-            && !ReflectionCache.IsValueTypeWithReferenceFields(type1)
-            && !ReflectionCache.IsValueTypeWithReferenceFields(type2);
+        return !IsSkipped(leftType)
+            && !IsSkipped(rightType)
+            && !ReflectionCache.IsValueTypeWithReferenceFields(leftType)
+            && !ReflectionCache.IsValueTypeWithReferenceFields(rightType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        var type1 = value1.GetType();
-        var type2 = value2.GetType();
+        var leftType = leftValue.GetType();
+        var rightType = rightValue.GetType();
 
-        if (IsSkipped(type1) || IsSkipped(type2))
+        if (IsSkipped(leftType) || IsSkipped(rightType))
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        if (type1 != type2)
+        if (leftType != rightType)
         {
-            if (CoerceValues(ref value1, ref value2))
+            if (CoerceValues(ref leftValue, ref rightValue))
             {
-                type1 = value1.GetType();
-                type2 = value2.GetType();
+                leftType = leftValue.GetType();
+                rightType = rightValue.GetType();
 
-                if (type1 != type2)
+                if (leftType != rightType)
                 {
                     return (ComparisonResult.Inconclusive, context);
                 }
             }
         }
 
-        if (value1.Equals(value2))
+        if (leftValue.Equals(rightValue))
         {
             return (ComparisonResult.Pass, context);
         }
 
-        if (ReflectionCache.IsValueType(type1))
+        if (ReflectionCache.IsValueType(leftType))
         {
-            return (ComparisonResult.Fail, context.AddDifference(value1, value2));
+            return (ComparisonResult.Fail, context.AddDifference(leftValue, rightValue));
         }
 
         return (ComparisonResult.Inconclusive, context);
@@ -73,24 +73,24 @@ public class DefaultComparison : IComparison
         SkippedTypes.Add(typeof(T));
     }
 
-    private static bool CoerceValues(ref object value1, ref object value2)
+    private static bool CoerceValues(ref object leftValue, ref object rightValue)
     {
         try
         {
-            value2 = Convert.ChangeType(value2, value1.GetType());
+            rightValue = Convert.ChangeType(rightValue, leftValue.GetType());
             return true;
         }
         catch { }
 
         try
         {
-            value1 = Convert.ChangeType(value1, value2.GetType());
+            leftValue = Convert.ChangeType(leftValue, rightValue.GetType());
             return true;
         }
         catch { }
 
-        return CallImplicitOperator(ref value2, value1.GetType())
-            || CallImplicitOperator(ref value1, value2.GetType());
+        return CallImplicitOperator(ref rightValue, leftValue.GetType())
+            || CallImplicitOperator(ref leftValue, rightValue.GetType());
     }
 
     private static bool CallImplicitOperator(ref object value, Type destType)

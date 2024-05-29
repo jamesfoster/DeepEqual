@@ -9,48 +9,48 @@ namespace DeepEqual.Test.Syntax;
 
 public class ResultTests
 {
-	private object a = new object();
-	private object b = new object();
+    private object a = new object();
+    private object b = new object();
 
-	[Fact]
-	public void PassResult()
-	{
-		var comparison = new EchoComparison(ComparisonResult.Pass);
+    [Fact]
+    public void PassResult()
+    {
+        var comparison = new EchoComparison(ComparisonResult.Pass);
 
-		DeepAssert.AreEqual(a, b, comparison);
-	}
+        DeepAssert.AreEqual(a, b, comparison);
+    }
 
-	[Fact]
-	public void FailResult()
-	{
-		var comparison = new EchoComparison(ComparisonResult.Fail);
+    [Fact]
+    public void FailResult()
+    {
+        var comparison = new EchoComparison(ComparisonResult.Fail);
 
-		DeepAssert.AreNotEqual(a, b, comparison);
-	}
+        DeepAssert.AreNotEqual(a, b, comparison);
+    }
 
-	[Fact]
-	public void InconclusiveResult()
-	{
-		var comparison = new EchoComparison(ComparisonResult.Inconclusive);
+    [Fact]
+    public void InconclusiveResult()
+    {
+        var comparison = new EchoComparison(ComparisonResult.Inconclusive);
 
-		DeepAssert.AreNotEqual(a, b, comparison);
-	}
+        DeepAssert.AreNotEqual(a, b, comparison);
+    }
 
-	[Fact]
-	public void ExceptionContainsExpectedInfo()
-	{
-		var value1 = new { A = 1 };
-		var value2 = new { A = 2 };
+    [Fact]
+    public void ExceptionContainsExpectedInfo()
+    {
+        var value1 = new { A = 1 };
+        var value2 = new { A = 2 };
 
-		var exception = Assert.Throws<DeepEqualException>(() => value1.ShouldDeepEqual(value2));
+        var exception = Assert.Throws<DeepEqualException>(() => value1.ShouldDeepEqual(value2));
 
-		var difference = exception.Context.Differences
-			.ShouldHaveSingleItem()
-			.ShouldBeAssignableTo<BasicDifference>();
+        var difference = exception.Context.Differences
+            .ShouldHaveSingleItem()
+            .ShouldBeAssignableTo<BasicDifference>();
 
-		difference.Breadcrumb.Left.ShouldBe(".A");
-		difference.Breadcrumb.Right.ShouldBe(".A");
-		difference.Value1.ShouldBe(1);
-		difference.Value2.ShouldBe(2);
-	}
+        difference.Breadcrumb.Left.ShouldBe("Left.A");
+        difference.Breadcrumb.Right.ShouldBe("Right.A");
+        difference.LeftValue.ShouldBe(1);
+        difference.RightValue.ShouldBe(2);
+    }
 }

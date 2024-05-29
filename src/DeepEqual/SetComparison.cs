@@ -9,66 +9,66 @@ public class SetComparison : IComparison
         Inner = inner;
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        var isSetType1 = ReflectionCache.IsSetType(type1);
-        var isSetType2 = ReflectionCache.IsSetType(type2);
+        var isSetType1 = ReflectionCache.IsSetType(leftType);
+        var isSetType2 = ReflectionCache.IsSetType(rightType);
 
         if (!isSetType1 && !isSetType2)
             return false;
 
-        if (!isSetType1 && !ReflectionCache.IsListType(type1))
+        if (!isSetType1 && !ReflectionCache.IsListType(leftType))
             return false;
 
-        if (!isSetType2 && !ReflectionCache.IsListType(type2))
+        if (!isSetType2 && !ReflectionCache.IsListType(rightType))
             return false;
 
-        var elementType1 = ReflectionCache.GetEnumerationType(type1);
-        var elementType2 = ReflectionCache.GetEnumerationType(type2);
+        var leftElementType = ReflectionCache.GetEnumerationType(leftType);
+        var rightElementType = ReflectionCache.GetEnumerationType(rightType);
 
-        return Inner.CanCompare(elementType1, elementType2);
+        return Inner.CanCompare(leftElementType, rightElementType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        var set1 = ((IEnumerable)value1).Cast<object>().ToArray();
-        var set2 = ((IEnumerable)value2).Cast<object>().ToArray();
+        var leftSet = ((IEnumerable)leftValue).Cast<object>().ToArray();
+        var rightSet = ((IEnumerable)rightValue).Cast<object>().ToArray();
 
-        if (set1.Length != set2.Length)
+        if (leftSet.Length != rightSet.Length)
         {
             return (
                 ComparisonResult.Fail,
-                context.AddDifference(set1.Length, set2.Length, "Count", "Count")
+                context.AddDifference(leftSet.Length, rightSet.Length, "Count", "Count")
             );
         }
 
-        if (set1.Length == 0)
+        if (leftSet.Length == 0)
         {
             return (ComparisonResult.Pass, context);
         }
 
-        return SetsEqual(context, set1, set2);
+        return SetsEqual(context, leftSet, rightSet);
     }
 
     private (ComparisonResult result, IComparisonContext context) SetsEqual(
         IComparisonContext context,
-        object[] set1,
-        object[] set2
+        object[] leftSet,
+        object[] rightSet
     )
     {
-        var expected = set2.ToList();
+        var expected = rightSet.ToList();
         var extra = new List<object>();
 
-        foreach (var obj in set1)
+        foreach (var obj in leftSet)
         {
             var innerContext = new ComparisonContext();
             var found = expected.FirstOrDefault(e =>

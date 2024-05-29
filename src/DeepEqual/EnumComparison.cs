@@ -2,62 +2,62 @@ namespace DeepEqual;
 
 public class EnumComparison : IComparison
 {
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        if (!type1.IsEnum && !type2.IsEnum)
+        if (!leftType.IsEnum && !rightType.IsEnum)
             return false;
 
-        return (type1.IsEnum || type1 == typeof(string) || type1 == typeof(int))
-            && (type2.IsEnum || type2 == typeof(string) || type2 == typeof(int));
+        return (leftType.IsEnum || leftType == typeof(string) || leftType == typeof(int))
+            && (rightType.IsEnum || rightType == typeof(string) || rightType == typeof(int));
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        var value1IsEnum = value1.GetType().IsEnum;
-        var value2IsEnum = value2.GetType().IsEnum;
+        var leftValueIsEnum = leftValue.GetType().IsEnum;
+        var rightValueIsEnum = rightValue.GetType().IsEnum;
 
-        if (value1IsEnum && value2IsEnum)
+        if (leftValueIsEnum && rightValueIsEnum)
         {
-            return value1.ToString() == value2.ToString()
+            return leftValue.ToString() == rightValue.ToString()
                 ? (ComparisonResult.Pass, context)
-                : (ComparisonResult.Fail, context.AddDifference(value1, value2));
+                : (ComparisonResult.Fail, context.AddDifference(leftValue, rightValue));
         }
 
-        var areEqual = value1IsEnum
-            ? CompareEnumWithConversion(value1, value2)
-            : CompareEnumWithConversion(value2, value1);
+        var areEqual = leftValueIsEnum
+            ? CompareEnumWithConversion(leftValue, rightValue)
+            : CompareEnumWithConversion(rightValue, leftValue);
 
         return areEqual
             ? (ComparisonResult.Pass, context)
-            : (ComparisonResult.Fail, context.AddDifference(value1, value2));
+            : (ComparisonResult.Fail, context.AddDifference(leftValue, rightValue));
     }
 
-    private static bool CompareEnumWithConversion(object value1, object value2)
+    private static bool CompareEnumWithConversion(object leftValue, object rightValue)
     {
-        var type = value1.GetType();
+        var type = leftValue.GetType();
 
         try
         {
-            if (value2 is int i)
-                value2 = Enum.ToObject(type, i);
+            if (rightValue is int i)
+                rightValue = Enum.ToObject(type, i);
 
-            if (value2 is string s)
-                value2 = Enum.Parse(type, s);
+            if (rightValue is string s)
+                rightValue = Enum.Parse(type, s);
         }
         catch (Exception)
         {
             return false;
         }
 
-        return value1.Equals(value2);
+        return leftValue.Equals(rightValue);
     }
 }

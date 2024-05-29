@@ -16,21 +16,25 @@ Usage
 To test equality simply call the `IsDeepEqual` extension method.
 
 ```c#
-bool result = object1.IsDeepEqual(object2);
+bool result = left.IsDeepEqual(right);
 ```
 
 When used inside a test you might want to call  `ShouldDeepEqual` instead. This method throws an exception with a detailed description of the differences between the 2 objects.
 
 ```c#
-object1.ShouldDeepEqual(object2);
+left.ShouldDeepEqual(right);
+
+// or
+
+left.ShouldDeepEqual(right, comparrison);
 ```
 
 You can pass a custom comparison as the second argument to the `ShouldDeepEqual` method to override the default behaviour. You can also customize the behaviour inline using the `WithDeepEqual` extension method.
 
 ```c#
-object1.WithDeepEqual(object2)
+left.WithDeepEqual(right)
        .SkipDefault<MyEntity>()
-       .IgnoreSourceProperty(x => x.Id)
+       .IgnoreLeftProperty(x => x.Id)
        .Assert()
 ```
 

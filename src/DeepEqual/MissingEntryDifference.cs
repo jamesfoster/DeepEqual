@@ -9,6 +9,6 @@ public record MissingEntryDifference(
 
 public enum MissingSide
 {
-    Actual,
-    Expected
+    Left,
+    Right
 }

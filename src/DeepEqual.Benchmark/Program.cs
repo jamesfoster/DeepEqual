@@ -86,19 +86,19 @@
 
     public class CustomComparison : IComparison
     {
-        public bool CanCompare(Type type1, Type type2)
+        public bool CanCompare(Type leftType, Type rightType)
         {
-            return type1 == typeof(Custom) && type1 == type2;
+            return leftType == typeof(Custom) && leftType == rightType;
         }
 
         public (ComparisonResult result, IComparisonContext context) Compare(
             IComparisonContext context,
-            object value1,
-            object value2
+            object leftValue,
+            object rightValue
         )
         {
-            var custom1 = (Custom)value1;
-            var custom2 = (Custom)value2;
+            var custom1 = (Custom)leftValue;
+            var custom2 = (Custom)rightValue;
 
             var str1 = custom1.Value.ToString();
             var str2 = custom2.Value.ToString();
@@ -108,7 +108,7 @@
                 return (ComparisonResult.Pass, context);
             }
 
-            return (ComparisonResult.Fail, context.AddDifference(value1, value2));
+            return (ComparisonResult.Fail, context.AddDifference(leftValue, rightValue));
         }
     }
 }

@@ -11,38 +11,39 @@ public class DictionaryComparison : IComparison
         ValueComparer = valueComparer;
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        return ReflectionCache.IsDictionaryType(type1) && ReflectionCache.IsDictionaryType(type2);
+        return ReflectionCache.IsDictionaryType(leftType)
+            && ReflectionCache.IsDictionaryType(rightType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 is not IDictionary dict1)
+        if (leftValue is not IDictionary leftDict)
         {
             return (ComparisonResult.Inconclusive, context);
         }
-        if (value2 is not IDictionary dict2)
+        if (rightValue is not IDictionary rightDict)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        if (dict1.Count != dict2.Count)
+        if (leftDict.Count != rightDict.Count)
         {
             return (
                 ComparisonResult.Fail,
-                context.AddDifference(dict1.Count, dict2.Count, "Count", "Count")
+                context.AddDifference(leftDict.Count, rightDict.Count, "Count", "Count")
             );
         }
 
-        var dict2entries = CastToDictionaryEntries(dict2)
+        var rightDictEntries = CastToDictionaryEntries(rightDict)
             .ToDictionary(e => e.Key, e => (object?)e.Value);
 
-        if (dict1.Count == 0)
+        if (leftDict.Count == 0)
         {
             return (ComparisonResult.Pass, context);
         }
@@ -50,17 +51,17 @@ public class DictionaryComparison : IComparison
         var newContext = context;
         var results = new List<ComparisonResult>();
 
-        foreach (DictionaryEntry entry in dict1)
+        foreach (DictionaryEntry leftEntry in leftDict)
         {
-            var key = FindKey(dict2entries, entry.Key);
+            var key = FindKey(rightDictEntries, leftEntry.Key);
 
             if (key == null)
             {
                 var difference = new MissingEntryDifference(
                     context.Breadcrumb,
-                    MissingSide.Expected,
-                    entry.Key,
-                    entry.Value
+                    MissingSide.Right,
+                    leftEntry.Key,
+                    leftEntry.Value
                 );
 
                 context.AddDifference(difference);
@@ -68,12 +69,12 @@ public class DictionaryComparison : IComparison
                 continue;
             }
 
-            var value = dict2entries[key];
-            dict2entries.Remove(key);
+            var value = rightDictEntries[key];
+            rightDictEntries.Remove(key);
 
             var (result, innerContext) = ValueComparer.Compare(
                 context.VisitingIndex(key),
-                entry.Value,
+                leftEntry.Value,
                 value
             );
 
@@ -81,14 +82,14 @@ public class DictionaryComparison : IComparison
             newContext = newContext.MergeDifferencesFrom(innerContext);
         }
 
-        if (dict2entries.Count == 0)
+        if (rightDictEntries.Count == 0)
             return (results.ToResult(), newContext);
 
-        foreach (var entry in dict2entries)
+        foreach (var entry in rightDictEntries)
         {
             var difference = new MissingEntryDifference(
                 context.Breadcrumb,
-                MissingSide.Actual,
+                MissingSide.Left,
                 entry.Key,
                 entry.Value
             );

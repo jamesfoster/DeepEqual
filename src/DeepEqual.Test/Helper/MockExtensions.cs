@@ -8,14 +8,14 @@ namespace DeepEqual.Test.Helper;
 
 public static class MockExtensions
 {
-	public static void VerifyAll<T>(
-		this IEnumerable<Mock<T>> source,
-		Expression<Action<T>> action,
-		Times times) where T : class
-	{
-		foreach (var mock in source)
-		{
-			mock.Verify(action, times);
-		}
-	}
+    public static void VerifyAll<T>(
+        this IEnumerable<Mock<T>> source,
+        Expression<Action<T>> action,
+        Times times) where T : class
+    {
+        foreach (var mock in source)
+        {
+            mock.Verify(action, times);
+        }
+    }
 }

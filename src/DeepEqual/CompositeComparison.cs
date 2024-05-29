@@ -22,33 +22,33 @@ public class CompositeComparison : IComparison
         Comparisons.AddRange(comparisons);
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
         return true;
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null && value2 == null)
+        if (leftValue == null && rightValue == null)
         {
             return (ComparisonResult.Pass, context);
         }
 
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
-            return (ComparisonResult.Fail, context.AddDifference(value1, value2));
+            return (ComparisonResult.Fail, context.AddDifference(leftValue, rightValue));
         }
 
         foreach (var c in Comparisons)
         {
-            if (!c.CanCompare(value1.GetType(), value2.GetType()))
+            if (!c.CanCompare(leftValue.GetType(), rightValue.GetType()))
                 continue;
 
-            var (result, newContext) = c.Compare(context, value1, value2);
+            var (result, newContext) = c.Compare(context, leftValue, rightValue);
             context = newContext;
 
             if (result != ComparisonResult.Inconclusive)

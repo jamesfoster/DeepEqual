@@ -9,35 +9,35 @@ public class ListComparison : IComparison
         Inner = inner;
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        if (!ReflectionCache.IsListType(type1) || !ReflectionCache.IsListType(type2))
+        if (!ReflectionCache.IsListType(leftType) || !ReflectionCache.IsListType(rightType))
             return false;
 
         return checkInnerCanCompare();
 
         bool checkInnerCanCompare()
         {
-            var innerType1 = ReflectionCache.GetEnumerationType(type1);
-            var innerType2 = ReflectionCache.GetEnumerationType(type2);
+            var innerLeftType = ReflectionCache.GetEnumerationType(leftType);
+            var innerRightType = ReflectionCache.GetEnumerationType(rightType);
 
-            return Inner.CanCompare(innerType1, innerType2);
+            return Inner.CanCompare(innerLeftType, innerRightType);
         }
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
 
-        var list1 = ((IEnumerable)value1).Cast<object>().ToArray();
-        var list2 = ((IEnumerable)value2).Cast<object>().ToArray();
+        var list1 = ((IEnumerable)leftValue).Cast<object>().ToArray();
+        var list2 = ((IEnumerable)rightValue).Cast<object>().ToArray();
 
         var length = list1.Length;
 
@@ -56,15 +56,15 @@ public class ListComparison : IComparison
 
         return Enumerable
             .Range(0, length)
-            .Select(i => (value1: list1[i], value2: list2[i], index: i))
+            .Select(i => (leftValue: list1[i], rightValue: list2[i], index: i))
             .Aggregate(
                 (result: ComparisonResult.Inconclusive, context: context),
                 (acc, x) =>
                 {
                     var (newResult, newContext) = Inner.Compare(
                         context.VisitingIndex(x.index),
-                        x.value1,
-                        x.value2
+                        x.leftValue,
+                        x.rightValue
                     );
                     return (
                         acc.result.Plus(newResult),

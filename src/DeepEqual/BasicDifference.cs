@@ -2,8 +2,8 @@
 
 public record BasicDifference(
     BreadcrumbPair Breadcrumb,
-    object? Value1,
-    object? Value2,
+    object? LeftValue,
+    object? RightValue,
     string? LeftChildProperty,
     string? RightChildProperty
 ) : Difference(Breadcrumb);

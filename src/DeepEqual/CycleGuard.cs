@@ -10,7 +10,7 @@ public class CycleGuard(IComparison inner) : IComparison
 
     public IComparison Inner { get; } = inner;
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
         return true;
     }
@@ -22,11 +22,11 @@ public class CycleGuard(IComparison inner) : IComparison
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        if (value1 == null || value2 == null)
+        if (leftValue == null || rightValue == null)
         {
             return (ComparisonResult.Inconclusive, context);
         }
@@ -38,20 +38,20 @@ public class CycleGuard(IComparison inner) : IComparison
             foreach (var comparison in arr)
             {
                 var foundCycle =
-                    ReferenceEquals(comparison.Value1, value1)
-                    || ReferenceEquals(comparison.Value2, value2);
+                    ReferenceEquals(comparison.LeftValue, leftValue)
+                    || ReferenceEquals(comparison.RightValue, rightValue);
 
                 if (foundCycle)
                 {
-                    return HandleCycle(comparison, context, value1, value2);
+                    return HandleCycle(comparison, context, leftValue, rightValue);
                 }
             }
         }
 
-        previousComparisons.Push(new ComparisonFrame(context.Breadcrumb, value1, value2));
+        previousComparisons.Push(new ComparisonFrame(context.Breadcrumb, leftValue, rightValue));
         try
         {
-            return Inner.Compare(context, value1, value2);
+            return Inner.Compare(context, leftValue, rightValue);
         }
         finally
         {
@@ -62,13 +62,16 @@ public class CycleGuard(IComparison inner) : IComparison
     private (ComparisonResult result, IComparisonContext context) HandleCycle(
         ComparisonFrame frame,
         IComparisonContext context,
-        object value1,
-        object value2
+        object leftValue,
+        object rightValue
     )
     {
         if (ignoreCircularReferences)
         {
-            if (ReferenceEquals(frame.Value1, value1) && ReferenceEquals(frame.Value2, value2))
+            if (
+                ReferenceEquals(frame.LeftValue, leftValue)
+                && ReferenceEquals(frame.RightValue, rightValue)
+            )
             {
                 return (ComparisonResult.Pass, context);
             }
@@ -79,7 +82,7 @@ public class CycleGuard(IComparison inner) : IComparison
         }
         else
         {
-            return ThrowCircularReferenceException(frame, context, value1, value2);
+            return ThrowCircularReferenceException(frame, context, leftValue, rightValue);
         }
     }
 
@@ -89,8 +92,8 @@ public class CycleGuard(IComparison inner) : IComparison
     ) ThrowCircularReferenceException(
         ComparisonFrame frame,
         IComparisonContext context,
-        object value1,
-        object value2
+        object leftValue,
+        object rightValue
     )
     {
         var message = $"""
@@ -108,8 +111,8 @@ public class CycleGuard(IComparison inner) : IComparison
         throw new ObjectGraphCircularReferenceException(
             message,
             context.Breadcrumb,
-            value1,
-            value2
+            leftValue,
+            rightValue
         );
     }
 
@@ -120,7 +123,7 @@ public class CycleGuard(IComparison inner) : IComparison
 
     private readonly record struct ComparisonFrame(
         BreadcrumbPair Breadcrumb,
-        object Value1,
-        object Value2
+        object LeftValue,
+        object RightValue
     );
 }

@@ -7,20 +7,20 @@ public class JsonElementComparison : IComparison
     private static readonly Type jsonElementType = typeof(JsonElement);
     private static readonly Type[] allowableTypes = { jsonElementType, typeof(string) };
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        return type1 == jsonElementType && allowableTypes.Contains(type2)
-            || type2 == jsonElementType && allowableTypes.Contains(type1);
+        return leftType == jsonElementType && allowableTypes.Contains(rightType)
+            || rightType == jsonElementType && allowableTypes.Contains(leftType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        var element1 = AsJsonElement(value1);
-        var element2 = AsJsonElement(value2);
+        var element1 = AsJsonElement(leftValue);
+        var element2 = AsJsonElement(rightValue);
 
         if (element1 is null || element2 is null)
             return (ComparisonResult.Inconclusive, context);
@@ -53,16 +53,16 @@ public class JsonElementComparison : IComparison
     }
 
     private (ComparisonResult result, IComparisonContext context) CompareObject(
-        JsonElement value1,
-        JsonElement value2,
+        JsonElement leftValue,
+        JsonElement rightValue,
         IComparisonContext context
     )
     {
         var newContext = context;
         var results = new List<ComparisonResult>();
 
-        var properties1 = value1.EnumerateObject().ToDictionary(x => x.Name);
-        var properties2 = value2.EnumerateObject().ToDictionary(x => x.Name);
+        var properties1 = leftValue.EnumerateObject().ToDictionary(x => x.Name);
+        var properties2 = rightValue.EnumerateObject().ToDictionary(x => x.Name);
 
         if (properties1.Count == 0 && properties2.Count == 0)
         {
@@ -89,7 +89,7 @@ public class JsonElementComparison : IComparison
                 newContext = newContext.AddDifference(
                     new MissingEntryDifference(
                         context.Breadcrumb,
-                        MissingSide.Expected,
+                        MissingSide.Right,
                         name,
                         prop1.Value
                     )
@@ -103,12 +103,7 @@ public class JsonElementComparison : IComparison
             var prop2 = properties2[name];
 
             newContext = newContext.AddDifference(
-                new MissingEntryDifference(
-                    context.Breadcrumb,
-                    MissingSide.Actual,
-                    name,
-                    prop2.Value
-                )
+                new MissingEntryDifference(context.Breadcrumb, MissingSide.Left, name, prop2.Value)
             );
             results.Add(ComparisonResult.Fail);
         }
@@ -117,13 +112,13 @@ public class JsonElementComparison : IComparison
     }
 
     private (ComparisonResult result, IComparisonContext context) CompareArray(
-        JsonElement value1,
-        JsonElement value2,
+        JsonElement leftValue,
+        JsonElement rightValue,
         IComparisonContext context
     )
     {
-        var list1 = value1.EnumerateArray().ToArray();
-        var list2 = value2.EnumerateArray().ToArray();
+        var list1 = leftValue.EnumerateArray().ToArray();
+        var list2 = rightValue.EnumerateArray().ToArray();
 
         var length = list1.Length;
 
@@ -142,15 +137,15 @@ public class JsonElementComparison : IComparison
 
         return Enumerable
             .Range(0, length)
-            .Select(i => (value1: list1[i], value2: list2[i], index: i))
+            .Select(i => (leftValue: list1[i], rightValue: list2[i], index: i))
             .Aggregate(
                 (result: ComparisonResult.Inconclusive, context: context),
                 (acc, x) =>
                 {
                     var (newResult, newContext) = Compare(
                         context.VisitingIndex(x.index),
-                        x.value1,
-                        x.value2
+                        x.leftValue,
+                        x.rightValue
                     );
                     return (
                         acc.result.Plus(newResult),
@@ -161,13 +156,13 @@ public class JsonElementComparison : IComparison
     }
 
     private (ComparisonResult result, IComparisonContext context) CompareString(
-        JsonElement value1,
-        JsonElement value2,
+        JsonElement leftValue,
+        JsonElement rightValue,
         IComparisonContext context
     )
     {
-        var str1 = value1.GetString();
-        var str2 = value2.GetString();
+        var str1 = leftValue.GetString();
+        var str2 = rightValue.GetString();
 
         if (str1 != str2)
             return (ComparisonResult.Fail, context.AddDifference(str1, str2));
@@ -176,13 +171,13 @@ public class JsonElementComparison : IComparison
     }
 
     private (ComparisonResult result, IComparisonContext context) CompareNumber(
-        JsonElement value1,
-        JsonElement value2,
+        JsonElement leftValue,
+        JsonElement rightValue,
         IComparisonContext context
     )
     {
-        var num1 = value1.GetDouble();
-        var num2 = value2.GetDouble();
+        var num1 = leftValue.GetDouble();
+        var num2 = rightValue.GetDouble();
 
         if (num1 != num2)
             return (ComparisonResult.Fail, context.AddDifference(num1, num2));

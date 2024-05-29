@@ -18,17 +18,17 @@ public class ComplexObjectComparison : IComparison
         MappedProperties = [];
     }
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        return (type1.IsClass && type2.IsClass)
-            || ReflectionCache.IsValueTypeWithReferenceFields(type1)
-            || ReflectionCache.IsValueTypeWithReferenceFields(type2);
+        return (leftType.IsClass && rightType.IsClass)
+            || ReflectionCache.IsValueTypeWithReferenceFields(leftType)
+            || ReflectionCache.IsValueTypeWithReferenceFields(rightType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
         var comparer = new ComplexObjectComparer(
@@ -38,7 +38,7 @@ public class ComplexObjectComparison : IComparison
             MappedProperties
         );
 
-        return comparer.CompareObjects(context, value1, value2);
+        return comparer.CompareObjects(context, leftValue, rightValue);
     }
 
     public void MapProperty<A, B>(

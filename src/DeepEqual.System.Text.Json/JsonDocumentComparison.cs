@@ -8,25 +8,25 @@ public class JsonDocumentComparison : IComparison
     private static readonly Type[] allowableTypes = { jsonDocumentType, typeof(string) };
     private static readonly JsonElementComparison jsonElementComparison = new();
 
-    public bool CanCompare(Type type1, Type type2)
+    public bool CanCompare(Type leftType, Type rightType)
     {
-        return type1 == jsonDocumentType && allowableTypes.Contains(type2)
-            || type2 == jsonDocumentType && allowableTypes.Contains(type1);
+        return leftType == jsonDocumentType && allowableTypes.Contains(rightType)
+            || rightType == jsonDocumentType && allowableTypes.Contains(leftType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,
-        object? value1,
-        object? value2
+        object? leftValue,
+        object? rightValue
     )
     {
-        var doc1 = AsJsonDocument(value1);
-        var doc2 = AsJsonDocument(value2);
+        var leftDoc = AsJsonDocument(leftValue);
+        var rightDoc = AsJsonDocument(rightValue);
 
-        if (doc1 is null || doc2 is null)
+        if (leftDoc is null || rightDoc is null)
             return (ComparisonResult.Inconclusive, context);
 
-        return jsonElementComparison.Compare(context, doc1.RootElement, doc2.RootElement);
+        return jsonElementComparison.Compare(context, leftDoc.RootElement, rightDoc.RootElement);
     }
 
     private static JsonDocument? AsJsonDocument(object? value)
