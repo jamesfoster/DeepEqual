@@ -48,6 +48,15 @@ public class CompareSyntax<TLeft, TRight> : IComparisonBuilder<CompareSyntax<TLe
     }
 
     [Pure]
+    public CompareSyntax<TLeft, TRight> IgnorePropertyIfMissing<T>(
+        Expression<Func<T, object?>> property
+    )
+    {
+        Builder.IgnorePropertyIfMissing(property);
+        return this;
+    }
+
+    [Pure]
     public CompareSyntax<TLeft, TRight> IgnoreProperty<T>(Expression<Func<T, object?>> property)
     {
         Builder.IgnoreProperty(property);

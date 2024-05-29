@@ -102,6 +102,13 @@ public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
         return this;
     }
 
+    public ComparisonBuilder IgnorePropertyIfMissing<T>(Expression<Func<T, object?>> property)
+    {
+        ComplexObjectComparison.IgnorePropertyIfMissing(property);
+
+        return this;
+    }
+
     public ComparisonBuilder IgnoreProperty(Func<PropertyPair, bool> func)
     {
         ComplexObjectComparison.IgnoreProperty(func);

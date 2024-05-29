@@ -5,6 +5,7 @@ using Moq;
 using Xbehave;
 
 using Shouldly;
+using Xunit;
 
 namespace DeepEqual.Test;
 
@@ -79,7 +80,11 @@ public class ComparisonBuilderTests
         var result = default (ComparisonBuilder);
 
         "Given a builder".x(() =>
-            SUT = new ComparisonBuilder()
+            SUT = new ComparisonBuilder().IgnoreCircularReferences()
+        );
+
+        "And a clean reflection cache".x(() =>
+            ReflectionCache.ClearCache()
         );
 
         "When ignoring the Major property of Version".x(() =>
@@ -90,12 +95,12 @@ public class ComparisonBuilderTests
             result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
         );
 
-        "And it should return true for the Major property of the Version type".x(() =>
-            SUT.Create().Compare(
+        "And it should ignore Major property of the Version type".x(() =>
+            SUT.ComplexObjectComparison.Compare(
                 new ComparisonContext(),
                 new Version(9, 9, 9, 9),
                 new Version(1, 9, 9, 9)
-            ).result.ShouldBe(ComparisonResult.Pass)
+            ).context.Differences.ShouldBeEmpty()
         );
     }
 
@@ -105,7 +110,11 @@ public class ComparisonBuilderTests
         var result = default (ComparisonBuilder);
 
         "Given a builder".x(() =>
-            SUT = new ComparisonBuilder()
+            SUT = new ComparisonBuilder().IgnoreCircularReferences()
+        );
+
+        "And a clean reflection cache".x(() =>
+            ReflectionCache.ClearCache()
         );
 
         "When ignoring the Major property of Version".x(() =>
@@ -116,12 +125,94 @@ public class ComparisonBuilderTests
             result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
         );
 
-        "And it should return true for the Major property of the Version type".x(() =>
-            SUT.Create().Compare(
+        "And it should ignore Major property of the Version type".x(() =>
+            SUT.ComplexObjectComparison.Compare(
                 new ComparisonContext(),
                 new Version(9, 9, 9, 9),
                 new Version(1, 9, 9, 9)
-            ).result.ShouldBe(ComparisonResult.Pass)
+            ).context.Differences.ShouldBeEmpty()
+        );
+    }
+
+    [Scenario]
+    public void Ignoring_specific_properties_if_missing_when_not_missing()
+    {
+        var result = default(ComparisonBuilder);
+
+        "Given a builder".x(() =>
+            SUT = new ComparisonBuilder().IgnoreCircularReferences()
+        );
+
+        "And a clean reflection cache".x(() =>
+            ReflectionCache.ClearCache()
+        );
+
+        "When ignoring the Major property of Version".x(() =>
+            result = SUT.IgnorePropertyIfMissing<Version>(x => x.Major)
+        );
+
+        "Then it should add an IgnoredProperty".x(() =>
+            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+        );
+
+        "And it should throw when attempting to compare if the property is not missing".x(() =>
+        {
+            var action = void () => SUT.ComplexObjectComparison.Compare(
+                new ComparisonContext(),
+                new Version(9, 9, 9, 9),
+                new AlmostVersion
+                {
+                    Major = 1,
+                    Minor = 9,
+                    Revision = 9,
+                    Build = 9,
+                    MajorRevision = 0,
+                    MinorRevision = 9
+                }
+            );
+
+            var exception = Assert.Throws<ExpectedMissingProperty>(action);
+            exception.Message.ShouldBe(
+                "Expected property Major to be missing from" +
+                " type DeepEqual.Test.ComparisonBuilderTests+AlmostVersion"
+            );
+        });
+    }
+
+    [Scenario]
+    public void Ignoring_specific_properties_if_missing_when_missing()
+    {
+        var result = default(ComparisonBuilder);
+
+        "Given a builder".x(() =>
+            SUT = new ComparisonBuilder().IgnoreCircularReferences()
+        );
+
+        "And a clean reflection cache".x(() =>
+            ReflectionCache.ClearCache()
+        );
+
+        "When ignoring the Major property of Version".x(() =>
+            result = SUT.IgnorePropertyIfMissing<Version>(x => x.Major)
+        );
+
+        "Then it should add an IgnoredProperty".x(() =>
+            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+        );
+
+        "And it should ignore Major property of the Version type".x(() =>
+            SUT.ComplexObjectComparison.Compare(
+                new ComparisonContext(),
+                new Version(9, 9, 9, 9),
+                new
+                {
+                    Minor = 9,
+                    Revision = 9,
+                    Build = 9,
+                    MajorRevision = 0,
+                    MinorRevision = 9
+                }
+            ).context.Differences.ShouldBeEmpty()
         );
     }
 
@@ -379,5 +470,15 @@ public class ComparisonBuilderTests
         "... and IgnoreUnmatchedProperties should be true".x(() =>
             ((ComplexObjectComparison)result.Comparisons[6]).IgnoreUnmatchedProperties.ShouldBe(true)
         );
+    }
+
+    private class AlmostVersion
+    {
+        public int Major { get; set; }
+        public int Minor { get; set; }
+        public int Revision { get; set; }
+        public int Build { get; set; }
+        public int MajorRevision { get; set; }
+        public int MinorRevision { get; set; }
     }
 }

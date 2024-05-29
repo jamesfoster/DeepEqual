@@ -70,6 +70,37 @@ public class ComplexObjectComparison : IComparison
         IgnoreProperty(typeof(T), name);
     }
 
+    public void IgnorePropertyIfMissing<T>(Expression<Func<T, object?>> property)
+    {
+        if (!GetMemberName(property, out var name))
+        {
+            throw new ArgumentException($"Expression must be a simple member access: {property}");
+        }
+
+        if (name is null)
+            return;
+
+        IgnoreProperty(scope =>
+        {
+            static bool Matches(PropertyReader? reader, Type type, string name)
+            {
+                return reader is not null
+                    && type.IsAssignableFrom(reader.DeclaringType)
+                    && reader.Name == name;
+            }
+            static bool AssertMissing(PropertyReader? reader, string name)
+            {
+                return reader == null
+                    ? true
+                    : throw new ExpectedMissingProperty(
+                        $"Expected property {name} to be missing from type {reader.DeclaringType.FullName}"
+                    );
+            }
+            return Matches(scope.Left, typeof(T), name) && AssertMissing(scope.Right, name)
+                || Matches(scope.Right, typeof(T), name) && AssertMissing(scope.Left, name);
+        });
+    }
+
     private static bool GetMemberName<T>(Expression<Func<T, object?>> property, out string? name)
     {
         var exp = property.Body;

@@ -79,6 +79,14 @@ public class CompareSyntaxTests : IDisposable
     }
 
     [Fact]
+    public void Delegates_IgnorePropertyIfMissing()
+    {
+        syntax.IgnorePropertyIfMissing<Version>(x => x.Major);
+
+        builder.Verify(x => x.IgnorePropertyIfMissing<Version>(y => y.Major), Times.Once());
+    }
+
+    [Fact]
     public void Delegates_IgnoreProperty_2()
     {
         Func<PropertyPair, bool> func = x => x.Left.Name == "Abc";
