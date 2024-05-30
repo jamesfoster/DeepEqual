@@ -3,12 +3,12 @@ namespace DeepEqual.Formatting;
 using System;
 using System.Linq;
 
-public class BasicDifferenceFormatter : DifferenceFormatterBase
+public class BasicDifferenceFormatter : IDifferenceFormatter
 {
     private const int InitialMaxLength = 20;
     private const int HalfMaxLength = InitialMaxLength / 2;
 
-    public override string Format(Difference difference)
+    public string Format(Difference difference)
     {
         var diff =
             difference as BasicDifference
@@ -26,8 +26,8 @@ public class BasicDifferenceFormatter : DifferenceFormatterBase
             "{0} != {1} ({2} != {3})",
             breadcrumb.Left,
             breadcrumb.Right,
-            Prettify(leftValue),
-            Prettify(rightValue)
+            FormatterHelper.Prettify(leftValue),
+            FormatterHelper.Prettify(rightValue)
         );
     }
 

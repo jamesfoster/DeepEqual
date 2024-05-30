@@ -9,11 +9,11 @@ public class ComparisonContext : IComparisonContext
         : this(new BreadcrumbPair("Left", "Right")) { }
 
     public ComparisonContext(BreadcrumbPair breadcrumb)
-        : this(null, breadcrumb) { }
+        : this(ImmutableList<Difference>.Empty, breadcrumb) { }
 
-    public ComparisonContext(ImmutableList<Difference>? differences, BreadcrumbPair breadcrumb)
+    public ComparisonContext(ImmutableList<Difference> differences, BreadcrumbPair breadcrumb)
     {
-        Differences = differences ?? ImmutableList<Difference>.Empty;
+        Differences = differences;
         Breadcrumb = breadcrumb;
     }
 

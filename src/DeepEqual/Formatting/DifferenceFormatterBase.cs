@@ -1,10 +1,8 @@
 namespace DeepEqual.Formatting;
 
-public abstract class DifferenceFormatterBase : IDifferenceFormatter
+internal static class FormatterHelper
 {
-    public abstract string Format(Difference difference);
-
-    protected static string Prettify(object? value)
+    internal static string Prettify(object? value)
     {
         if (value == null)
             return "(null)";

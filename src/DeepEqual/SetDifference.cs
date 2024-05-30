@@ -2,14 +2,14 @@
 
 public record SetDifference(
     BreadcrumbPair Breadcrumb,
-    ImmutableList<object> Expected,
-    ImmutableList<object> Extra
+    ImmutableList<object> MissingInLeft,
+    ImmutableList<object> MissingInRight
 ) : Difference(Breadcrumb)
 {
     public SetDifference(
         BreadcrumbPair breadcrumb,
-        IEnumerable<object> expected,
-        IEnumerable<object> extra
+        IEnumerable<object> missingInLeft,
+        IEnumerable<object> missingInRight
     )
-        : this(breadcrumb, expected.ToImmutableList(), extra.ToImmutableList()) { }
+        : this(breadcrumb, missingInLeft.ToImmutableList(), missingInRight.ToImmutableList()) { }
 }

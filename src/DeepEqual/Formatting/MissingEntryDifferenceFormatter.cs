@@ -1,8 +1,8 @@
 namespace DeepEqual.Formatting;
 
-public class MissingEntryDifferenceFormatter : DifferenceFormatterBase
+public class MissingEntryDifferenceFormatter : IDifferenceFormatter
 {
-    public override string Format(Difference diff)
+    public string Format(Difference diff)
     {
         var difference = (MissingEntryDifference)diff;
 
@@ -15,8 +15,8 @@ public class MissingEntryDifferenceFormatter : DifferenceFormatterBase
             format,
             difference.Breadcrumb.Left,
             difference.Breadcrumb.Right,
-            Prettify(difference.Key),
-            Prettify(difference.Value)
+            FormatterHelper.Prettify(difference.Key),
+            FormatterHelper.Prettify(difference.Value)
         );
     }
 }

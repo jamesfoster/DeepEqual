@@ -1,8 +1,8 @@
 ﻿namespace DeepEqual.Formatting;
 
-public class BreadcrumbDifferenceFormatter : DifferenceFormatterBase
+public class BreadcrumbDifferenceFormatter : IDifferenceFormatter
 {
-    public override string Format(Difference difference)
+    public string Format(Difference difference)
     {
         return $"{difference.Breadcrumb.Left} != {difference.Breadcrumb.Right}";
     }

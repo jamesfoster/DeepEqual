@@ -1,0 +1,10 @@
+﻿using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo(
+    "DeepEqual.Test, PublicKey=00240000048000009400000006020000"
+        + "002400005253413100040000010001001fe9cb2ded59176088ef825aec"
+        + "da1cbd211fa058786a5c1e77b1f2e217f7ec1234a693b33f3f449b5d03"
+        + "f0027941e7e263683de7ae504fbc8f734ab935bb6508249b47beda81ec"
+        + "14e7eb96e2f92f4af67779fc695075cfb38b925820d82e9462d63c3708"
+        + "c453d8d7faf605d328d8ca38e6bd22dac576525808695e134f6cafcc"
+)]

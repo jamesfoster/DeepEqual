@@ -220,8 +220,8 @@ Comparison Failed: The following 1 differences were found.
         context = context
             .AddDifference(new SetDifference(
                 breadcrumb: context.Breadcrumb.Dot("Set"),
-                expected: new List<object> { 1, 2, 3 },
-                extra: new List<object>()
+                missingInLeft: new List<object> { 1, 2, 3 },
+                missingInRight: new List<object>()
             ));
 
         AssertExceptionMessage(
@@ -243,8 +243,8 @@ Comparison Failed: The following 1 differences were found.
         context = context
             .AddDifference(new SetDifference(
                 breadcrumb: context.Breadcrumb.Dot("Set"),
-                expected: new List<object>(),
-                extra: new List<object> {1, 2, 3}
+                missingInLeft: new List<object>(),
+                missingInRight: new List<object> {1, 2, 3}
             ));
 
         AssertExceptionMessage(

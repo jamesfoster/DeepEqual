@@ -444,70 +444,60 @@ public class ComplexObjectComparisonTests
         public new string Property => "abc";
     }
 
-    public static IEnumerable<object[]> SimilarObjectsTestData => new[]
-    {
-        new object[]
-        {
+    public static IEnumerable<object[]> SimilarObjectsTestData => [
+        [
             false,
             new {A = 1, B = 2, C = 3},
             new {A = 1, B = 2, C = 3},
             ComparisonResult.Pass
-        },
-        new object[]
-        {
+        ],
+        [
             false,
             new {},
             new {},
             ComparisonResult.Pass
-        },
-        new object[]
-        {
+        ],
+        [
             false,
             new {A = 1, B = 2, C = 3},
             new {A = 1, B = 2},
             ComparisonResult.Fail
-        },
-        new object[]
-        {
+        ],
+        [
             false,
             new {A = 1, B = 2},
             new {A = 1, B = 2, C = 3},
             ComparisonResult.Fail
-        },
-        new object[]
-        {
+        ],
+        [
             false,
             new {A = 1, B = 2, C = 3},
             new {A = 123, B = 2, C = 3},
             ComparisonResult.Fail
-        },
-        new object[]
-        {
+        ],
+        [
             true,
             new {A = 1, B = 2, C = 3},
             new {A = 1, B = 2, C = 3},
             ComparisonResult.Pass
-        },
-        new object[]
-        {
+        ],
+        [
             true,
             new {A = 1, B = 2, C = 3},
             new {A = 1, B = 2},
             ComparisonResult.Pass
-        },
-        new object[]
-        {
+        ],
+        [
             true,
             new {A = 1, B = 2},
             new {A = 1, B = 2, C = 3},
             ComparisonResult.Pass
-        },
-        new object[]
-        {
+        ],
+        [
             true,
             new {A = 1, B = 2, C = 3},
             new {A = 123, B = 2, C = 3},
             ComparisonResult.Fail
-        }
-    };
+        ]
+    ];
 }

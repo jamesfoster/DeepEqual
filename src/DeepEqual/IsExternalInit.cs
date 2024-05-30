@@ -1,3 +1,7 @@
 ﻿namespace System.Runtime.CompilerServices;
 
-public class IsExternalInit { }
+#if NETSTANDARD
+
+internal class IsExternalInit { }
+
+#endif

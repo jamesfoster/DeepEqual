@@ -1,15 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace DeepEqual;
+﻿namespace DeepEqual;
 
 public class ComplexObjectComparison : IComparison
 {
     public IComparison Inner { get; set; }
 
-    public bool IgnoreUnmatchedProperties { get; set; }
+    internal bool IgnoreUnmatchedProperties { get; set; }
 
-    public List<Func<PropertyPair, bool>> IgnoredProperties { get; set; }
-    public List<Func<Type, Type, string, string?>> MappedProperties { get; set; }
+    internal List<Func<PropertyPair, bool>> IgnoredProperties { get; set; }
+    internal List<Func<Type, Type, string, string?>> MappedProperties { get; set; }
 
     public ComplexObjectComparison(IComparison inner)
     {

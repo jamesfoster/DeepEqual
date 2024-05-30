@@ -2,17 +2,17 @@
 
 public sealed class ComparisonBuilder : IComparisonBuilder<ComparisonBuilder>
 {
-    public IList<IComparison> CustomComparisons { get; set; }
-    public IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
+    internal IList<IComparison> CustomComparisons { get; set; }
+    internal IDictionary<Type, IDifferenceFormatter> CustomFormatters { get; set; }
 
     private CycleGuard CycleGuard { get; set; }
     private CompositeComparison AllComparisons { get; set; }
 
-    public ComplexObjectComparison ComplexObjectComparison { get; set; }
-    public DefaultComparison DefaultComparison { get; set; }
+    internal ComplexObjectComparison ComplexObjectComparison { get; set; }
+    internal DefaultComparison DefaultComparison { get; set; }
 
-    public double DoubleTolerance { get; set; } = 1e-15d;
-    public float SingleTolerance { get; set; } = 1e-6f;
+    internal double DoubleTolerance { get; set; } = 1e-15d;
+    internal float SingleTolerance { get; set; } = 1e-6f;
 
     private static readonly Func<IComparisonBuilder<ComparisonBuilder>> DefaultGet = () =>
         new ComparisonBuilder();
