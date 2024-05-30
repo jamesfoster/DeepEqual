@@ -5,7 +5,7 @@ public class CycleGuard(IComparison inner) : IComparison
     private readonly ThreadLocal<Stack<ComparisonFrame>> framesByThread = new(() => new());
     private bool ignoreCircularReferences = false;
 
-    public IComparison Inner { get; } = inner;
+    internal IComparison Inner { get; } = inner;
 
     public bool CanCompare(Type leftType, Type rightType)
     {

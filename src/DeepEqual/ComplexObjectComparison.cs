@@ -2,7 +2,7 @@
 
 public class ComplexObjectComparison : IComparison
 {
-    public IComparison Inner { get; set; }
+    internal IComparison Inner { get; }
 
     internal bool IgnoreUnmatchedProperties { get; set; }
 

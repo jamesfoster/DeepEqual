@@ -1,6 +1,6 @@
 ﻿using AutoFixture;
 using AutoFixture.AutoMoq;
-
+using AutoFixture.Kernel;
 using DeepEqual.Test.Helper;
 
 using Moq;
@@ -32,6 +32,7 @@ public class CompositComparisonTests
         {
             Fixture = new Fixture();
             Fixture.Customize(new AutoMoqCustomization());
+            Fixture.Customizations.Add(new MethodInvoker(new GreedyConstructorQuery()));
             Fixture.Register(() => BreadcrumbPair.Empty);
         });
 
@@ -59,10 +60,7 @@ public class CompositComparisonTests
         });
 
         "And a CompositeComparer".x(() =>
-            SUT = Fixture
-                .Build<CompositeComparison>()
-                .With(x => x.Comparisons)
-                .Create()
+            SUT = Fixture.Create<CompositeComparison>()
         );
     }
 

@@ -2,7 +2,7 @@
 
 public class DefaultComparison : IComparison
 {
-    public List<Type> SkippedTypes { get; set; }
+    internal List<Type> SkippedTypes { get; }
 
     public DefaultComparison()
     {

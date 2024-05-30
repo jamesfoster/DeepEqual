@@ -2,14 +2,14 @@
 
 public class CompositeComparison : IComparison
 {
-    public List<IComparison> Comparisons { get; set; }
+    internal List<IComparison> Comparisons { get; }
 
     public CompositeComparison()
         : this(Enumerable.Empty<IComparison>()) { }
 
-    public CompositeComparison(IEnumerable<IComparison> comparers)
+    public CompositeComparison(IEnumerable<IComparison> comparisons)
     {
-        Comparisons = comparers.ToList();
+        Comparisons = comparisons.ToList();
     }
 
     public void Add(IComparison comparison)

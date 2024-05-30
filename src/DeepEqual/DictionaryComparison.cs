@@ -2,8 +2,8 @@
 
 public class DictionaryComparison : IComparison
 {
-    public IComparison KeyComparer { get; set; }
-    public IComparison ValueComparer { get; set; }
+    internal IComparison KeyComparer { get; }
+    internal IComparison ValueComparer { get; }
 
     public DictionaryComparison(IComparison keyComparer, IComparison valueComparer)
     {
