@@ -1,7 +1,4 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-using AutoFixture.Kernel;
-using DeepEqual.Test.Helper;
+﻿using DeepEqual.Test.Helper;
 
 using Moq;
 
@@ -17,35 +14,22 @@ namespace DeepEqual.Test.Comparsions;
 
 public class CompositComparisonTests
 {
-    protected Fixture Fixture { get; set; }
+    private CompositeComparison SUT { get; set; }
+    private List<Mock<IComparison>> Inner { get; set; }
+    private IComparisonContext Context { get; set; }
 
-    protected CompositeComparison SUT { get; set; }
-    protected List<Mock<IComparison>> Inner { get; set; }
-    protected IComparisonContext Context { get; set; }
-
-    protected ComparisonResult Result { get; set; }
+    private ComparisonResult Result { get; set; }
 
     [Background]
     public void SetUp()
     {
-        "Given a fixture".x(() =>
+        "Given some inner comparers".x(() =>
         {
-            Fixture = new Fixture();
-            Fixture.Customize(new AutoMoqCustomization());
-            Fixture.Customizations.Add(new MethodInvoker(new GreedyConstructorQuery()));
-            Fixture.Register(() => BreadcrumbPair.Empty);
-        });
-
-        "And some inner comparers".x(() =>
-        {
-            Inner = Fixture
-                .Freeze<IEnumerable<IComparison>>()
-                .Select(Mock.Get)
-                .ToList();
+            Inner = [new Mock<IComparison>(), new Mock<IComparison>(), new Mock<IComparison>()];
 
             Inner.ForEach(
                 m => m
-                    .Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
+                    .Setup(c => c.CanCompare(It.IsAny<IComparisonContext>(), It.IsAny<Type>(), It.IsAny<Type>()))
                     .Returns(false)
             );
         });
@@ -60,7 +44,7 @@ public class CompositComparisonTests
         });
 
         "And a CompositeComparer".x(() =>
-            SUT = Fixture.Create<CompositeComparison>()
+            SUT = new CompositeComparison(Inner.Select(x => x.Object))
         );
     }
 
@@ -76,7 +60,7 @@ public class CompositComparisonTests
         );
 
         "CanCompare should always true".x(() =>
-            SUT.CanCompare(null, null).ShouldBe(true)
+            SUT.CanCompare(context: null, leftType: null, rightType: null).ShouldBe(true)
         );
     }
 
@@ -101,7 +85,7 @@ public class CompositComparisonTests
     {
         "Given the first comparer can compare the values".x(() =>
             Inner[0]
-                .Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
+                .Setup(c => c.CanCompare(It.IsAny<IComparisonContext>(), It.IsAny<Type>(), It.IsAny<Type>()))
                 .Returns(true)
         );
 
@@ -118,23 +102,23 @@ public class CompositComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(rootComparison: null!)
         );
 
         "When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context, leftValue, rightValue)
+            (Result, _) = SUT.Compare(Context, leftValue, rightValue)
         );
 
         "Then it should call CanCompare on all inner comparisons".x(() =>
-            Inner.VerifyAll(c => c.CanCompare(typeof(object), typeof(object)), Times.Once())
+            Inner.VerifyAll(c => c.CanCompare(Context, typeof(object), typeof(object)), Times.Once())
         );
 
         "and it should call Compare on the first inner comparison".x(() =>
-			Inner[0].Verify(c => c.Compare(Context, leftValue, rightValue), Times.Once())
+            Inner[0].Verify(c => c.Compare(Context, leftValue, rightValue), Times.Once())
         );
 
         "but it shouldn't call the other comparisons Compare".x(() =>
-			Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never())
+            Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never())
         );
 
         "and it should return Inconclusive".x(() =>
@@ -147,7 +131,7 @@ public class CompositComparisonTests
     {
         "Given the first comparer can compare the values".x(() =>
             Inner[0]
-                .Setup(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()))
+                .Setup(c => c.CanCompare(It.IsAny<IComparisonContext>(), It.IsAny<Type>(), It.IsAny<Type>()))
                 .Returns(true)
         );
 
@@ -164,7 +148,7 @@ public class CompositComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(rootComparison: null!)
         );
 
         "When calling Compare".x(() =>
@@ -172,7 +156,7 @@ public class CompositComparisonTests
         );
 
         "Then it should call CanCompare on the first inner comparisons".x(() =>
-            Inner[0].Verify(c => c.CanCompare(typeof(object), typeof(object)), Times.Once())
+            Inner[0].Verify(c => c.CanCompare(Context, typeof(object), typeof(object)), Times.Once())
         );
 
         "and it should call Compare on the first inner comparison".x(() =>
@@ -180,11 +164,11 @@ public class CompositComparisonTests
         );
 
         "but it shouldn't call the other comparisons CanCompare".x(() =>
-            Inner.Skip(1).VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never())
+            Inner.Skip(1).VerifyAll(c => c.CanCompare(It.IsAny<IComparisonContext>(), It.IsAny<Type>(), It.IsAny<Type>()), Times.Never())
         );
 
         "and it shouldn't call the other comparisons Compare".x(() =>
-			Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never())
+            Inner.Skip(1).VerifyAll(c => c.Compare(It.IsAny<IComparisonContext>(), It.IsAny<object>(), It.IsAny<object>()), Times.Never())
         );
 
         "and it should return Pass".x(() =>
@@ -197,12 +181,12 @@ public class CompositComparisonTests
     {
         "Given some values to compare".x(() =>
         {
-            leftValue = Fixture.Create<object>();
-            rightValue = Fixture.Create<object>();
+            leftValue = new object();
+            rightValue = new object();
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(rootComparison: null!)
         );
 
         "When calling Compare".x(() =>
@@ -210,11 +194,11 @@ public class CompositComparisonTests
         );
 
         "it should call the inner comparers CanCompare".x(() =>
-            Inner.VerifyAll(c => c.CanCompare(typeof(object), typeof(object)), Times.Once())
+            Inner.VerifyAll(c => c.CanCompare(Context, typeof(object), typeof(object)), Times.Once())
         );
 
         "it should not call the inner comparers Compare".x(() =>
-			Inner.VerifyAll(c => c.Compare(Context, leftValue, rightValue), Times.Never())
+            Inner.VerifyAll(c => c.Compare(Context, leftValue, rightValue), Times.Never())
         );
 
         "and it should return false".x(() =>
@@ -229,11 +213,11 @@ public class CompositComparisonTests
     public void When_testing_nulls(object leftValue, object rightValue, ComparisonResult expected)
     {
         "Given a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(rootComparison: null!)
         );
 
         "When calling Compare".x(() =>
-			(Result, _) = SUT.Compare(Context, leftValue, rightValue)
+            (Result, _) = SUT.Compare(Context, leftValue, rightValue)
         );
 
         "Then it should return {2}".x(() =>
@@ -241,11 +225,11 @@ public class CompositComparisonTests
         );
 
         "And it should not call the inner comparers CanCompare".x(() =>
-            Inner.VerifyAll(c => c.CanCompare(It.IsAny<Type>(), It.IsAny<Type>()), Times.Never())
+            Inner.VerifyAll(c => c.CanCompare(It.IsAny<IComparisonContext>(), It.IsAny<Type>(), It.IsAny<Type>()), Times.Never())
         );
 
         "And it should not call the inner comparers Compare".x(() =>
-			Inner.VerifyAll(c => c.Compare(Context, leftValue, rightValue), Times.Never())
+            Inner.VerifyAll(c => c.Compare(Context, leftValue, rightValue), Times.Never())
         );
     }
 }

@@ -11,7 +11,7 @@ public class EchoComparison : IComparison
         this.result = result;
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return true;
     }

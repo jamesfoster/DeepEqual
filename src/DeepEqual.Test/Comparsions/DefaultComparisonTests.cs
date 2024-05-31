@@ -23,7 +23,7 @@ public class DefaultComparisonTests
     public void Creating_a_DefaultComparison()
     {
         "When creating a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "Then is should implement IComparison".x(() =>
@@ -41,11 +41,11 @@ public class DefaultComparisonTests
     public void Can_compare_any_type(Type leftType, Type rightType)
     {
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "When calling CanCompare".x(() =>
-            CanCompareResult = SUT.CanCompare(leftType, rightType)
+            CanCompareResult = SUT.CanCompare(Context, leftType, rightType)
         );
 
         "Then the result should be true".x(() =>
@@ -60,7 +60,7 @@ public class DefaultComparisonTests
         var rightValue = default (string);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And 2 objects to compare".x(() =>
@@ -70,7 +70,7 @@ public class DefaultComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(SUT)
         );
 
         "When calling Compare".x(() =>
@@ -93,7 +93,7 @@ public class DefaultComparisonTests
         var rightValue = default (string);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And 2 objects to compare".x(() =>
@@ -103,7 +103,7 @@ public class DefaultComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(SUT)
         );
 
         "When calling Compare".x(() =>
@@ -126,7 +126,7 @@ public class DefaultComparisonTests
         var rightValue = default (int);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And 2 objects to compare".x(() =>
@@ -136,7 +136,7 @@ public class DefaultComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(SUT)
         );
 
         "When calling Compare".x(() =>
@@ -155,7 +155,7 @@ public class DefaultComparisonTests
         var rightValue = default (EqualsSpy);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And 2 objects to compare".x(() =>
@@ -165,7 +165,7 @@ public class DefaultComparisonTests
         });
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(SUT)
         );
 
         "When calling Compare".x(() =>
@@ -192,11 +192,11 @@ public class DefaultComparisonTests
         var newContext = default(IComparisonContext);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext(new BreadcrumbPair("Root"))
+            Context = new ComparisonContext(SUT, new BreadcrumbPair("Root"))
         );
 
         "When calling Compare".x(() =>
@@ -232,7 +232,7 @@ public class DefaultComparisonTests
         var rightValue = default (EqualsSpy);
 
         "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
+            SUT = new DefaultComparison(skippedTypes: [])
         );
 
         "And 2 objects to compare".x(() =>
@@ -258,16 +258,12 @@ public class DefaultComparisonTests
     [Example(typeof(AlwaysEqualAswell), typeof(object))]
     public void Calling_CanCompare_on_ignored_types_returns_false(Type leftType, Type rightType)
     {
-        "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
-        );
-
-        "And the type is skipped".x(() =>
-            SUT.Skip<AlwaysEqual>()
+        "Given a DefaultComparison and the type is skipped".x(() =>
+            SUT = new DefaultComparison([typeof(AlwaysEqual)])
         );
 
         "When calling Compare".x(() =>
-            CanCompareResult = SUT.CanCompare(leftType, rightType)
+            CanCompareResult = SUT.CanCompare(Context, leftType, rightType)
         );
 
         "The result should be false".x(() =>
@@ -281,12 +277,8 @@ public class DefaultComparisonTests
         var leftValue = default (AlwaysEqual);
         var rightValue = default (object);
 
-        "Given a DefaultComparison".x(() =>
-            SUT = new DefaultComparison()
-        );
-
-        "And the type is skipped".x(() =>
-            SUT.Skip<AlwaysEqual>()
+        "Given a DefaultComparison And the type is skipped".x(() =>
+            SUT = new DefaultComparison([typeof(AlwaysEqual)])
         );
 
         "And 2 objects to compare".x(() =>

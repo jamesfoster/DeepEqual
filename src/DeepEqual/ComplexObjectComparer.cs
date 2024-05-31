@@ -2,21 +2,18 @@
 
 public class ComplexObjectComparer
 {
-    private readonly IComparison inner;
     private readonly bool ignoreUnmatchedProperties;
-    private readonly List<Func<PropertyPair, bool>> ignoredProperties;
-    private readonly List<Func<Type, Type, string, string?>> mappedProperties;
+    private readonly IReadOnlyList<Func<PropertyPair, bool>> ignoredProperties;
+    private readonly IReadOnlyList<Func<Type, Type, string, string?>> mappedProperties;
 
     private readonly List<ComparisonResult> results;
 
     public ComplexObjectComparer(
-        IComparison inner,
         bool ignoreUnmatchedProperties,
-        List<Func<PropertyPair, bool>> ignoredProperties,
-        List<Func<Type, Type, string, string?>> mappedProperties
+        IReadOnlyList<Func<PropertyPair, bool>> ignoredProperties,
+        IReadOnlyList<Func<Type, Type, string, string?>> mappedProperties
     )
     {
-        this.inner = inner;
         this.ignoreUnmatchedProperties = ignoreUnmatchedProperties;
         this.ignoredProperties = ignoredProperties;
         this.mappedProperties = mappedProperties;
@@ -53,11 +50,9 @@ public class ComplexObjectComparer
 
             if (LeftAndRightPresent(pair))
             {
-                var (result, innerContext) = inner.Compare(
-                    context.VisitingProperty(pair.LeftName, pair.RightName),
-                    leftPropValue.Value,
-                    rightPropValue.Value
-                );
+                var (result, innerContext) = context
+                    .VisitingProperty(pair.LeftName, pair.RightName)
+                    .Compare(leftPropValue.Value, rightPropValue.Value);
 
                 results.Add(result);
                 currentContext = currentContext.MergeDifferencesFrom(innerContext);

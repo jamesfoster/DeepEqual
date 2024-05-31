@@ -86,7 +86,7 @@
 
     public class CustomComparison : IComparison
     {
-        public bool CanCompare(Type leftType, Type rightType)
+        public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
         {
             return leftType == typeof(Custom) && leftType == rightType;
         }

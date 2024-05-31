@@ -166,7 +166,7 @@ public record Right(long Width);
 
 public class RegexComparison : IComparison
 {
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return leftType == typeof(string) && rightType == typeof(Regex);
     }

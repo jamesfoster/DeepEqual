@@ -2,14 +2,14 @@
 
 public class DefaultComparison : IComparison
 {
-    internal List<Type> SkippedTypes { get; }
+    internal IReadOnlyList<Type> SkippedTypes { get; }
 
-    public DefaultComparison()
+    public DefaultComparison(List<Type> skippedTypes)
     {
-        SkippedTypes = new List<Type>();
+        SkippedTypes = skippedTypes;
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return !IsSkipped(leftType)
             && !IsSkipped(rightType)
@@ -66,11 +66,6 @@ public class DefaultComparison : IComparison
     private bool IsSkipped(Type type)
     {
         return SkippedTypes.Any(t => t.IsAssignableFrom(type));
-    }
-
-    public void Skip<T>()
-    {
-        SkippedTypes.Add(typeof(T));
     }
 
     private static bool CoerceValues(ref object leftValue, ref object rightValue)

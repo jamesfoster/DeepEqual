@@ -2,14 +2,7 @@
 
 public class ListComparison : IComparison
 {
-    public IComparison Inner { get; }
-
-    public ListComparison(IComparison inner)
-    {
-        Inner = inner;
-    }
-
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         if (!ReflectionCache.IsListType(leftType) || !ReflectionCache.IsListType(rightType))
             return false;
@@ -21,7 +14,7 @@ public class ListComparison : IComparison
             var innerLeftType = ReflectionCache.GetEnumerationType(leftType);
             var innerRightType = ReflectionCache.GetEnumerationType(rightType);
 
-            return Inner.CanCompare(innerLeftType, innerRightType);
+            return context.CanCompare(innerLeftType, innerRightType);
         }
     }
 
@@ -61,11 +54,9 @@ public class ListComparison : IComparison
                 (result: ComparisonResult.Inconclusive, context: context),
                 (acc, x) =>
                 {
-                    var (newResult, newContext) = Inner.Compare(
-                        context.VisitingIndex(x.index),
-                        x.leftValue,
-                        x.rightValue
-                    );
+                    var (newResult, newContext) = context
+                        .VisitingIndex(x.index)
+                        .Compare(x.leftValue, x.rightValue);
                     return (
                         acc.result.Plus(newResult),
                         acc.context.MergeDifferencesFrom(newContext)

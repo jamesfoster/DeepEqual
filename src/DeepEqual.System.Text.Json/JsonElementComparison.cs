@@ -7,7 +7,7 @@ public class JsonElementComparison : IComparison
     private static readonly Type jsonElementType = typeof(JsonElement);
     private static readonly Type[] allowableTypes = { jsonElementType, typeof(string) };
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return leftType == jsonElementType && allowableTypes.Contains(rightType)
             || rightType == jsonElementType && allowableTypes.Contains(leftType);

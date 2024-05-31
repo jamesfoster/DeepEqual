@@ -2,7 +2,7 @@ namespace DeepEqual;
 
 public class EnumComparison : IComparison
 {
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         if (!leftType.IsEnum && !rightType.IsEnum)
             return false;

@@ -11,7 +11,7 @@ public class FloatComparison : IComparison
         this.singleTolerance = singleTolerance;
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return IsFloat(leftType) && IsNumber(rightType) || IsFloat(rightType) && IsNumber(leftType);
     }

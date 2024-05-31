@@ -107,17 +107,7 @@ public class CompareSyntaxTests : IDisposable
     [Fact]
     public void Delegates_WithCustomComparison()
     {
-        var c = new DefaultComparison();
-
-        syntax.WithCustomComparison(c);
-
-        builder.Verify(x => x.WithCustomComparison(c), Times.Once());
-    }
-
-    [Fact]
-    public void Delegates_WithCustomComparison_Lambda()
-    {
-        var c = (IComparison root) => new DefaultComparison();
+        var c = new DefaultComparison(skippedTypes: []);
 
         syntax.WithCustomComparison(c);
 

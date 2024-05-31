@@ -25,7 +25,7 @@ public class ComparisonBuilderTests
         );
 
         "And UnmatchedPropertiesIgnored should be false".x(() =>
-            SUT.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(false)
+            SUT.Create().OfType<ComplexObjectComparison>().IgnoreUnmatchedProperties.ShouldBe(false)
         );
     }
 
@@ -60,6 +60,7 @@ public class ComparisonBuilderTests
     public void Ignoring_unmatched_properties()
     {
         var result = default (ComparisonBuilder);
+        var comparison = default(IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder()
@@ -69,8 +70,12 @@ public class ComparisonBuilderTests
             result = SUT.IgnoreUnmatchedProperties()
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then UnmatchedPropertiesIgnored should be true".x(() =>
-            result.ComplexObjectComparison.IgnoreUnmatchedProperties.ShouldBe(true)
+            comparison.OfType<ComplexObjectComparison>().IgnoreUnmatchedProperties.ShouldBe(true)
         );
     }
 
@@ -78,6 +83,7 @@ public class ComparisonBuilderTests
     public void Ignoring_specific_properties()
     {
         var result = default (ComparisonBuilder);
+        var comparison = default (IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder().IgnoreCircularReferences()
@@ -91,13 +97,17 @@ public class ComparisonBuilderTests
             result = SUT.IgnoreProperty<Version>(x => x.Major)
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then it should add an IgnoredProperty".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+            comparison.OfType<ComplexObjectComparison>().IgnoredProperties.Count.ShouldBe(1)
         );
 
         "And it should ignore Major property of the Version type".x(() =>
-            SUT.ComplexObjectComparison.Compare(
-                new ComparisonContext(),
+            comparison.OfType<ComplexObjectComparison>().Compare(
+                new ComparisonContext(comparison),
                 new Version(9, 9, 9, 9),
                 new Version(1, 9, 9, 9)
             ).context.Differences.ShouldBeEmpty()
@@ -108,6 +118,7 @@ public class ComparisonBuilderTests
     public void Ignoring_specific_properties_2()
     {
         var result = default (ComparisonBuilder);
+        var comparison = default(IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder().IgnoreCircularReferences()
@@ -121,13 +132,17 @@ public class ComparisonBuilderTests
             result = SUT.IgnoreProperty(x => x.Left.Name == "Major")
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then it should add an IgnoredProperty".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+            comparison.OfType<ComplexObjectComparison>().IgnoredProperties.Count.ShouldBe(1)
         );
 
         "And it should ignore Major property of the Version type".x(() =>
-            SUT.ComplexObjectComparison.Compare(
-                new ComparisonContext(),
+            comparison.OfType<ComplexObjectComparison>().Compare(
+                new ComparisonContext(comparison),
                 new Version(9, 9, 9, 9),
                 new Version(1, 9, 9, 9)
             ).context.Differences.ShouldBeEmpty()
@@ -138,6 +153,7 @@ public class ComparisonBuilderTests
     public void Ignoring_specific_properties_if_missing_when_not_missing()
     {
         var result = default(ComparisonBuilder);
+        var comparison = default(IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder().IgnoreCircularReferences()
@@ -151,14 +167,18 @@ public class ComparisonBuilderTests
             result = SUT.IgnorePropertyIfMissing<Version>(x => x.Major)
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then it should add an IgnoredProperty".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+            comparison.OfType<ComplexObjectComparison>().IgnoredProperties.Count.ShouldBe(1)
         );
 
         "And it should throw when attempting to compare if the property is not missing".x(() =>
         {
-            var action = void () => SUT.ComplexObjectComparison.Compare(
-                new ComparisonContext(),
+            var action = void () => comparison.OfType<ComplexObjectComparison>().Compare(
+                new ComparisonContext(comparison),
                 new Version(9, 9, 9, 9),
                 new AlmostVersion
                 {
@@ -183,6 +203,7 @@ public class ComparisonBuilderTests
     public void Ignoring_specific_properties_if_missing_when_missing()
     {
         var result = default(ComparisonBuilder);
+        var comparison = default(IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder().IgnoreCircularReferences()
@@ -196,13 +217,17 @@ public class ComparisonBuilderTests
             result = SUT.IgnorePropertyIfMissing<Version>(x => x.Major)
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then it should add an IgnoredProperty".x(() =>
-            result.ComplexObjectComparison.IgnoredProperties.Count.ShouldBe(1)
+            comparison.OfType<ComplexObjectComparison>().IgnoredProperties.Count.ShouldBe(1)
         );
 
         "And it should ignore Major property of the Version type".x(() =>
-            SUT.ComplexObjectComparison.Compare(
-                new ComparisonContext(),
+            comparison.OfType<ComplexObjectComparison>().Compare(
+                new ComparisonContext(comparison),
                 new Version(9, 9, 9, 9),
                 new
                 {
@@ -220,6 +245,7 @@ public class ComparisonBuilderTests
     public void Skipping_default_comparison_for_types()
     {
         var result = default (ComparisonBuilder);
+        var comparison = default(IComparison);
 
         "Given a builder".x(() =>
             SUT = new ComparisonBuilder()
@@ -229,8 +255,12 @@ public class ComparisonBuilderTests
             result = SUT.SkipDefault<Version>()
         );
 
+        "And building the comparison".x(() =>
+            comparison = result.Create()
+        );
+
         "Then SkippedTypes should contain Version".x(() =>
-            result.DefaultComparison.SkippedTypes.ShouldContain(typeof (Version))
+            comparison.OfType<DefaultComparison>().SkippedTypes.ShouldContain(typeof (Version))
         );
     }
 
@@ -356,32 +386,16 @@ public class ComparisonBuilderTests
             ((DictionaryComparison)result.Comparisons[3]).KeyComparer.ShouldBeAssignableTo<DefaultComparison>()
         );
 
-        "... and the value comparer is the result".x(() =>
-            ((DictionaryComparison)result.Comparisons[3]).ValueComparer.ShouldBeSameAs(root)
-        );
-
         "And the 5th comparer is the DictionaryComparison".x(() =>
             result.Comparisons[4].ShouldBeAssignableTo<SetComparison>()
-        );
-
-        "... and the inner comparer is the result".x(() =>
-            ((SetComparison)result.Comparisons[4]).Inner.ShouldBeSameAs(root)
         );
 
         "And the 6th comparer is the DictionaryComparison".x(() =>
             result.Comparisons[5].ShouldBeAssignableTo<ListComparison>()
         );
 
-        "... and the inner comparer is the result".x(() =>
-            ((ListComparison)result.Comparisons[5]).Inner.ShouldBeSameAs(root)
-        );
-
         "And the 7th comparer is the ComplexObjectComparison".x(() =>
             result.Comparisons[6].ShouldBeAssignableTo<ComplexObjectComparison>()
-        );
-
-        "... and the inner comparer is the result".x(() =>
-            ((ComplexObjectComparison)result.Comparisons[6]).Inner.ShouldBeSameAs(root)
         );
 
         "... and IgnoreUnmatchedProperties should be false".x(() =>
@@ -412,37 +426,6 @@ public class ComparisonBuilderTests
 
         "Then the 1st comparer is the custom comparison".x(() =>
             result.Comparisons[0].ShouldBeSameAs(custom)
-        );
-    }
-
-    [Scenario]
-    public void Creating_a_Comparison_with_custom_comparisons_lambda()
-    {
-        var result = default (CompositeComparison);
-        var custom = default (IComparison);
-        var capture = default (IComparison);
-
-        "Given a builder".x(() =>
-            SUT = new ComparisonBuilder()
-        );
-
-        "And a custom comparison".x(() =>
-        {
-            custom = new Mock<IComparison>().Object;
-
-            SUT.WithCustomComparison(x => { capture = x; return custom; });
-        });
-
-        "When calling Create".x(() =>
-            result = ((CycleGuard)SUT.Create()).Inner as CompositeComparison
-        );
-
-        "Then the 1st comparer is the custom comparison".x(() =>
-            result.Comparisons[0].ShouldBeSameAs(custom)
-        );
-
-        "And the lambda is given a reference to the root comparer".x(() =>
-            capture.ShouldBe(result)
         );
     }
 

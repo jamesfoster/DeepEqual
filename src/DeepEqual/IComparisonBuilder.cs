@@ -10,7 +10,6 @@ public interface IComparisonBuilder<out TBuilder>
     IDifferenceFormatterFactory GetFormatterFactory();
 
     TBuilder WithCustomComparison(IComparison comparison);
-    TBuilder WithCustomComparison(Func<IComparison, IComparison> comparison);
     TBuilder WithCustomFormatter<TDifference>(IDifferenceFormatter formatter)
         where TDifference : Difference;
     TBuilder MapProperty<A, B>(

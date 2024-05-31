@@ -22,7 +22,7 @@ public class CompositeComparison : IComparison
         Comparisons.AddRange(comparisons);
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return true;
     }
@@ -45,7 +45,7 @@ public class CompositeComparison : IComparison
 
         foreach (var c in Comparisons)
         {
-            if (!c.CanCompare(leftValue.GetType(), rightValue.GetType()))
+            if (!c.CanCompare(context, leftValue.GetType(), rightValue.GetType()))
                 continue;
 
             var (result, newContext) = c.Compare(context, leftValue, rightValue);

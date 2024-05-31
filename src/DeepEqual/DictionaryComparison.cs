@@ -3,15 +3,13 @@
 public class DictionaryComparison : IComparison
 {
     internal IComparison KeyComparer { get; }
-    internal IComparison ValueComparer { get; }
 
-    public DictionaryComparison(IComparison keyComparer, IComparison valueComparer)
+    public DictionaryComparison(IComparison keyComparer)
     {
         KeyComparer = keyComparer;
-        ValueComparer = valueComparer;
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return ReflectionCache.IsDictionaryType(leftType)
             && ReflectionCache.IsDictionaryType(rightType);
@@ -72,11 +70,7 @@ public class DictionaryComparison : IComparison
             var value = rightDictEntries[key];
             rightDictEntries.Remove(key);
 
-            var (result, innerContext) = ValueComparer.Compare(
-                context.VisitingIndex(key),
-                leftEntry.Value,
-                value
-            );
+            var (result, innerContext) = context.VisitingIndex(key).Compare(leftEntry.Value, value);
 
             results.Add(result);
             newContext = newContext.MergeDifferencesFrom(innerContext);
@@ -108,7 +102,7 @@ public class DictionaryComparison : IComparison
 
     private object? FindKey(IDictionary<object, object?> dictionary, object key)
     {
-        var tempContext = new ComparisonContext();
+        var tempContext = new ComparisonContext(KeyComparer);
 
         foreach (var key2 in dictionary.Keys)
         {

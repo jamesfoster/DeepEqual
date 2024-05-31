@@ -2,21 +2,22 @@
 
 public class ComplexObjectComparison : IComparison
 {
-    internal IComparison Inner { get; }
+    internal bool IgnoreUnmatchedProperties { get; }
+    internal IReadOnlyList<Func<PropertyPair, bool>> IgnoredProperties { get; }
+    internal IReadOnlyList<Func<Type, Type, string, string?>> MappedProperties { get; }
 
-    internal bool IgnoreUnmatchedProperties { get; set; }
-
-    internal List<Func<PropertyPair, bool>> IgnoredProperties { get; set; }
-    internal List<Func<Type, Type, string, string?>> MappedProperties { get; set; }
-
-    public ComplexObjectComparison(IComparison inner)
+    public ComplexObjectComparison(
+        bool ignoreUnmatchedProperties,
+        List<Func<PropertyPair, bool>> ignoredProperties,
+        List<Func<Type, Type, string, string?>> mappedProperties
+    )
     {
-        Inner = inner;
-        IgnoredProperties = [];
-        MappedProperties = [];
+        IgnoreUnmatchedProperties = ignoreUnmatchedProperties;
+        IgnoredProperties = ignoredProperties;
+        MappedProperties = mappedProperties;
     }
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return (leftType.IsClass && rightType.IsClass)
             || ReflectionCache.IsValueTypeWithReferenceFields(leftType)
@@ -30,114 +31,11 @@ public class ComplexObjectComparison : IComparison
     )
     {
         var comparer = new ComplexObjectComparer(
-            Inner,
             IgnoreUnmatchedProperties,
             IgnoredProperties,
             MappedProperties
         );
 
         return comparer.CompareObjects(context, leftValue, rightValue);
-    }
-
-    public void MapProperty<A, B>(
-        Expression<Func<A, object?>> left,
-        Expression<Func<B, object?>> right
-    )
-    {
-        if (GetMemberName(left, out var leftName) && GetMemberName(right, out var rightName))
-        {
-            MappedProperties.Add(
-                (leftType, rightType, propName) =>
-                {
-                    if (leftType == typeof(A) && rightType == typeof(B) && propName == leftName)
-                    {
-                        return rightName;
-                    }
-                    return null;
-                }
-            );
-        }
-    }
-
-    public void IgnoreProperty<T>(Expression<Func<T, object?>> property)
-    {
-        if (!GetMemberName(property, out var name))
-        {
-            throw new ArgumentException($"Expression must be a simple member access: {property}");
-        }
-        IgnoreProperty(typeof(T), name);
-    }
-
-    public void IgnorePropertyIfMissing<T>(Expression<Func<T, object?>> property)
-    {
-        if (!GetMemberName(property, out var name))
-        {
-            throw new ArgumentException($"Expression must be a simple member access: {property}");
-        }
-
-        if (name is null)
-            return;
-
-        IgnoreProperty(scope =>
-        {
-            static bool Matches(PropertyReader? reader, Type type, string name)
-            {
-                return reader is not null
-                    && type.IsAssignableFrom(reader.DeclaringType)
-                    && reader.Name == name;
-            }
-            static bool AssertMissing(PropertyReader? reader, string name)
-            {
-                return reader == null
-                    ? true
-                    : throw new ExpectedMissingProperty(
-                        $"Expected property {name} to be missing from type {reader.DeclaringType.FullName}"
-                    );
-            }
-            return Matches(scope.Left, typeof(T), name) && AssertMissing(scope.Right, name)
-                || Matches(scope.Right, typeof(T), name) && AssertMissing(scope.Left, name);
-        });
-    }
-
-    private static bool GetMemberName<T>(Expression<Func<T, object?>> property, out string? name)
-    {
-        var exp = property.Body;
-
-        if (exp is UnaryExpression cast)
-        {
-            exp = cast.Operand; // implicit cast to object
-        }
-
-        if (exp is MemberExpression member)
-        {
-            name = member.Member.Name;
-            return true;
-        }
-
-        name = null;
-        return false;
-    }
-
-    private void IgnoreProperty(Type type, string? propertyName)
-    {
-        if (propertyName is null)
-            return;
-
-        IgnoreProperty(property =>
-        {
-            static bool Matches(PropertyReader? reader, Type type, string name)
-            {
-                return reader is not null
-                    && type.IsAssignableFrom(reader.DeclaringType)
-                    && reader.Name == name;
-            }
-            return Matches(property.Left, type, propertyName)
-                || Matches(property.Right, type, propertyName);
-        });
-    }
-
-    public void IgnoreProperty(Func<PropertyPair, bool> item)
-    {
-        IgnoredProperties.Add(item);
     }
 }

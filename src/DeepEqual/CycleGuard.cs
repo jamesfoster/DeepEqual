@@ -1,20 +1,15 @@
 ﻿namespace DeepEqual;
 
-public class CycleGuard(IComparison inner) : IComparison
+public class CycleGuard(bool ignoreCircularReferences, IComparison inner) : IComparison
 {
     private readonly ThreadLocal<Stack<ComparisonFrame>> framesByThread = new(() => new());
-    private bool ignoreCircularReferences = false;
+    private readonly bool ignoreCircularReferences = ignoreCircularReferences;
 
     internal IComparison Inner { get; } = inner;
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return true;
-    }
-
-    public void IgnoreCircularReferences()
-    {
-        ignoreCircularReferences = true;
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
@@ -102,7 +97,7 @@ public class CycleGuard(IComparison inner) : IComparison
             If it's not possible to redesign your API to eliminate circular references
             you can change this default behavior with the following:
 
-            {nameof(ComparisonBuilder)}.{nameof(ComparisonBuilder.IgnoreCircularReferences)}
+            {nameof(ComparisonBuilder)}.{nameof(ComparisonBuilder.IgnoreCircularReferences)}()
             """;
 
         throw new ObjectGraphCircularReferenceException(

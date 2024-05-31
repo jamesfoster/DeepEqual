@@ -16,7 +16,7 @@ public static class ObjectExtensions
     {
         comparison ??= ComparisonBuilder.Get().Create();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(comparison);
 
         var (result, _) = comparison.Compare(context, actual, expected);
 
@@ -45,7 +45,7 @@ public static class ObjectExtensions
         comparison ??= builder.Create();
         formatterFactory ??= builder.GetFormatterFactory();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(comparison);
 
         var (result, newContext) = comparison.Compare(context, actual, expected);
 

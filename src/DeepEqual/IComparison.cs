@@ -2,7 +2,7 @@
 
 public interface IComparison
 {
-    bool CanCompare(Type leftType, Type rightType);
+    bool CanCompare(IComparisonContext context, Type leftType, Type rightType);
 
     (ComparisonResult result, IComparisonContext context) Compare(
         IComparisonContext context,

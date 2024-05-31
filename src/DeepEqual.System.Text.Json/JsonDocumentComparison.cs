@@ -8,7 +8,7 @@ public class JsonDocumentComparison : IComparison
     private static readonly Type[] allowableTypes = { jsonDocumentType, typeof(string) };
     private static readonly JsonElementComparison jsonElementComparison = new();
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         return leftType == jsonDocumentType && allowableTypes.Contains(rightType)
             || rightType == jsonDocumentType && allowableTypes.Contains(leftType);

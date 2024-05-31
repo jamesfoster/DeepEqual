@@ -44,7 +44,7 @@ public class FloatComparisonTests
         );
 
         "When calling CanCompare".x(() =>
-            CanCompareResult = SUT.CanCompare(type1, type2)
+            CanCompareResult = SUT.CanCompare(Context, type1, type2)
         );
 
         "Then the result should be {2}".x(() =>
@@ -66,7 +66,7 @@ public class FloatComparisonTests
         );
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext()
+            Context = new ComparisonContext(rootComparison: null!)
         );
 
         "When calling Compare".x(() =>
@@ -78,24 +78,24 @@ public class FloatComparisonTests
         );
     }
 
-    public static IEnumerable<object[]> TestData => new[]
-    {
-        new object[] {1e-15, 1e-6, 0, 0.0d, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, 0.0f, 0, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, double.Epsilon, 0.0d, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, 0.0f, float.Epsilon, ComparisonResult.Pass},
-        new object[] {0.0d, 0.0f, double.Epsilon, 0.0d, ComparisonResult.Fail},
-        new object[] {0.0d, 0.0f, 0.0f, float.Epsilon, ComparisonResult.Fail},
-        new object[] {1e-15, 1e-6, 1.111_111_111_111_118d, 1.111_111_111_111_119d, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, 1.111_111_111_111_117d, 1.111_111_111_111_119d, ComparisonResult.Fail},
-        new object[] {1e-15, 1e-6, 1.111_118f, 1.111_119f, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, 1.111_117f, 1.111_119f, ComparisonResult.Fail},
-        new object[] {1e-15, 1e-6, 100_000_100.0f, 100_000_000, ComparisonResult.Pass},
-        new object[] {1e-15, 1e-6, 100_000_000.0f, 100_000_200m, ComparisonResult.Fail},
-        new object[] {0.0001d, 0.01f, 10000.0d, 10001, ComparisonResult.Pass},
-        new object[] {0.0001d, 0.01f, float.NaN, float.NaN, ComparisonResult.Pass},
-        new object[] {0.0001d, 0.01f, double.NaN, double.NaN, ComparisonResult.Pass},
-        new object[] {0.0001d, 0.01f, 0.0f, float.NaN, ComparisonResult.Fail},
-        new object[] {0.0001d, 0.01f, double.NaN, 0.001d, ComparisonResult.Fail}
-    };
+    public static IEnumerable<object[]> TestData =>
+    [
+        [1e-15, 1e-6, 0, 0.0d, ComparisonResult.Pass],
+        [1e-15, 1e-6, 0.0f, 0, ComparisonResult.Pass],
+        [1e-15, 1e-6, double.Epsilon, 0.0d, ComparisonResult.Pass],
+        [1e-15, 1e-6, 0.0f, float.Epsilon, ComparisonResult.Pass],
+        [0.0d, 0.0f, double.Epsilon, 0.0d, ComparisonResult.Fail],
+        [0.0d, 0.0f, 0.0f, float.Epsilon, ComparisonResult.Fail],
+        [1e-15, 1e-6, 1.111_111_111_111_118d, 1.111_111_111_111_119d, ComparisonResult.Pass],
+        [1e-15, 1e-6, 1.111_111_111_111_117d, 1.111_111_111_111_119d, ComparisonResult.Fail],
+        [1e-15, 1e-6, 1.111_118f, 1.111_119f, ComparisonResult.Pass],
+        [1e-15, 1e-6, 1.111_117f, 1.111_119f, ComparisonResult.Fail],
+        [1e-15, 1e-6, 100_000_100.0f, 100_000_000, ComparisonResult.Pass],
+        [1e-15, 1e-6, 100_000_000.0f, 100_000_200m, ComparisonResult.Fail],
+        [0.0001d, 0.01f, 10000.0d, 10001, ComparisonResult.Pass],
+        [0.0001d, 0.01f, float.NaN, float.NaN, ComparisonResult.Pass],
+        [0.0001d, 0.01f, double.NaN, double.NaN, ComparisonResult.Pass],
+        [0.0001d, 0.01f, 0.0f, float.NaN, ComparisonResult.Fail],
+        [0.0001d, 0.01f, double.NaN, 0.001d, ComparisonResult.Fail]
+    ];
 }

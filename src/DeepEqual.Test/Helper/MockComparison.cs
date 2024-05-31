@@ -5,22 +5,22 @@ namespace DeepEqual.Test.Helper;
 
 public class MockComparison : IComparison
 {
-    private Func<Type, Type, bool> canCompare
-        = (t1, t2) => true;
+    private Func<IComparisonContext, Type, Type, bool> canCompare
+        = (c, t1, t2) => true;
 
     private Func<IComparisonContext, object, object, (ComparisonResult, IComparisonContext)> compare
         = (c, v1, v2) => v1.Equals(v2)
             ? (ComparisonResult.Pass, c)
             : (ComparisonResult.Fail, c.AddDifference(v1, v2));
 
-    public List<(Type leftType, Type rightType)> CanCompareCalls { get; } = new List<(Type, Type)>();
+    public List<(IComparisonContext context, Type leftType, Type rightType)> CanCompareCalls { get; } = new List<(IComparisonContext, Type, Type)>();
     public List<(IComparisonContext context, object leftValue, object rightValue)> CompareCalls { get; }
         = new List<(IComparisonContext, object, object)>();
 
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
-        CanCompareCalls.Add((leftType, rightType));
-        return canCompare(leftType, rightType);
+        CanCompareCalls.Add((context, leftType, rightType));
+        return canCompare(context, leftType, rightType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
@@ -33,7 +33,7 @@ public class MockComparison : IComparison
         return compare(context, leftValue, rightValue);
     }
 
-    public void SetCanCompare(Func<Type, Type, bool> func)
+    public void SetCanCompare(Func<IComparisonContext, Type, Type, bool> func)
     {
         canCompare = func;
     }

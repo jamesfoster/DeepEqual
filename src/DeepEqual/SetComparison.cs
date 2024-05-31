@@ -2,14 +2,7 @@
 
 public class SetComparison : IComparison
 {
-    public IComparison Inner { get; set; }
-
-    public SetComparison(IComparison inner)
-    {
-        Inner = inner;
-    }
-
-    public bool CanCompare(Type leftType, Type rightType)
+    public bool CanCompare(IComparisonContext context, Type leftType, Type rightType)
     {
         var isSetType1 = ReflectionCache.IsSetType(leftType);
         var isSetType2 = ReflectionCache.IsSetType(rightType);
@@ -26,7 +19,7 @@ public class SetComparison : IComparison
         var leftElementType = ReflectionCache.GetEnumerationType(leftType);
         var rightElementType = ReflectionCache.GetEnumerationType(rightType);
 
-        return Inner.CanCompare(leftElementType, rightElementType);
+        return context.CanCompare(leftElementType, rightElementType);
     }
 
     public (ComparisonResult result, IComparisonContext context) Compare(
@@ -70,9 +63,9 @@ public class SetComparison : IComparison
 
         foreach (var obj in leftSet)
         {
-            var innerContext = new ComparisonContext();
+            var innerContext = context.NewEmptyContext();
             var found = expected.FirstOrDefault(e =>
-                Inner.Compare(innerContext, obj, e).result == ComparisonResult.Pass
+                innerContext.Compare(obj, e).result == ComparisonResult.Pass
             );
 
             if (found != null)

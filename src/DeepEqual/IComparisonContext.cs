@@ -7,4 +7,9 @@ public interface IComparisonContext
 
     IComparisonContext AddDifference(Difference difference);
     IComparisonContext SetBreadcrumb(BreadcrumbPair breadcrumb);
+
+    IComparisonContext NewEmptyContext();
+
+    bool CanCompare(Type left, Type right);
+    (ComparisonResult result, IComparisonContext context) Compare(object? left, object? right);
 }

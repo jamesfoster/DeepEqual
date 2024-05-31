@@ -1,44 +1,28 @@
-﻿using System;
+﻿using DeepEqual.Syntax;
+using DeepEqual.Test.Helper;
+
+using Shouldly;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using DeepEqual.Syntax;
-using DeepEqual.Test.Helper;
-
-using AutoFixture;
-using AutoFixture.AutoMoq;
-
-using Shouldly;
-
 using Xbehave;
+
 using Xunit;
 
 namespace DeepEqual.Test.Comparsions;
 
 public class SetComparisonTests
 {
-    protected Fixture Fixture { get; set; }
-
-    protected SetComparison SUT { get; set; }
-
-    protected MockComparison Inner { get; set; }
-    protected IComparisonContext Context { get; set; }
-
-    protected ComparisonResult Result { get; set; }
-    protected bool CanCompareResult { get; set; }
-
     [Scenario]
     public void Creating_a_SetComparison()
     {
-        "Given a fixture".x(() =>
-        {
-            Fixture = new Fixture();
-            Fixture.Customize(new AutoMoqCustomization());
-        });
+        SetComparison SUT = null!;
 
         "When creating an SetComparison".x(() =>
-            SUT = Fixture.Create<SetComparison>()
+            SUT = new SetComparison()
         );
 
         "Then it should implement IComparison".x(() =>
@@ -50,33 +34,38 @@ public class SetComparisonTests
     [MemberData(nameof(CanCompareTypesTestData))]
     public void Can_compare_types(Type type1, Type type2, Type elementType1, Type elementType2, bool expected)
     {
-        "Given a fixture".x(() =>
+        SetComparison SUT = null!;
+
+        MockComparison inner = null!;
+        IComparisonContext context = null!;
+
+        bool canCompareResult = false;
+
+        "Given an inner comparison".x(() =>
         {
-            Fixture = new Fixture();
+            inner = new MockComparison();
         });
 
-        "And an inner comparison".x(() =>
-        {
-            Inner = new MockComparison();
-            Fixture.Inject<IComparison>(Inner);
-        });
+        "And a Comparison context object".x(() =>
+            context = new ComparisonContext(inner, new BreadcrumbPair("Set"))
+        );
 
         "And an ListComparison".x(() =>
-            SUT = Fixture.Create<SetComparison>()
+            SUT = new SetComparison()
         );
 
         "When calling CanCompare({0}, {1})".x(() =>
-            CanCompareResult = SUT.CanCompare(type1, type2)
+            canCompareResult = SUT.CanCompare(context, type1, type2)
         );
 
         "It should return {2}".x(() =>
-            CanCompareResult.ShouldBe(expected)
+            canCompareResult.ShouldBe(expected)
         );
 
         if (expected)
         {
             "and it should call CanCompare on the inner comparer".x(() =>
-                Inner.CanCompareCalls.ShouldContain((elementType1, elementType2))
+                inner.CanCompareCalls.ShouldContain((context, elementType1, elementType2))
             );
         }
     }
@@ -85,37 +74,35 @@ public class SetComparisonTests
     [MemberData(nameof(IntTestData))]
     public void When_comparing_sets(IEnumerable leftValue, IEnumerable rightValue, ComparisonResult expected)
     {
+        SetComparison SUT = null!;
+
+        MockComparison inner = null!;
+        IComparisonContext context = null!;
+        ComparisonResult result = default;
+
         var leftList = leftValue.Cast<object>().ToArray();
         var rightList = rightValue.Cast<object>().ToArray();
 
-        "Given a fixture".x(() =>
+        "Given an inner comparison".x(() =>
         {
-            Fixture = new Fixture();
-        });
-
-        "And an inner comparison".x(() =>
-        {
-            Inner = new MockComparison();
-            Fixture.Inject<IComparison>(Inner);
+            inner = new MockComparison();
         });
 
         "And a SetComparison".x(() =>
-            SUT = Fixture.Create<SetComparison>()
+            SUT = new SetComparison()
         );
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext(new BreadcrumbPair("Set"))
+            context = new ComparisonContext(inner, new BreadcrumbPair("Set"))
         );
 
         "When comparing enumerables".x(() =>
         {
-            var (result, context) = SUT.Compare(Context, leftValue, rightValue);
-            Result = result;
-            Context = context;
+            (result, context) = SUT.Compare(context, leftValue, rightValue);
         });
 
         "Then it should return right{}".x(() =>
-            Result.ShouldBe(expected)
+            result.ShouldBe(expected)
         );
 
         if (leftList.Length == rightList.Length)
@@ -126,14 +113,14 @@ public class SetComparisonTests
                 {
                     var local = i;
 
-                    Inner.CompareCalls.ShouldContain(call => call.leftValue.Equals(leftList[local]));
+                    inner.CompareCalls.ShouldContain(call => call.leftValue.Equals(leftList[local]));
                 }
             });
 
             if (expected == ComparisonResult.Fail)
             {
                 "And it should add a SetDifference".x(() =>
-                    Context.Differences[0].ShouldBeAssignableTo<SetDifference>()
+                    context.Differences[0].ShouldBeAssignableTo<SetDifference>()
                 );
             }
         }
@@ -148,7 +135,7 @@ public class SetComparisonTests
             );
 
             "And it should add a Difference".x(() =>
-                Context.Differences[0].ShouldDeepEqual(expectedDifference)
+                context.Differences[0].ShouldDeepEqual(expectedDifference)
             );
         }
     }

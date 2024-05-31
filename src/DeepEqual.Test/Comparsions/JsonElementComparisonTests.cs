@@ -42,7 +42,7 @@ public class JsonElementComparisonTests
         );
 
         "When calling CanCompare".x(() =>
-            CanCompareResult = SUT.CanCompare(type1, type2)
+            CanCompareResult = SUT.CanCompare(context: null!, type1, type2)
         );
 
         "Then the result should be {2}".x(() =>
@@ -55,7 +55,7 @@ public class JsonElementComparisonTests
     {
         SUT = new JsonElementComparison();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         var (result, _) = SUT.Compare(context, ParseElement("{}"), 123);
 
@@ -67,7 +67,7 @@ public class JsonElementComparisonTests
     {
         SUT = new JsonElementComparison();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         var (result, _) = SUT.Compare(context, ParseElement("{}"), ParseElement("{}"));
 
@@ -79,7 +79,7 @@ public class JsonElementComparisonTests
     {
         SUT = new JsonElementComparison();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         var (result, _) = SUT.Compare(context, ParseElement("123"), ParseElement("123"));
 
@@ -95,7 +95,7 @@ public class JsonElementComparisonTests
 
         SUT = new JsonElementComparison();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         var (result, _) = SUT.Compare(context, doc1, doc2);
 
@@ -111,7 +111,7 @@ public class JsonElementComparisonTests
 
         SUT = new JsonElementComparison();
 
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         var (result, _) = SUT.Compare(context, doc1, doc2);
 

@@ -12,17 +12,18 @@ public class ExceptionMessageTests
     [Fact]
     public void No_differences_recorded()
     {
-        var context = new ComparisonContext();
+        var context = new ComparisonContext(rootComparison: null!);
 
         AssertExceptionMessage(
             context,
-            expectedMessage: "Comparison Failed");
+            expectedMessage: "Comparison Failed"
+        );
     }
 
     [Fact]
     public void Null_difference()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(null, new object());
 
         AssertExceptionMessage(
@@ -36,7 +37,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Single_string_difference()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference("a", "b");
 
         AssertExceptionMessage(
@@ -50,7 +51,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Single_int_difference()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(1, 2);
 
         AssertExceptionMessage(
@@ -64,7 +65,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void List_int_difference()
     {
-        var root = new ComparisonContext();
+        var root = new ComparisonContext(rootComparison: null!);
         var childContext1 = root
             .VisitingIndex(2)
             .AddDifference(1, 2);
@@ -87,7 +88,7 @@ Comparison Failed: The following 2 differences were found.
     [Fact]
     public void Long_string_difference_start()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(
                 "01234567890123456789012345678901234567890123456789",
                 "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij"
@@ -104,7 +105,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Long_string_difference_middle()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(
                 "01234567890123456789012345first678901234567890123456789",
                 "01234567890123456789012345second678901234567890123456789"
@@ -121,7 +122,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Long_string_difference_end()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(
                 "01234567890123456789012345678901234567890123456789a",
                 "01234567890123456789012345678901234567890123456789b"
@@ -138,7 +139,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Long_string_difference_end_2()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(
                 "01234567890123456789012345678901234567890123",
                 "01234567890123456789012345678901234567890123456789"
@@ -159,7 +160,7 @@ Comparison Failed: The following 1 differences were found.
     [InlineData("012345678901234567890", "0123456789012345678", "...12345678901234567890", "0123456789012345678")]
     public void Strings_around_same_length_as_max_length(string value1, string value2, string expected1, string expected2)
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(
                 value1,
                 value2
@@ -176,7 +177,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Missing_expected_entry()
     {
-        IComparisonContext context = new ComparisonContext();
+        IComparisonContext context = new ComparisonContext(rootComparison: null!);
         context = context
             .AddDifference(new MissingEntryDifference(
                 Breadcrumb: context.Breadcrumb,
@@ -196,7 +197,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Missing_actual_entry()
     {
-        IComparisonContext context = new ComparisonContext();
+        IComparisonContext context = new ComparisonContext(rootComparison: null!);
         context = context
             .AddDifference(new MissingEntryDifference(
                 Breadcrumb: context.Breadcrumb,
@@ -216,7 +217,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Set_difference_expected()
     {
-        IComparisonContext context = new ComparisonContext();
+        IComparisonContext context = new ComparisonContext(rootComparison: null!);
         context = context
             .AddDifference(new SetDifference(
                 breadcrumb: context.Breadcrumb.Dot("Set"),
@@ -239,7 +240,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Set_difference_actual()
     {
-        IComparisonContext context = new ComparisonContext();
+        IComparisonContext context = new ComparisonContext(rootComparison: null!);
         context = context
             .AddDifference(new SetDifference(
                 breadcrumb: context.Breadcrumb.Dot("Set"),
@@ -262,7 +263,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Custom_difference_type()
     {
-        IComparisonContext context = new ComparisonContext();
+        IComparisonContext context = new ComparisonContext(rootComparison: null!);
         context = context
             .AddDifference(new CustomDifference(context.Breadcrumb.Dot("Custom"), 123));
 
@@ -277,7 +278,7 @@ Comparison Failed: The following 1 differences were found.
     [Fact]
     public void Custom_difference_type_formatter()
     {
-        var context = new ComparisonContext()
+        var context = new ComparisonContext(rootComparison: null!)
             .AddDifference(new CustomDifference(new BreadcrumbPair(".Custom"), 123));
 
         var customFormatters = new Dictionary<Type, IDifferenceFormatter>

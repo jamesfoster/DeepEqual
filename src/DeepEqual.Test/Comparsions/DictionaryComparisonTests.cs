@@ -27,20 +27,18 @@ public class DictionaryComparisonTests
 
     private void SetUp()
     {
-        "Given a fixture".x(() =>
-            Fixture = new Fixture()
-        );
+        IComparison inner = null!;
 
-        "And an inner comparison".x(() =>
-            Fixture.Register<IComparison>(() => new MockComparison())
+        "Given an inner comparison".x(() =>
+            inner = new MockComparison()
         );
 
         "And an ListComparison".x(() =>
-            SUT = Fixture.Create<DictionaryComparison>()
+            SUT = new DictionaryComparison(keyComparer: new DefaultComparison(skippedTypes: []))
         );
 
         "And a ComparisonContext".x(() =>
-            Context = new ComparisonContext(new BreadcrumbPair("Set"))
+            Context = new ComparisonContext(inner, new BreadcrumbPair("Set"))
         );
     }
 
@@ -69,7 +67,7 @@ public class DictionaryComparisonTests
         SetUp();
 
         "When calling CanCompare({0}, {1})".x(() =>
-            CanCompareResult = SUT.CanCompare(type1, type2)
+            CanCompareResult = SUT.CanCompare(Context, type1, type2)
         );
 
         "It should return {2}".x(() =>
@@ -173,20 +171,20 @@ public class DictionaryComparisonTests
         }
     };
 
-    public static IEnumerable<object[]> CanCompareTypesTestData => new[]
-    {
-        new object[] {typeof (Dictionary<int, int>), typeof (Dictionary<int, int>), true},
-        new object[] {typeof (Dictionary<int, int>), typeof (SortedDictionary<int, int>), true},
-        new object[] {typeof (IDictionary), typeof (Dictionary<object, object>), true},
+    public static IEnumerable<object[]> CanCompareTypesTestData =>
+    [
+        [typeof (Dictionary<int, int>), typeof (Dictionary<int, int>), true],
+        [typeof (Dictionary<int, int>), typeof (SortedDictionary<int, int>), true],
+        [typeof (IDictionary), typeof (Dictionary<object, object>), true],
 
-        new object[] {typeof (List<int>), typeof (List<int>), false},
-        new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), false},
-        new object[] {typeof (string), typeof (string), false},
-        new object[] {typeof (object), typeof (object), false},
-        new object[] {typeof (object), typeof (int), false},
-        new object[] {typeof (int), typeof (int), false},
-        new object[] {typeof (int), typeof (string), false}
-    };
+        [typeof (List<int>), typeof (List<int>), false],
+        [typeof (IEnumerable<int>), typeof (IEnumerable), false],
+        [typeof (string), typeof (string), false],
+        [typeof (object), typeof (object), false],
+        [typeof (object), typeof (int), false],
+        [typeof (int), typeof (int), false],
+        [typeof (int), typeof (string), false]
+    ];
 
     #endregion
 

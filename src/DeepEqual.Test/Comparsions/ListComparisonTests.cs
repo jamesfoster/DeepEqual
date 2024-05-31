@@ -1,7 +1,4 @@
-﻿using AutoFixture;
-using AutoFixture.AutoMoq;
-
-using DeepEqual.Syntax;
+﻿using DeepEqual.Syntax;
 using DeepEqual.Test.Helper;
 
 using Moq;
@@ -22,8 +19,6 @@ namespace DeepEqual.Test.Comparsions;
 
 public class ListComparisonTests
 {
-    protected Fixture Fixture { get; set; }
-
     protected ListComparison SUT { get; set; }
 
     protected MockComparison Inner { get; set; }
@@ -36,14 +31,8 @@ public class ListComparisonTests
     [Scenario]
     public void Creating_an_EnumerableComparison()
     {
-        "Given a fixture".x(() =>
-        {
-            Fixture = new Fixture();
-            Fixture.Customize(new AutoMoqCustomization());
-        });
-
         "When creating an ListComparison".x(() =>
-            SUT = Fixture.Create<ListComparison>()
+            SUT = new ListComparison()
         );
 
         "Then it should implement IComparison".x(() =>
@@ -62,22 +51,17 @@ public class ListComparisonTests
         var list1 = leftValue.Cast<object>().ToArray();
         var list2 = rightValue.Cast<object>().ToArray();
 
-        "Given a fixture".x(() =>
-            Fixture = new Fixture()
-        );
-
-        "And an inner comparison".x(() =>
+        "Given an inner comparison".x(() =>
         {
             Inner = new MockComparison();
-            Fixture.Inject<IComparison>(Inner);
         });
 
         "And a ListComparison".x(() =>
-            SUT = Fixture.Create<ListComparison>()
+            SUT = new ListComparison()
         );
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext(new BreadcrumbPair("List"))
+            Context = new ComparisonContext(Inner, new BreadcrumbPair("List"))
         );
 
         "When comparing enumerables".x(() =>
@@ -131,23 +115,21 @@ public class ListComparisonTests
     [MemberData(nameof(CanCompareTypesTestData))]
     public void Can_compare_types(Type type1, Type type2, Type elementType1, Type elementType2, bool expected)
     {
-        "Given a fixture".x(() =>
-        {
-            Fixture = new Fixture();
-        });
-
-        "And an inner comparison".x(() =>
+        "Given an inner comparison".x(() =>
         {
             Inner = new MockComparison();
-            Fixture.Inject<IComparison>(Inner);
         });
 
         "And an ListComparison".x(() =>
-            SUT = Fixture.Create<ListComparison>()
+            SUT = new ListComparison()
+        );
+
+        "And a Comparison context object".x(() =>
+            Context = new ComparisonContext(Inner, new BreadcrumbPair("List"))
         );
 
         "When calling CanCompare({0}, {1})".x(() =>
-            CanCompareResult = SUT.CanCompare(type1, type2)
+            CanCompareResult = SUT.CanCompare(Context, type1, type2)
         );
 
         "It should return {2}".x(() =>
@@ -164,21 +146,21 @@ public class ListComparisonTests
         }
     }
 
-    public static IEnumerable<object[]> IntTestData => new[]
-    {
-        new object[] {new List<int>(), new int[] {}, ComparisonResult.Pass},
-        new object[] {new List<int>(), new List<int>(), ComparisonResult.Pass},
-        new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
-        new object[] {new List<int> {1}, new[] {1}, ComparisonResult.Pass},
-        new object[] {new[] {1, 2, 3}, new List<int> {1, 2, 3}, ComparisonResult.Pass},
-        new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
-        new object[] {new Collection<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass},
-        new object[] {Enumerate(1, 2, 3), new[] {1, 2, 3}, ComparisonResult.Pass},
+    public static IEnumerable<object[]> IntTestData =>
+    [
+        [new List<int>(), new int[] {}, ComparisonResult.Pass],
+        [new List<int>(), new List<int>(), ComparisonResult.Pass],
+        [new List<int> {1}, new[] {1}, ComparisonResult.Pass],
+        [new List<int> {1}, new[] {1}, ComparisonResult.Pass],
+        [new[] {1, 2, 3}, new List<int> {1, 2, 3}, ComparisonResult.Pass],
+        [new List<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass],
+        [new Collection<int> {1, 2, 3}, new[] {1, 2, 3}, ComparisonResult.Pass],
+        [Enumerate(1, 2, 3), new[] {1, 2, 3}, ComparisonResult.Pass],
 
-        new object[] {new List<int> {1}, new[] {2}, ComparisonResult.Fail},
-        new object[] {new List<int> {1}, new[] {1, 1}, ComparisonResult.Fail},
-        new object[] {new List<int> {1, 2, 3}, new[] {1, 2, 2}, ComparisonResult.Fail}
-    };
+        [new List<int> {1}, new[] {2}, ComparisonResult.Fail],
+        [new List<int> {1}, new[] {1, 1}, ComparisonResult.Fail],
+        [new List<int> {1, 2, 3}, new[] {1, 2, 2}, ComparisonResult.Fail]
+    ];
 
     private static IEnumerable<T> Enumerate<T>(params T[] values)
     {
@@ -188,17 +170,17 @@ public class ListComparisonTests
         }
     }
 
-    public static IEnumerable<object[]> CanCompareTypesTestData => new[]
-    {
-        new object[] {typeof (IList), typeof (IList), typeof (object), typeof (object), true},
-        new object[] {typeof (IList<int>), typeof (IList<int>), typeof (int), typeof (int), true},
-        new object[] {typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), true},
-        new object[] {typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), true},
-        new object[] {typeof (string), typeof (string), typeof (char), typeof (char), true},
+    public static IEnumerable<object[]> CanCompareTypesTestData =>
+    [
+        [typeof (IList), typeof (IList), typeof (object), typeof (object), true],
+        [typeof (IList<int>), typeof (IList<int>), typeof (int), typeof (int), true],
+        [typeof (List<int>), typeof (List<int>), typeof (int), typeof (int), true],
+        [typeof (IEnumerable<int>), typeof (IEnumerable), typeof (int), typeof (object), true],
+        [typeof (string), typeof (string), typeof (char), typeof (char), true],
 
-        new object[] {typeof (object), typeof (object), null, null, false},
-        new object[] {typeof (object), typeof (int), null, null, false},
-        new object[] {typeof (int), typeof (int), null, null, false},
-        new object[] {typeof (int), typeof (string), null, null, false}
-    };
+        [typeof (object), typeof (object), null, null, false],
+        [typeof (object), typeof (int), null, null, false],
+        [typeof (int), typeof (int), null, null, false],
+        [typeof (int), typeof (string), null, null, false]
+    ];
 }

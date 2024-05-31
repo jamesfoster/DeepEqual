@@ -1,13 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
+﻿using AutoFixture;
 
 using DeepEqual.Test.Helper;
 
-using AutoFixture;
-using AutoFixture.AutoMoq;
-
 using Shouldly;
+
+using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Linq;
 
 using Xbehave;
 
@@ -17,19 +17,26 @@ namespace DeepEqual.Test.Comparsions;
 
 public class ComplexObjectComparisonTests
 {
-    protected Fixture Fixture { get; set; }
+    private readonly Fixture fixture = new();
 
-    protected ComplexObjectComparison SUT { get; set; }
-    protected MockComparison Inner { get; set; }
-    protected IComparisonContext Context { get; set; }
+    private ComplexObjectComparison SUT;
+    private MockComparison inner;
+    private IComparisonContext context;
 
-    protected ComparisonResult Result { get; set; }
+    private ComparisonResult result;
+
+    private readonly List<Func<PropertyPair, bool>> ignoredProperties = [];
+    private readonly List<Func<Type, Type, string, string>> mappedProperties = [];
 
     [Scenario]
     public void Creating_a_ComplexObjectComparer()
     {
         "When creating a ComplexObjectComparison".x(() =>
-            SUT = new ComplexObjectComparison(null)
+            SUT = new ComplexObjectComparison(
+                ignoreUnmatchedProperties: false,
+                ignoredProperties: [],
+                mappedProperties: []
+            )
         );
 
         "It should be an IComparison".x(() =>
@@ -37,28 +44,19 @@ public class ComplexObjectComparisonTests
         );
     }
 
-    private void SetUp()
+    private void SetUp(bool ignoreUnmatchedProperties = false)
     {
-        "Given a fixture".x(() =>
+        "Given an inner comparison".x(() =>
         {
-            Fixture = new Fixture();
-            Fixture.Customize(new AutoMoqCustomization());
-        });
-
-        "And an inner comparison".x(() =>
-        {
-            Inner = new MockComparison();
-            Fixture.Inject<IComparison>(Inner);
+            inner = new MockComparison();
         });
 
         "And a ComplexObjectComparison".x(() =>
-            SUT = Fixture.Build<ComplexObjectComparison>()
-                .OmitAutoProperties()
-                .Create()
+            SUT = new ComplexObjectComparison(ignoreUnmatchedProperties, ignoredProperties, mappedProperties)
         );
 
         "And a Comparison context object".x(() =>
-            Context = new ComparisonContext(new BreadcrumbPair("Property"))
+            context = new ComparisonContext(inner, new BreadcrumbPair("Property"))
         );
     }
 
@@ -71,33 +69,27 @@ public class ComplexObjectComparisonTests
         ComparisonResult expected
     )
     {
-        SetUp();
-
-        "And IgnoreUnmatchedProperties is set to {0}".x(() =>
-            SUT.IgnoreUnmatchedProperties = ignoreUnmatchedProperties
-        );
+        SetUp(ignoreUnmatchedProperties);
 
         "When calling Compare".x(() =>
         {
-			var (result, context) = SUT.Compare(Context, leftValue, rightValue);
-            Result = result;
-            Context = context;
+            (result, context) = SUT.Compare(context, leftValue, rightValue);
         });
 
         "It should return {3}".x(() =>
-            Result.ShouldBe(expected)
+            result.ShouldBe(expected)
         );
 
         if (expected == ComparisonResult.Fail)
         {
             "And it should add a difference to the context".x(() =>
-                Context.Differences.Count.ShouldBe(1)
+                context.Differences.Count.ShouldBe(1)
             );
         }
         else
         {
             "And there should be no differences in the context".x(() =>
-                Context.Differences.Count.ShouldBe(0)
+                context.Differences.Count.ShouldBe(0)
             );
         }
 
@@ -116,7 +108,7 @@ public class ComplexObjectComparisonTests
                 var v1 = p1.GetValue(leftValue);
                 var v2 = p2.GetValue(rightValue);
 
-                Inner.CompareCalls.ShouldContain(call =>
+                inner.CompareCalls.ShouldContain(call =>
                     call.context.Breadcrumb.Left == "Property." + p1.Name &&
                     call.context.Breadcrumb.Right == "Property." + p1.Name &&
                     call.leftValue.Equals(v1) &&
@@ -135,15 +127,15 @@ public class ComplexObjectComparisonTests
         SetUp();
 
         "And the IgnoreMe property is ignored".x(() =>
-            SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+            ignoredProperties.Add((property) => property.LeftName == "IgnoreMe")
         );
 
         "And leftValue is provided".x(() =>
             leftValue = new A
             {
-                X = Fixture.Create<string>(),
-                Y = Fixture.Create<string>(),
-                IgnoreMe = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                Y = fixture.Create<string>(),
+                IgnoreMe = fixture.Create<string>()
             }
         );
 
@@ -156,11 +148,11 @@ public class ComplexObjectComparisonTests
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -173,15 +165,15 @@ public class ComplexObjectComparisonTests
         SetUp();
 
         "And the IgnoreMe property is ignored".x(() =>
-            SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+            ignoredProperties.Add((property) => property.LeftName == "IgnoreMe")
         );
 
         "And leftValue is a MyClass instance".x(() =>
             leftValue = new A
             {
-                X = Fixture.Create<string>(),
-                Y = Fixture.Create<string>(),
-                IgnoreMe = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                Y = fixture.Create<string>(),
+                IgnoreMe = fixture.Create<string>()
             }
         );
 
@@ -190,16 +182,16 @@ public class ComplexObjectComparisonTests
             {
                 leftValue.X,
                 leftValue.Y,
-                IgnoreMe = Fixture.Create<string>()
+                IgnoreMe = fixture.Create<string>()
             }
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -212,16 +204,15 @@ public class ComplexObjectComparisonTests
         SetUp();
 
         "And the IgnoreMe property is ignored".x(() =>
-            SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+            ignoredProperties.Add((property) => property.LeftName == "IgnoreMe")
         );
 
         "And rightValue".x(() =>
-            rightValue = new
-        A
+            rightValue = new A
             {
-                X = Fixture.Create<string>(),
-                Y = Fixture.Create<string>(),
-                IgnoreMe = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                Y = fixture.Create<string>(),
+                IgnoreMe = fixture.Create<string>()
             });
 
         "And leftValue is equivalent to rightValue".x(() =>
@@ -233,11 +224,11 @@ public class ComplexObjectComparisonTests
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -250,15 +241,15 @@ public class ComplexObjectComparisonTests
         SetUp();
 
         "And the IgnoreMe property is ignored".x(() =>
-            SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+            ignoredProperties.Add((property) => property.LeftName == "IgnoreMe")
         );
 
         "And rightValue".x(() =>
             rightValue = new A
             {
-                X = Fixture.Create<string>(),
-                Y = Fixture.Create<string>(),
-                IgnoreMe = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                Y = fixture.Create<string>(),
+                IgnoreMe = fixture.Create<string>()
             }
         );
 
@@ -267,16 +258,16 @@ public class ComplexObjectComparisonTests
                 {
                     rightValue.X,
                     rightValue.Y,
-                    IgnoreMe = Fixture.Create<string>()
+                    IgnoreMe = fixture.Create<string>()
                 }
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -289,15 +280,15 @@ public class ComplexObjectComparisonTests
         SetUp();
 
         "And the IgnoreMe property is ignored".x(() =>
-            SUT.IgnoreProperty<A>(x => x.IgnoreMe)
+            ignoredProperties.Add((property) => property.LeftName == "IgnoreMe")
         );
 
         "And leftValue".x(() =>
             leftValue = new B
             {
-                X = Fixture.Create<string>(),
-                Y = Fixture.Create<string>(),
-                IgnoreMe = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                Y = fixture.Create<string>(),
+                IgnoreMe = fixture.Create<string>()
             }
         );
 
@@ -306,16 +297,16 @@ public class ComplexObjectComparisonTests
                 {
                     leftValue.X,
                     leftValue.Y,
-                    IgnoreMe = Fixture.Create<string>()
+                    IgnoreMe = fixture.Create<string>()
                 }
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -334,11 +325,11 @@ public class ComplexObjectComparisonTests
         });
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -353,8 +344,8 @@ public class ComplexObjectComparisonTests
         "And leftValue is provided".x(() =>
             leftValue = new C
             {
-                X = Fixture.Create<string>(),
-                SetOnly = Fixture.Create<string>()
+                X = fixture.Create<string>(),
+                SetOnly = fixture.Create<string>()
             }
         );
 
@@ -367,11 +358,11 @@ public class ComplexObjectComparisonTests
         );
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 
@@ -400,11 +391,11 @@ public class ComplexObjectComparisonTests
         });
 
         "When comparing the 2 values".x(() =>
-            (Result, _) = ((ComparisonResult, IComparisonContext)) SUT.Compare(Context, rightValue, rightValue)
+            (result, _) = SUT.Compare(context, rightValue, rightValue)
         );
 
         "Then it should return a Pass".x(() =>
-            Result.ShouldBe(ComparisonResult.Pass)
+            result.ShouldBe(ComparisonResult.Pass)
         );
     }
 

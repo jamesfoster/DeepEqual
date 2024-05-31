@@ -85,15 +85,6 @@ public class CompareSyntax<TLeft, TRight> : IComparisonBuilder<CompareSyntax<TLe
     }
 
     [Pure]
-    public CompareSyntax<TLeft, TRight> WithCustomComparison(
-        Func<IComparison, IComparison> comparison
-    )
-    {
-        Builder.WithCustomComparison(comparison);
-        return this;
-    }
-
-    [Pure]
     public CompareSyntax<TLeft, TRight> WithCustomFormatter<TDifference>(
         IDifferenceFormatter formatter
     )

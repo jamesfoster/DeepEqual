@@ -27,25 +27,31 @@ DeepEqual.ComparisonBuilder.ExposeInternalsOf(params System.Type![]! types) -> D
 DeepEqual.ComparisonBuilder.ExposeInternalsOf<T>() -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.GetFormatterFactory() -> DeepEqual.Formatting.IDifferenceFormatterFactory!
 DeepEqual.ComparisonBuilder.IgnoreCircularReferences() -> DeepEqual.ComparisonBuilder!
-DeepEqual.ComparisonBuilder.IgnoreProperty(System.Func<DeepEqual.PropertyPair!, bool>! func) -> DeepEqual.ComparisonBuilder!
+DeepEqual.ComparisonBuilder.IgnoreProperty(System.Func<DeepEqual.PropertyPair!, bool>! predicate) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.IgnoreProperty<T>(System.Linq.Expressions.Expression<System.Func<T, object?>!>! property) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.IgnorePropertyIfMissing<T>(System.Linq.Expressions.Expression<System.Func<T, object?>!>! property) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.IgnoreUnmatchedProperties() -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.MapProperty<A, B>(System.Linq.Expressions.Expression<System.Func<A, object?>!>! left, System.Linq.Expressions.Expression<System.Func<B, object?>!>! right) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.SkipDefault<T>() -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.WithCustomComparison(DeepEqual.IComparison! comparison) -> DeepEqual.ComparisonBuilder!
-DeepEqual.ComparisonBuilder.WithCustomComparison(System.Func<DeepEqual.IComparison!, DeepEqual.IComparison!>! ctor) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.WithCustomFormatter<TDifference>(DeepEqual.Formatting.IDifferenceFormatter! formatter) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonBuilder.WithFloatingPointTolerance(double doubleTolerance = 1E-15, float singleTolerance = 1E-06) -> DeepEqual.ComparisonBuilder!
 DeepEqual.ComparisonContext
 DeepEqual.ComparisonContext.AddDifference(DeepEqual.Difference! difference) -> DeepEqual.IComparisonContext!
 DeepEqual.ComparisonContext.Breadcrumb.get -> DeepEqual.BreadcrumbPair!
-DeepEqual.ComparisonContext.ComparisonContext() -> void
-DeepEqual.ComparisonContext.ComparisonContext(DeepEqual.BreadcrumbPair! breadcrumb) -> void
-DeepEqual.ComparisonContext.ComparisonContext(System.Collections.Immutable.ImmutableList<DeepEqual.Difference!>! differences, DeepEqual.BreadcrumbPair! breadcrumb) -> void
+DeepEqual.ComparisonContext.CanCompare(System.Type! left, System.Type! right) -> bool
+DeepEqual.ComparisonContext.Compare(object? left, object? right) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
+DeepEqual.ComparisonContext.ComparisonContext(DeepEqual.IComparison! rootComparison) -> void
+DeepEqual.ComparisonContext.ComparisonContext(DeepEqual.IComparison! rootComparison, DeepEqual.BreadcrumbPair! breadcrumb) -> void
+DeepEqual.ComparisonContext.ComparisonContext(DeepEqual.IComparison! rootComparison, System.Collections.Immutable.ImmutableList<DeepEqual.Difference!>! differences, DeepEqual.BreadcrumbPair! breadcrumb) -> void
 DeepEqual.ComparisonContext.Differences.get -> System.Collections.Immutable.ImmutableList<DeepEqual.Difference!>!
+DeepEqual.ComparisonContext.NewEmptyContext() -> DeepEqual.IComparisonContext!
+DeepEqual.ComparisonContext.RootComparison.get -> DeepEqual.IComparison!
 DeepEqual.ComparisonContext.SetBreadcrumb(DeepEqual.BreadcrumbPair! breadcrumb) -> DeepEqual.IComparisonContext!
 DeepEqual.ComparisonContextExtensions
+DeepEqual.ComparisonExtensions
+DeepEqual.ComparisonNotFoundException
+DeepEqual.ComparisonNotFoundException.ComparisonNotFoundException(string! message) -> void
 DeepEqual.ComparisonResult
 DeepEqual.ComparisonResult.Fail = 2 -> DeepEqual.ComparisonResult
 DeepEqual.ComparisonResult.Inconclusive = 0 -> DeepEqual.ComparisonResult
@@ -53,48 +59,42 @@ DeepEqual.ComparisonResult.Pass = 1 -> DeepEqual.ComparisonResult
 DeepEqual.ComparisonResultExtensions
 DeepEqual.ComplexObjectComparer
 DeepEqual.ComplexObjectComparer.CompareObjects(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult, DeepEqual.IComparisonContext!)
-DeepEqual.ComplexObjectComparer.ComplexObjectComparer(DeepEqual.IComparison! inner, bool ignoreUnmatchedProperties, System.Collections.Generic.List<System.Func<DeepEqual.PropertyPair!, bool>!>! ignoredProperties, System.Collections.Generic.List<System.Func<System.Type!, System.Type!, string!, string?>!>! mappedProperties) -> void
+DeepEqual.ComplexObjectComparer.ComplexObjectComparer(bool ignoreUnmatchedProperties, System.Collections.Generic.IReadOnlyList<System.Func<DeepEqual.PropertyPair!, bool>!>! ignoredProperties, System.Collections.Generic.IReadOnlyList<System.Func<System.Type!, System.Type!, string!, string?>!>! mappedProperties) -> void
 DeepEqual.ComplexObjectComparison
-DeepEqual.ComplexObjectComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.ComplexObjectComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.ComplexObjectComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.ComplexObjectComparison.ComplexObjectComparison(DeepEqual.IComparison! inner) -> void
-DeepEqual.ComplexObjectComparison.IgnoreProperty(System.Func<DeepEqual.PropertyPair!, bool>! item) -> void
-DeepEqual.ComplexObjectComparison.IgnoreProperty<T>(System.Linq.Expressions.Expression<System.Func<T, object?>!>! property) -> void
-DeepEqual.ComplexObjectComparison.IgnorePropertyIfMissing<T>(System.Linq.Expressions.Expression<System.Func<T, object?>!>! property) -> void
-DeepEqual.ComplexObjectComparison.MapProperty<A, B>(System.Linq.Expressions.Expression<System.Func<A, object?>!>! left, System.Linq.Expressions.Expression<System.Func<B, object?>!>! right) -> void
+DeepEqual.ComplexObjectComparison.ComplexObjectComparison(bool ignoreUnmatchedProperties, System.Collections.Generic.List<System.Func<DeepEqual.PropertyPair!, bool>!>! ignoredProperties, System.Collections.Generic.List<System.Func<System.Type!, System.Type!, string!, string?>!>! mappedProperties) -> void
 DeepEqual.CompositeComparison
 DeepEqual.CompositeComparison.Add(DeepEqual.IComparison! comparison) -> void
 DeepEqual.CompositeComparison.AddRange(params DeepEqual.IComparison![]! comparisons) -> void
-DeepEqual.CompositeComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.CompositeComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.CompositeComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
 DeepEqual.CompositeComparison.CompositeComparison() -> void
 DeepEqual.CompositeComparison.CompositeComparison(System.Collections.Generic.IEnumerable<DeepEqual.IComparison!>! comparisons) -> void
 DeepEqual.CycleGuard
-DeepEqual.CycleGuard.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.CycleGuard.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.CycleGuard.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.CycleGuard.CycleGuard(DeepEqual.IComparison! inner) -> void
-DeepEqual.CycleGuard.IgnoreCircularReferences() -> void
+DeepEqual.CycleGuard.CycleGuard(bool ignoreCircularReferences, DeepEqual.IComparison! inner) -> void
 DeepEqual.DefaultComparison
-DeepEqual.DefaultComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.DefaultComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.DefaultComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.DefaultComparison.DefaultComparison() -> void
-DeepEqual.DefaultComparison.Skip<T>() -> void
+DeepEqual.DefaultComparison.DefaultComparison(System.Collections.Generic.List<System.Type!>! skippedTypes) -> void
 DeepEqual.DictionaryComparison
-DeepEqual.DictionaryComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.DictionaryComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.DictionaryComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.DictionaryComparison.DictionaryComparison(DeepEqual.IComparison! keyComparer, DeepEqual.IComparison! valueComparer) -> void
+DeepEqual.DictionaryComparison.DictionaryComparison(DeepEqual.IComparison! keyComparer) -> void
 DeepEqual.Difference
 DeepEqual.Difference.Breadcrumb.get -> DeepEqual.BreadcrumbPair!
 DeepEqual.Difference.Breadcrumb.init -> void
 DeepEqual.Difference.Difference(DeepEqual.BreadcrumbPair! Breadcrumb) -> void
 DeepEqual.EnumComparison
-DeepEqual.EnumComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.EnumComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.EnumComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
 DeepEqual.EnumComparison.EnumComparison() -> void
 DeepEqual.ExpectedMissingProperty
 DeepEqual.ExpectedMissingProperty.ExpectedMissingProperty(string! message) -> void
 DeepEqual.FloatComparison
-DeepEqual.FloatComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.FloatComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.FloatComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
 DeepEqual.FloatComparison.FloatComparison(double doubleTolerance, float singleTolerance) -> void
 DeepEqual.Formatting.BasicDifferenceFormatter
@@ -120,7 +120,7 @@ DeepEqual.Formatting.SetDifferenceFormatter
 DeepEqual.Formatting.SetDifferenceFormatter.Format(DeepEqual.Difference! difference) -> string!
 DeepEqual.Formatting.SetDifferenceFormatter.SetDifferenceFormatter() -> void
 DeepEqual.IComparison
-DeepEqual.IComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.IComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.IComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
 DeepEqual.IComparisonBuilder<TBuilder>
 DeepEqual.IComparisonBuilder<TBuilder>.Create() -> DeepEqual.IComparison!
@@ -135,19 +135,20 @@ DeepEqual.IComparisonBuilder<TBuilder>.IgnoreUnmatchedProperties() -> TBuilder
 DeepEqual.IComparisonBuilder<TBuilder>.MapProperty<A, B>(System.Linq.Expressions.Expression<System.Func<A, object?>!>! left, System.Linq.Expressions.Expression<System.Func<B, object?>!>! right) -> TBuilder
 DeepEqual.IComparisonBuilder<TBuilder>.SkipDefault<T>() -> TBuilder
 DeepEqual.IComparisonBuilder<TBuilder>.WithCustomComparison(DeepEqual.IComparison! comparison) -> TBuilder
-DeepEqual.IComparisonBuilder<TBuilder>.WithCustomComparison(System.Func<DeepEqual.IComparison!, DeepEqual.IComparison!>! comparison) -> TBuilder
 DeepEqual.IComparisonBuilder<TBuilder>.WithCustomFormatter<TDifference>(DeepEqual.Formatting.IDifferenceFormatter! formatter) -> TBuilder
 DeepEqual.IComparisonBuilder<TBuilder>.WithFloatingPointTolerance(double doubleTolerance = 1E-15, float singleTolerance = 1E-06) -> TBuilder
 DeepEqual.IComparisonContext
 DeepEqual.IComparisonContext.AddDifference(DeepEqual.Difference! difference) -> DeepEqual.IComparisonContext!
 DeepEqual.IComparisonContext.Breadcrumb.get -> DeepEqual.BreadcrumbPair!
+DeepEqual.IComparisonContext.CanCompare(System.Type! left, System.Type! right) -> bool
+DeepEqual.IComparisonContext.Compare(object? left, object? right) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
 DeepEqual.IComparisonContext.Differences.get -> System.Collections.Immutable.ImmutableList<DeepEqual.Difference!>!
+DeepEqual.IComparisonContext.NewEmptyContext() -> DeepEqual.IComparisonContext!
 DeepEqual.IComparisonContext.SetBreadcrumb(DeepEqual.BreadcrumbPair! breadcrumb) -> DeepEqual.IComparisonContext!
 DeepEqual.ListComparison
-DeepEqual.ListComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.ListComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.ListComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.ListComparison.Inner.get -> DeepEqual.IComparison!
-DeepEqual.ListComparison.ListComparison(DeepEqual.IComparison! inner) -> void
+DeepEqual.ListComparison.ListComparison() -> void
 DeepEqual.MissingEntryDifference
 DeepEqual.MissingEntryDifference.Key.get -> object!
 DeepEqual.MissingEntryDifference.Key.init -> void
@@ -183,11 +184,9 @@ DeepEqual.PropertyReader.Read.get -> System.Func<object!, object?>!
 DeepEqual.PropertyReader.Read.init -> void
 DeepEqual.ReflectionCache
 DeepEqual.SetComparison
-DeepEqual.SetComparison.CanCompare(System.Type! leftType, System.Type! rightType) -> bool
+DeepEqual.SetComparison.CanCompare(DeepEqual.IComparisonContext! context, System.Type! leftType, System.Type! rightType) -> bool
 DeepEqual.SetComparison.Compare(DeepEqual.IComparisonContext! context, object? leftValue, object? rightValue) -> (DeepEqual.ComparisonResult result, DeepEqual.IComparisonContext! context)
-DeepEqual.SetComparison.Inner.get -> DeepEqual.IComparison!
-DeepEqual.SetComparison.Inner.set -> void
-DeepEqual.SetComparison.SetComparison(DeepEqual.IComparison! inner) -> void
+DeepEqual.SetComparison.SetComparison() -> void
 DeepEqual.SetDifference
 DeepEqual.SetDifference.MissingInLeft.get -> System.Collections.Immutable.ImmutableList<object!>!
 DeepEqual.SetDifference.MissingInLeft.init -> void
@@ -215,7 +214,6 @@ DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.Right.get -> TRight
 DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.Right.set -> void
 DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.SkipDefault<T>() -> DeepEqual.Syntax.CompareSyntax<TLeft, TRight>!
 DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.WithCustomComparison(DeepEqual.IComparison! comparison) -> DeepEqual.Syntax.CompareSyntax<TLeft, TRight>!
-DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.WithCustomComparison(System.Func<DeepEqual.IComparison!, DeepEqual.IComparison!>! comparison) -> DeepEqual.Syntax.CompareSyntax<TLeft, TRight>!
 DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.WithCustomFormatter<TDifference>(DeepEqual.Formatting.IDifferenceFormatter! formatter) -> DeepEqual.Syntax.CompareSyntax<TLeft, TRight>!
 DeepEqual.Syntax.CompareSyntax<TLeft, TRight>.WithFloatingPointTolerance(double doubleTolerance = 1E-15, float singleTolerance = 1E-06) -> DeepEqual.Syntax.CompareSyntax<TLeft, TRight>!
 DeepEqual.Syntax.DeepEqualException
@@ -233,6 +231,7 @@ static DeepEqual.ComparisonContextExtensions.VisitingIndex(this DeepEqual.ICompa
 static DeepEqual.ComparisonContextExtensions.VisitingIndex(this DeepEqual.IComparisonContext! context, object? leftIndex, object? rightIndex) -> DeepEqual.IComparisonContext!
 static DeepEqual.ComparisonContextExtensions.VisitingProperty(this DeepEqual.IComparisonContext! context, string! propertyName) -> DeepEqual.IComparisonContext!
 static DeepEqual.ComparisonContextExtensions.VisitingProperty(this DeepEqual.IComparisonContext! context, string? leftPropertyName, string? rightPropertyName) -> DeepEqual.IComparisonContext!
+static DeepEqual.ComparisonExtensions.OfType<T>(this DeepEqual.IComparison! source) -> T!
 static DeepEqual.ComparisonResultExtensions.Plus(this DeepEqual.ComparisonResult result, DeepEqual.ComparisonResult other) -> DeepEqual.ComparisonResult
 static DeepEqual.ComparisonResultExtensions.ToResult(this System.Collections.Generic.IEnumerable<DeepEqual.ComparisonResult>! results) -> DeepEqual.ComparisonResult
 static DeepEqual.ReflectionCache.CachePrivatePropertiesOfTypes(System.Collections.Generic.IEnumerable<System.Type!>! types) -> void
