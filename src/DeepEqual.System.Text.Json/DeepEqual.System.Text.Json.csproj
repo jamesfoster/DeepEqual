@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 
     <Version>6.0.0</Version>
-    <PackageVersion>6.0.0-alpha3</PackageVersion>
+    <PackageVersion>6.0.0-rc1</PackageVersion>
     <Description>An extension to DeepEqual for comparing System.Test.Json types</Description>
     <Authors>James Foster</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
