@@ -162,12 +162,9 @@ DeepEqual.MissingSide.Left = 0 -> DeepEqual.MissingSide
 DeepEqual.MissingSide.Right = 1 -> DeepEqual.MissingSide
 DeepEqual.ObjectGraphCircularReferenceException
 DeepEqual.ObjectGraphCircularReferenceException.Breadcrumb.get -> DeepEqual.BreadcrumbPair!
-DeepEqual.ObjectGraphCircularReferenceException.Breadcrumb.set -> void
-DeepEqual.ObjectGraphCircularReferenceException.ObjectGraphCircularReferenceException(string! message, DeepEqual.BreadcrumbPair! breadcrumb, object! value1, object! value2) -> void
-DeepEqual.ObjectGraphCircularReferenceException.Value1.get -> object!
-DeepEqual.ObjectGraphCircularReferenceException.Value1.set -> void
-DeepEqual.ObjectGraphCircularReferenceException.Value2.get -> object!
-DeepEqual.ObjectGraphCircularReferenceException.Value2.set -> void
+DeepEqual.ObjectGraphCircularReferenceException.ObjectGraphCircularReferenceException(string! message, DeepEqual.BreadcrumbPair! breadcrumb, object? left, object? right) -> void
+DeepEqual.ObjectGraphCircularReferenceException.Left.get -> object?
+DeepEqual.ObjectGraphCircularReferenceException.Right.get -> object?
 DeepEqual.PropertyPair
 DeepEqual.PropertyPair.Left.get -> DeepEqual.PropertyReader?
 DeepEqual.PropertyPair.LeftName.get -> string!

@@ -50,6 +50,14 @@ public class ObjectsWithCyclicalReferences
         builder.Compare().ShouldBe(true);
     }
 
+    [Fact]
+    public void Null_compared_to_non_null_cycle_is_not_equal()
+    {
+        expected.Parent = null;
+
+        DeepAssert.AreNotEqual(actual, expected);
+    }
+
     public class Data
     {
         public string Name { get; set; }

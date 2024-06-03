@@ -18,20 +18,13 @@ public class CycleGuard(bool ignoreCircularReferences, IComparison inner) : ICom
         object? rightValue
     )
     {
-        if (leftValue == null || rightValue == null)
-        {
-            return (ComparisonResult.Inconclusive, context);
-        }
-
         var previousComparisons = PreviousComparisonsForCurrentThread();
         if (previousComparisons.Count > 0)
         {
             var arr = previousComparisons.ToArray();
             foreach (var comparison in arr)
             {
-                var foundCycle =
-                    ReferenceEquals(comparison.LeftValue, leftValue)
-                    || ReferenceEquals(comparison.RightValue, rightValue);
+                var foundCycle = HasFoundCycle(comparison, leftValue, rightValue);
 
                 if (foundCycle)
                 {
@@ -51,11 +44,21 @@ public class CycleGuard(bool ignoreCircularReferences, IComparison inner) : ICom
         }
     }
 
+    private static bool HasFoundCycle(
+        ComparisonFrame comparison,
+        object? leftValue,
+        object? rightValue
+    )
+    {
+        return ReferenceEquals(comparison.LeftValue, leftValue)
+            || ReferenceEquals(comparison.RightValue, rightValue);
+    }
+
     private (ComparisonResult result, IComparisonContext context) HandleCycle(
         ComparisonFrame frame,
         IComparisonContext context,
-        object leftValue,
-        object rightValue
+        object? leftValue,
+        object? rightValue
     )
     {
         if (ignoreCircularReferences)
@@ -84,8 +87,8 @@ public class CycleGuard(bool ignoreCircularReferences, IComparison inner) : ICom
     ) ThrowCircularReferenceException(
         ComparisonFrame frame,
         IComparisonContext context,
-        object leftValue,
-        object rightValue
+        object? leftValue,
+        object? rightValue
     )
     {
         var message = $"""
@@ -115,7 +118,7 @@ public class CycleGuard(bool ignoreCircularReferences, IComparison inner) : ICom
 
     private readonly record struct ComparisonFrame(
         BreadcrumbPair Breadcrumb,
-        object LeftValue,
-        object RightValue
+        object? LeftValue,
+        object? RightValue
     );
 }
