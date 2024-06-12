@@ -26,7 +26,7 @@ left.ShouldDeepEqual(right);
 
 // or
 
-left.ShouldDeepEqual(right, comparrison);
+left.ShouldDeepEqual(right, comparison);
 ```
 
 You can pass a custom comparison as the second argument to the `ShouldDeepEqual` method to override the default behaviour. You can also customize the behaviour inline using the `WithDeepEqual` extension method.
